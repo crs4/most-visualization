@@ -3,17 +3,24 @@ package org.crs4.most.visualization.example;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import org.crs4.most.streaming.IStream;
 import org.crs4.most.streaming.StreamProperties;
+import org.crs4.most.streaming.StreamingEventBundle;
 import org.crs4.most.streaming.StreamingLib;
 import org.crs4.most.streaming.StreamingLibBackend;
 import org.crs4.most.streaming.enums.StreamProperty;
+import org.crs4.most.streaming.enums.StreamingEvent;
+import org.crs4.most.streaming.enums.StreamingEventType;
 import org.crs4.most.visualization.IStreamFragmentCommandListener;
+import org.crs4.most.visualization.StreamInspectorFragment;
+import org.crs4.most.visualization.StreamInspectorFragment.IStreamProvider;
 import org.crs4.most.visualization.StreamViewerFragment;
 
 import crs4.most.visualization.example.R;
@@ -35,7 +42,7 @@ import android.widget.RadioButton;
 
 
 
-public class StillImageExampleActivity extends ActionBarActivity implements Handler.Callback, IStreamFragmentCommandListener {
+public class StillImageExampleActivity extends ActionBarActivity implements Handler.Callback, IStreamFragmentCommandListener , IStreamProvider {
 
 private Handler handler;
 
@@ -43,6 +50,8 @@ private Handler handler;
 	
 	private IStream stream1 = null;
 	StreamViewerFragment stream1Fragment = null;
+	StreamInspectorFragment streamInspectorFragment = null;
+	
 	private String stillImageUri = null;
 	private String streamingUri = null;
 	private Timer motionTimer = null;
@@ -85,6 +94,11 @@ private Handler handler;
 	    	Log.d(TAG,"STREAM 1 INSTANCE");
 	    	// Instance the first StreamViewer fragment where to render the first stream by passing the stream name as its ID.
 	    	this.stream1Fragment = StreamViewerFragment.newInstance(stream1.getName());
+	    	
+	    	this.streamInspectorFragment = StreamInspectorFragment.newInstance();
+	    	
+	    	// Default radio button at the start
+	    	 ((RadioButton) findViewById(R.id.radio_stream)).setChecked(true);
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -96,7 +110,10 @@ private Handler handler;
 				.beginTransaction();
 		fragmentTransaction.add(R.id.container_stream_1,
 				stream1Fragment);
+		fragmentTransaction.add(R.id.container_stream_inspector, streamInspectorFragment);
 		fragmentTransaction.commit();
+		
+		
         
     }
     
@@ -164,6 +181,9 @@ private Handler handler;
     	EditText txtFrameRate = (EditText) findViewById(R.id.txt_frame_rate);
     	txtFrameRate.setEnabled(true);
     	this.stream1Fragment.setPlayerButtonsVisible(true);
+    	
+    	// pause the stream
+    	this.stream1.pause();
     	this.currentMode = StreamMode.MOTION_JPEG;
     }
     
@@ -244,9 +264,28 @@ private Handler handler;
 
 
 	@Override
-	public boolean handleMessage(Message msg) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean handleMessage(Message streamingMessage) {
+		// The bundle containing all available informations and resources about the incoming event
+				StreamingEventBundle myEvent = (StreamingEventBundle) streamingMessage.obj;
+				
+				String infoMsg ="Event Type:" +  myEvent.getEventType() + " ->" +  myEvent.getEvent() + ":" + myEvent.getInfo();
+				Log.d(TAG, "handleMessage: Current Event:" + infoMsg);
+				
+				
+				
+				// for simplicity, in this example we only handle events of type STREAM_EVENT
+				if (myEvent.getEventType()==StreamingEventType.STREAM_EVENT)
+					if (myEvent.getEvent()== StreamingEvent.STREAM_STATE_CHANGED || myEvent.getEvent()== StreamingEvent.STREAM_ERROR)
+					{
+					    // All events of type STREAM_EVENT provide a reference to the stream that triggered it.
+					    // In this case we are handling two streams, so we need to check what stream triggered the event.
+					    // Note that we are only interested to the new state of the stream
+						IStream stream  =  (IStream) myEvent.getData();
+					   
+						// notify the stream inspector about the state chanced for refresh the informations
+						this.streamInspectorFragment.updateStreamStateInfo(stream);
+					}
+				return false;
 	}
 
 
@@ -281,9 +320,15 @@ private Handler handler;
 		
 	}
 
-
 	@Override
 	public void onSurfaceViewDestroyed(String streamId) {
 		this.stream1.destroy();
+	}
+
+	@Override
+	public List<IStream> getStreams() {
+		 List<IStream> streams = new ArrayList<IStream>();
+		 streams.add(this.stream1);
+		return streams;
 	}
 }
