@@ -5,5 +5,5 @@
     <string name="stream_mode">Streaming Mode</string>
     <string name="still_image_mode">Still Image Mode</string>
     <string name="motion_jpeg_mode">Motion JPEG Mode</string>
-    <string name="action_settings">Settings</string>
+    <string name="mnu_exit">Exit</string>
 </resources>

@@ -1,6 +1,5 @@
 package org.crs4.most.visualization;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.crs4.most.streaming.IStream;
@@ -14,7 +13,6 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
@@ -22,16 +20,26 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.TextView;
 
 
 public class StreamInspectorFragment extends Fragment {
 	
 	public interface IStreamProvider {
 		
+		/**
+		 * Provide the list of the streams to show in the inspector
+		 * @return
+		 */
 		public List<IStream> getStreams();
+
+		/**
+		 * Provide the list of properties to show for each stream (provide null for showing all fields)
+		 * @return
+		 */
+		public List<StreamProperty> getStreamProperties();
 	}
 	
 	 
@@ -94,16 +102,37 @@ public class StreamInspectorFragment extends Fragment {
 	    	}
 	    	this.streamsArrayAdapter.notifyDataSetChanged();
 	    }
-	 	
+	 
+	 private void filterHeaderView(List<StreamProperty> streamProperties, ViewGroup header)
+	 {
+		 if (streamProperties!=null)
+	    	{
+	    		if (!streamProperties.contains(StreamProperty.NAME))
+	    				{header.getChildAt(0).setVisibility(View.GONE);}
+	    		if (!streamProperties.contains(StreamProperty.URI))
+						{header.getChildAt(1).setVisibility(View.GONE);}
+	    		if (!streamProperties.contains(StreamProperty.VIDEO_SIZE))
+					{header.getChildAt(2).setVisibility(View.GONE);}
+	    		if (!streamProperties.contains(StreamProperty.LATENCY))
+					{header.getChildAt(3).setVisibility(View.GONE);}
+	    		if (!streamProperties.contains(StreamProperty.STATE))
+					{header.getChildAt(4).setVisibility(View.GONE);}
+	    
+	    	}
+	 }
 	 private void setupStreamsListView()
 	    {
 	    		this.streamsArray = this.streamProvider.getStreams();
+	    		List<StreamProperty> streamProperties = this.streamProvider.getStreamProperties();
 	    		
-	    		
-	            this.streamsArrayAdapter = new IStreamArrayAdapter(getActivity(), R.layout.istream_row, this.streamsArray);
-	            
+	            this.streamsArrayAdapter = new IStreamArrayAdapter(getActivity(), R.layout.istream_row, this.streamsArray, streamProperties);
+	           
 	            LayoutInflater inflater = getActivity().getLayoutInflater();
+	            
 	            ViewGroup header = (ViewGroup)inflater.inflate(R.layout.istream_header, streamsView, false);
+	            
+	            this.filterHeaderView(streamProperties,header);
+	            
 	            streamsView.addHeaderView(header, null, false);
 	            
 	            streamsView.setAdapter(this.streamsArrayAdapter);
@@ -131,10 +160,10 @@ public class StreamInspectorFragment extends Fragment {
 						
 						
 						final EditText txtUri = (EditText) dialog.findViewById(R.id.editUri);
-						final String currentUri =  selectedStream.getProperty(StreamProperty.URI);
+						final String currentUri =  selectedStream.getProperty(StreamProperty.URI).toString();
 						txtUri.setText(currentUri);
 						final EditText txtLatency = (EditText) dialog.findViewById(R.id.editLatency);
-						final String currentLatency = selectedStream.getProperty(StreamProperty.LATENCY);
+						final String currentLatency = selectedStream.getProperty(StreamProperty.LATENCY).toString();
 						txtLatency.setText(currentLatency);
 						
 						Button butOk = (Button) dialog.findViewById(R.id.button_ok);

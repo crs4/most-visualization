@@ -20,6 +20,8 @@ import org.crs4.most.streaming.enums.StreamState;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.opengl.Visibility;
+import android.util.Property;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,10 +29,13 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 public class IStreamArrayAdapter extends ArrayAdapter<IStream> {
-
+   
+	private List<StreamProperty> streamProperties = null;
+	
     public IStreamArrayAdapter(Context context, int textViewResourceId,
-                 List<IStream> objects) {
+                 List<IStream> objects, List<StreamProperty> streamProperties) {
         super(context, textViewResourceId, objects);
+        this.streamProperties = streamProperties;
     }
 
     @Override
@@ -57,9 +62,9 @@ public class IStreamArrayAdapter extends ArrayAdapter<IStream> {
         }
         IStream myStream = getItem(position);
         viewHolder.name.setText(myStream.getName());
-        viewHolder.uri.setText(myStream.getProperty(StreamProperty.URI));
-        if (myStream.getVideoSize()!=null)
-        	viewHolder.videoSize.setText(myStream.getVideoSize().toString());
+        viewHolder.uri.setText(myStream.getProperty(StreamProperty.URI).toString());
+        if (myStream.getProperty(StreamProperty.VIDEO_SIZE)!=null)
+        	viewHolder.videoSize.setText(myStream.getProperty(StreamProperty.VIDEO_SIZE).toString());
         else
         	viewHolder.videoSize.setText("n.a");
         viewHolder.latency.setText("" + myStream.getProperty(StreamProperty.LATENCY)+ " ms");
@@ -71,9 +76,28 @@ public class IStreamArrayAdapter extends ArrayAdapter<IStream> {
         else
         	viewHolder.status.setBackgroundColor(Color.GREEN);
         
+        this.filterViewColumns(viewHolder);
+        
         return convertView;
     }
-
+    
+    private void filterViewColumns(ViewHolder viewHolder)
+    {
+    	if (this.streamProperties!=null)
+    	{
+    		if (!this.streamProperties.contains(StreamProperty.NAME))
+    				{ viewHolder.name.setVisibility(View.GONE);}
+    		if (!this.streamProperties.contains(StreamProperty.URI))
+					{ viewHolder.uri.setVisibility(View.GONE);}
+    		if (!this.streamProperties.contains(StreamProperty.VIDEO_SIZE))
+			{ viewHolder.videoSize.setVisibility(View.GONE);}
+    		if (!this.streamProperties.contains(StreamProperty.LATENCY))
+			{ viewHolder.latency.setVisibility(View.GONE);}
+    		if (!this.streamProperties.contains(StreamProperty.STATE))
+			{ viewHolder.videoSize.setVisibility(View.GONE);}
+    	}
+    }
+    
     private class ViewHolder {
         public TextView name;
         public TextView uri;

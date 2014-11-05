@@ -16,6 +16,7 @@ import org.crs4.most.streaming.StreamingEventBundle;
 import org.crs4.most.streaming.StreamingLib;
 import org.crs4.most.streaming.StreamingLibBackend;
 import org.crs4.most.streaming.enums.StreamProperty;
+import org.crs4.most.streaming.enums.StreamState;
 import org.crs4.most.streaming.enums.StreamingEvent;
 import org.crs4.most.streaming.enums.StreamingEventType;
 import org.crs4.most.visualization.IStreamFragmentCommandListener;
@@ -43,8 +44,11 @@ import android.widget.RadioButton;
 
 
 public class StillImageExampleActivity extends ActionBarActivity implements Handler.Callback, IStreamFragmentCommandListener , IStreamProvider {
-
-private Handler handler;
+	
+	private boolean exitFromAppRequest = false;
+	//ID for the menu exit option
+    private final int ID_MENU_EXIT = 1;
+    private Handler handler;
 
 	private static String TAG="StillImageExample";
 	
@@ -244,24 +248,35 @@ private Handler handler;
  }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+	 	//get the MenuItem reference
+	 MenuItem item = 
+	    	menu.add(Menu.NONE,ID_MENU_EXIT,Menu.NONE,R.string.mnu_exit);
+	 return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+    	//check selected menu item
+    	if(item.getItemId() == ID_MENU_EXIT)
+    	{
+    		exitFromApp();
+    		return true;
+    	}
+    	return false;
     }
-
+    
+    private void exitFromApp() {
+		this.exitFromAppRequest = true;
+		if (this.stream1!=null)
+		{
+			this.stream1.destroy();
+		}
+		else
+			this.finish();
+	}
 
 	@Override
 	public boolean handleMessage(Message streamingMessage) {
@@ -277,6 +292,12 @@ private Handler handler;
 				if (myEvent.getEventType()==StreamingEventType.STREAM_EVENT)
 					if (myEvent.getEvent()== StreamingEvent.STREAM_STATE_CHANGED || myEvent.getEvent()== StreamingEvent.STREAM_ERROR)
 					{
+						if (this.stream1.getState()==StreamState.DEINITIALIZED && this.exitFromAppRequest)
+						{
+							Log.d(TAG,"Stream deinitialized. Exiting from app.");
+							this.finish();
+						}
+						
 					    // All events of type STREAM_EVENT provide a reference to the stream that triggered it.
 					    // In this case we are handling two streams, so we need to check what stream triggered the event.
 					    // Note that we are only interested to the new state of the stream
@@ -284,6 +305,7 @@ private Handler handler;
 					   
 						// notify the stream inspector about the state chanced for refresh the informations
 						this.streamInspectorFragment.updateStreamStateInfo(stream);
+					    
 					}
 				return false;
 	}
@@ -330,5 +352,15 @@ private Handler handler;
 		 List<IStream> streams = new ArrayList<IStream>();
 		 streams.add(this.stream1);
 		return streams;
+	}
+
+	@Override
+	public List<StreamProperty> getStreamProperties() {
+		ArrayList<StreamProperty> streamProps = new ArrayList<StreamProperty>();
+		//streamProps.add(StreamProperty.LATENCY);
+		streamProps.add(StreamProperty.NAME);
+		streamProps.add(StreamProperty.URI);
+		streamProps.add(StreamProperty.STATE);
+		return streamProps;
 	}
 }
