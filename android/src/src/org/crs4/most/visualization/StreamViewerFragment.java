@@ -11,6 +11,10 @@ package org.crs4.most.visualization;
 
 
 
+ 
+
+import org.crs4.most.streaming.IStream;
+
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.Fragment;
@@ -21,6 +25,11 @@ import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 
+/**
+ * This fragment represents a visual container for an {@link IStream}. It can be attached to any Activity, provided that it implements the {@link IStreamFragmentCommandListener} interface.
+ * This fragment contains a surface where to render the stream along with two image buttons that you can optionally use for sending play or pause stream requests to the attached activity 
+ *
+ */
 public class StreamViewerFragment extends Fragment {
 	 
 	 public static final String FRAGMENT_STREAM_ID_KEY = "stream_fragment_stream_id_key";
@@ -28,6 +37,11 @@ public class StreamViewerFragment extends Fragment {
 	 private IStreamFragmentCommandListener cmdListener = null;
 	 private SurfaceView surfaceView = null;
 	 
+	 /**
+	  * Intances a new StreamViewerFragment
+	  * @param streamId the id of the stream to render
+	  * @return a new StreamViewerFragment instance
+	  */
 	 public static  StreamViewerFragment newInstance(String streamId) {
 		 StreamViewerFragment sf = new StreamViewerFragment();
 
@@ -55,8 +69,11 @@ public class StreamViewerFragment extends Fragment {
 		StreamViewerFragment.this.cmdListener.onSurfaceViewCreated(getStreamId(),this.surfaceView);
 	}
 	 
-	    
+	   
 	   @Override
+	   /**
+	    * @param activity: the activity attached to this fragment: it must implement the  {@link IStreamFragmentCommandListener} interface
+	    */
 	   public void onAttach(Activity activity) {
 		   super.onAttach(activity);
 		   this.cmdListener = (IStreamFragmentCommandListener) activity;
@@ -100,7 +117,7 @@ public class StreamViewerFragment extends Fragment {
 	    
 	 /**
 	  * Set the player buttons visible or not
-	  * @param value
+	  * @param value <code>true</code> set buttons visible; <code>false</code> invisible.
 	  */
 	 public void setPlayerButtonsVisible(boolean value)
 	 {

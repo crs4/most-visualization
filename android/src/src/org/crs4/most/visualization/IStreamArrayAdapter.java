@@ -20,21 +20,26 @@ import org.crs4.most.streaming.enums.StreamState;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.opengl.Visibility;
-import android.util.Property;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-public class IStreamArrayAdapter extends ArrayAdapter<IStream> {
+class IStreamArrayAdapter extends ArrayAdapter<IStream> {
    
 	private List<StreamProperty> streamProperties = null;
 	
-    public IStreamArrayAdapter(Context context, int textViewResourceId,
+	/**
+	 * This adapter provides a way of rendering informations about a list of {@link IStream} objects.
+	 * @param context
+	 * @param viewId the view id where to render the informations about each stream
+	 * @param objects the list of {@link IStream} objects.
+	 * @param streamProperties the properties to render for each stream (a null value renders all the available properties)
+	 */
+    public IStreamArrayAdapter(Context context, int viewId,
                  List<IStream> objects, List<StreamProperty> streamProperties) {
-        super(context, textViewResourceId, objects);
+        super(context, viewId, objects);
         this.streamProperties = streamProperties;
     }
 
@@ -43,7 +48,7 @@ public class IStreamArrayAdapter extends ArrayAdapter<IStream> {
         return getViewOptimize(position, convertView, parent);
     }
 
-    public View getViewOptimize(int position, View convertView, ViewGroup parent) {
+    private View getViewOptimize(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder = null;
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) getContext()

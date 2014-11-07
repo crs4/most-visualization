@@ -22,21 +22,30 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.TextView;
 
-
+/**
+ * This fragment provides a way for visually getting real time informations about a list of {@link IStream} objects.
+ * Also, you can specify a filter for getting only the stream propertires you are interested in.
+ * You can attach this fragment to any activity, provided that it implements the {@link StreamInspectorFragment.IStreamProvider} interface.
+ *  
+ */
 public class StreamInspectorFragment extends Fragment {
 	
+	/**
+	 * 
+	 * This interface is used by the StreamInspector for getting the streams to inspect along with their properties.
+	 *
+	 */
 	public interface IStreamProvider {
 		
 		/**
-		 * Provide the list of the streams to show in the inspector
-		 * @return
+		 * Provides the list of the streams to show in the inspector
+		 * @return the list of the streams to inspect
 		 */
 		public List<IStream> getStreams();
 
 		/**
-		 * Provide the list of properties to show for each stream (provide null for showing all fields)
+		 * Provide the list of properties to show for each stream (a null value shows all properties)
 		 * @return
 		 */
 		public List<StreamProperty> getStreamProperties();
@@ -51,12 +60,17 @@ public class StreamInspectorFragment extends Fragment {
 	private ArrayAdapter<IStream> streamsArrayAdapter = null;
 	private ListView streamsView = null;
 	
+
+	/**
+	 * Provides a new istance of this fragment
+	 * @return the StreamInspectorFragment instance
+	 */
 	 public static  StreamInspectorFragment newInstance() {
 		 StreamInspectorFragment sf = new StreamInspectorFragment();
 	     return sf;
 	    }
 	 
-	 @Override
+	  @Override
 	   public void onAttach(Activity activity) {
 		   super.onAttach(activity);
 		   this.streamProvider = (IStreamProvider) activity;
@@ -78,6 +92,10 @@ public class StreamInspectorFragment extends Fragment {
 	 		this.setupStreamsListView();
 	 	}
 	 	
+	 /**
+	  * This method would be called for notifying the StreamInspectorFragment that one or more properties of the IStream (specified as argument) has been changed, 
+	  * @param stream the modified IStream object 
+	  */
 	 public void updateStreamStateInfo(IStream stream)
 	    { Log.d(TAG, "Called updateStreamStateInfo on stream");
 	    	if (stream==null)
@@ -120,6 +138,7 @@ public class StreamInspectorFragment extends Fragment {
 	    
 	    	}
 	 }
+	 
 	 private void setupStreamsListView()
 	    {
 	    		this.streamsArray = this.streamProvider.getStreams();
