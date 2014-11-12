@@ -36,7 +36,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -293,10 +292,9 @@ public class StillImageExampleActivity extends ActionBarActivity implements Hand
 				Log.d(TAG, "handleMessage: Current Event:" + infoMsg);
 				
 				
-				
 				// for simplicity, in this example we only handle events of type STREAM_EVENT
 				if (myEvent.getEventType()==StreamingEventType.STREAM_EVENT)
-					if (myEvent.getEvent()== StreamingEvent.STREAM_STATE_CHANGED || myEvent.getEvent()== StreamingEvent.STREAM_ERROR)
+					if (myEvent.getEvent()==StreamingEvent.STREAM_STATE_CHANGED || myEvent.getEvent()== StreamingEvent.STREAM_ERROR)
 					{
 						if (this.stream1.getState()==StreamState.DEINITIALIZED && this.exitFromAppRequest)
 						{

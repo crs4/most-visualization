@@ -12,16 +12,36 @@ public final class R {
     }
     public static final class drawable {
         public static int ic_launcher=0x7f020000;
+        public static int ptz_arrow_e=0x7f020001;
+        public static int ptz_arrow_n=0x7f020002;
+        public static int ptz_arrow_ne=0x7f020003;
+        public static int ptz_arrow_nw=0x7f020004;
+        public static int ptz_arrow_s=0x7f020005;
+        public static int ptz_arrow_se=0x7f020006;
+        public static int ptz_arrow_sw=0x7f020007;
+        public static int ptz_arrow_w=0x7f020008;
+        public static int ptz_arrows_in=0x7f020009;
+        public static int ptz_house=0x7f02000a;
+        public static int ptz_magnify=0x7f02000b;
     }
     public static final class id {
+        public static int but_move_E=0x7f060010;
+        public static int but_move_N=0x7f06000c;
+        public static int but_move_NE=0x7f06000d;
+        public static int but_move_NW=0x7f06000b;
+        public static int but_move_S=0x7f060012;
+        public static int but_move_SE=0x7f060013;
+        public static int but_move_SW=0x7f060011;
+        public static int but_move_W=0x7f06000e;
+        public static int but_move_home=0x7f06000f;
         public static int button_cancel=0x7f060005;
         public static int button_ok=0x7f060004;
-        public static int button_pause=0x7f06000d;
-        public static int button_play=0x7f06000c;
+        public static int button_pause=0x7f060016;
+        public static int button_play=0x7f060015;
         public static int editLatency=0x7f060003;
         public static int editUri=0x7f060002;
         public static int listStreams=0x7f060000;
-        public static int streamSurface=0x7f06000b;
+        public static int streamSurface=0x7f060014;
         public static int textLatency=0x7f060009;
         public static int textName=0x7f060006;
         public static int textSize=0x7f060008;
@@ -34,7 +54,8 @@ public final class R {
         public static int istream_listview=0x7f030001;
         public static int istream_popup_editor=0x7f030002;
         public static int istream_row=0x7f030003;
-        public static int stream_layout=0x7f030004;
+        public static int ptz_panel=0x7f030004;
+        public static int stream_layout=0x7f030005;
     }
     public static final class string {
         public static int app_name=0x7f040000;

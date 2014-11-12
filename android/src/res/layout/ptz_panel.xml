@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" 
+    android:columnCount="3"
+    android:rowCount="3"
+    >
+    
+    <ImageButton
+        android:id="@+id/but_move_NW"
+        android:layout_gravity="fill"
+        android:contentDescription="ptz_button_nw"
+        android:src="@drawable/ptz_arrow_nw"
+        />
+    
+     <ImageButton
+        android:id="@+id/but_move_N"
+        android:layout_gravity="fill"
+        android:contentDescription="ptz_button_n"
+        android:src="@drawable/ptz_arrow_n" 
+      />
+
+     <ImageButton
+        android:id="@+id/but_move_NE"
+        android:layout_gravity="fill"
+        android:contentDescription="ptz_button_ne"
+        android:src="@drawable/ptz_arrow_ne" 
+        />
+     	
+     <ImageButton
+        android:id="@+id/but_move_W"
+        android:layout_gravity="fill"
+        android:contentDescription="ptz_button_w"
+ 	    android:src="@drawable/ptz_arrow_w" 
+        />
+     
+     <ImageButton
+        android:id="@+id/but_move_home"
+        android:contentDescription="ptz_button_home"
+ 		android:src="@drawable/ptz_house" 
+ 		android:layout_gravity="fill"
+        />
+     
+     <ImageButton
+        android:id="@+id/but_move_E"
+		android:src="@drawable/ptz_arrow_e" 
+		android:contentDescription="ptz_button_e"
+		android:layout_gravity="fill"
+        />
+     
+     <ImageButton
+        android:id="@+id/but_move_SW"
+		android:src="@drawable/ptz_arrow_sw" 
+		android:contentDescription="ptz_button_sw"
+		android:layout_gravity="fill"
+        />
+     
+     <ImageButton
+        android:id="@+id/but_move_S"
+		android:src="@drawable/ptz_arrow_s"
+		android:contentDescription="ptz_button_s"
+		android:layout_gravity="fill"
+        />
+     
+      <ImageButton
+        android:id="@+id/but_move_SE"
+		android:src="@drawable/ptz_arrow_se" 
+		android:contentDescription="ptz_button_se"
+		android:layout_gravity="fill"
+        />
+
+</GridLayout>
