@@ -14,19 +14,20 @@ public final class R {
         public static int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static int button_cancel=0x7f060004;
-        public static int button_ok=0x7f060003;
-        public static int button_pause=0x7f06000c;
-        public static int button_play=0x7f06000b;
-        public static int editLatency=0x7f060002;
-        public static int editUri=0x7f060001;
+        public static int button_cancel=0x7f060005;
+        public static int button_ok=0x7f060004;
+        public static int button_pause=0x7f06000d;
+        public static int button_play=0x7f06000c;
+        public static int editLatency=0x7f060003;
+        public static int editUri=0x7f060002;
         public static int listStreams=0x7f060000;
-        public static int streamSurface=0x7f06000a;
-        public static int textLatency=0x7f060008;
-        public static int textName=0x7f060005;
-        public static int textSize=0x7f060007;
-        public static int textState=0x7f060009;
-        public static int textUri=0x7f060006;
+        public static int streamSurface=0x7f06000b;
+        public static int textLatency=0x7f060009;
+        public static int textName=0x7f060006;
+        public static int textSize=0x7f060008;
+        public static int textState=0x7f06000a;
+        public static int textUri=0x7f060007;
+        public static int txtErrorMsg=0x7f060001;
     }
     public static final class layout {
         public static int istream_header=0x7f030000;
