@@ -42,7 +42,13 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 
 
-
+/**
+ * This activity shows you:
+ * <li> how to attach to an activity a StreamViewerFragment for playing a remote Stream </li>
+ * <li> how to attach to the activity a StreamInspectorFragment for getting real time information about one or more remote streams and for changing its properties
+ * <li> how to switch among three streaming modality: the H264 streaming mode, the motion jpeg mode and the still image mode </li>
+ *
+ */
 public class StillImageExampleActivity extends ActionBarActivity implements Handler.Callback, IStreamFragmentCommandListener , IStreamProvider {
 	
 	private boolean exitFromAppRequest = false;

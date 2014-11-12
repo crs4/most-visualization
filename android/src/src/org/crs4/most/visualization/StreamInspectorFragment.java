@@ -10,6 +10,7 @@ import org.crs4.most.streaming.enums.StreamProperty;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.Fragment;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,6 +23,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.TextView;
 
 /**
  * This fragment provides a way for visually getting real time informations about a list of {@link IStream} objects.
@@ -124,7 +126,7 @@ public class StreamInspectorFragment extends Fragment {
 	 private void filterHeaderView(List<StreamProperty> streamProperties, ViewGroup header)
 	 {
 		 if (streamProperties!=null)
-	    	{
+	    	{   
 	    		if (!streamProperties.contains(StreamProperty.NAME))
 	    				{header.getChildAt(0).setVisibility(View.GONE);}
 	    		if (!streamProperties.contains(StreamProperty.URI))
@@ -177,6 +179,9 @@ public class StreamInspectorFragment extends Fragment {
 						
 						dialog.setTitle(selectedStream.getName() + " [" + selectedStream.getState()+"]");
 						
+						final TextView txtErrorMsg = (TextView)  dialog.findViewById(R.id.txtErrorMsg);
+						txtErrorMsg.setText(selectedStream.getErrorMsg());
+						txtErrorMsg.setTextColor(Color.RED);
 						
 						final EditText txtUri = (EditText) dialog.findViewById(R.id.editUri);
 						final String currentUri =  selectedStream.getProperty(StreamProperty.URI).toString();

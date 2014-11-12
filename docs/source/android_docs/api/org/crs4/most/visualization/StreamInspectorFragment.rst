@@ -12,6 +12,8 @@
 
 .. java:import:: android.app Fragment
 
+.. java:import:: android.graphics Color
+
 .. java:import:: android.os Bundle
 
 .. java:import:: android.util Log
@@ -35,6 +37,8 @@
 .. java:import:: android.widget ListView
 
 .. java:import:: android.widget AdapterView.OnItemClickListener
+
+.. java:import:: android.widget TextView
 
 StreamInspectorFragment
 =======================
