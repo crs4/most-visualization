@@ -4,8 +4,6 @@ import java.util.ArrayList;
  
 
 import org.crs4.most.streaming.enums.PTZ_Direction;
-import org.crs4.most.visualization.StreamInspectorFragment.IStreamProvider;
-
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
@@ -60,7 +58,7 @@ public class PTZ_ControllerFragment extends Fragment implements OnTouchListener{
 		
 		 ArrayList<View> ptzButtons = new ArrayList<View>();
 	     rootView.findViewsWithText(ptzButtons, "ptz_button" , View.FIND_VIEWS_WITH_CONTENT_DESCRIPTION);
-	     Toast.makeText(getActivity(), "Found views:" + String.valueOf(ptzButtons.size()), Toast.LENGTH_LONG).show();
+	    // Toast.makeText(getActivity(), "Found views:" + String.valueOf(ptzButtons.size()), Toast.LENGTH_LONG).show();
 	     for (View v : ptzButtons)
 		           v.setOnTouchListener(this);
 	}
