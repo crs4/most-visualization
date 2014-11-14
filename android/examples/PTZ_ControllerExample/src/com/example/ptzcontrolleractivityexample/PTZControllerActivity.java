@@ -86,9 +86,7 @@ public class PTZControllerActivity extends ActionBarActivity implements Handler.
 	    	
 	    	Properties uriProps = getUriProperties("uri.properties.default");
        	 	
- 
-            
-            this.ptzManager = new PTZ_Manager(this, uriProps.getProperty("uri_ptz") , "", "");
+            this.ptzManager = new PTZ_Manager(this, uriProps.getProperty("uri_ptz") , uriProps.getProperty("username_ptz"), uriProps.getProperty("password_ptz"));
             
             
        	    this.streamingUri =  uriProps.getProperty("uri_stream");  
