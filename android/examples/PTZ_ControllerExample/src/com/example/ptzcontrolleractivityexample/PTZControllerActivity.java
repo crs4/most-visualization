@@ -13,6 +13,7 @@ import org.crs4.most.streaming.StreamingEventBundle;
 import org.crs4.most.streaming.StreamingLib;
 import org.crs4.most.streaming.StreamingLibBackend;
 import org.crs4.most.streaming.enums.PTZ_Direction;
+import org.crs4.most.streaming.enums.PTZ_Zoom;
 import org.crs4.most.streaming.enums.StreamProperty;
 import org.crs4.most.streaming.enums.StreamState;
 import org.crs4.most.streaming.enums.StreamingEvent;
@@ -176,6 +177,29 @@ public class PTZControllerActivity extends ActionBarActivity implements Handler.
 		//Toast.makeText(this, "Stop Moving from ->" + dir, Toast.LENGTH_LONG).show();
 		this.ptzManager.stopMove();
 	}
+	
+	
+	@Override
+	public void onPTZstartZoom(PTZ_Zoom dir) {
+		this.ptzManager.startZoom(dir);	
+	}
+
+	@Override
+	public void onPTZstopZoom(PTZ_Zoom dir) {
+		this.ptzManager.stopZoom();
+	}
+
+	@Override
+	public void onGoHome() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onSnaphot() {
+		// TODO Auto-generated method stub
+		
+	}
 
 	@Override
 	public boolean handleMessage(Message streamingMessage) {
@@ -253,4 +277,6 @@ public class PTZControllerActivity extends ActionBarActivity implements Handler.
 		streamProps.add(StreamProperty.STATE);
 		return streamProps;
 	}
+
+	
 }

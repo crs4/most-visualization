@@ -115,6 +115,8 @@ public class StreamViewerFragment extends Fragment {
 	        return rootView;
 	          }
 	    
+	 
+	    
 	 /**
 	  * Set the player buttons visible or not
 	  * @param value <code>true</code> set buttons visible; <code>false</code> invisible.

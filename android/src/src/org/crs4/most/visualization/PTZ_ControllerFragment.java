@@ -4,6 +4,8 @@ import java.util.ArrayList;
  
 
 import org.crs4.most.streaming.enums.PTZ_Direction;
+import org.crs4.most.streaming.enums.PTZ_Zoom;
+
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
@@ -13,7 +15,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnTouchListener;
-import android.widget.Toast;
+
 
 
 public class PTZ_ControllerFragment extends Fragment implements OnTouchListener{
@@ -24,6 +26,13 @@ public class PTZ_ControllerFragment extends Fragment implements OnTouchListener{
 		
 		public void onPTZstartMove(PTZ_Direction dir);
 		public void onPTZstopMove(PTZ_Direction dir);
+		
+		public void onPTZstartZoom(PTZ_Zoom dir);
+		public void onPTZstopZoom(PTZ_Zoom dir);
+		
+		public void onGoHome();
+		public void onSnaphot();
+		
 	}
 	
 	private IPtzCommandReceiver ptzCommandReceiver = null;
@@ -77,19 +86,30 @@ public class PTZ_ControllerFragment extends Fragment implements OnTouchListener{
 		if (desc.endsWith("_se")) return PTZ_Direction.DOWN_RIGHT;
 		
 		else return null;
-		
 	}
+	
+	private PTZ_Zoom getPTZZoomByContentDescription(String desc)
+	{
+		if (desc.endsWith("_plus")) return PTZ_Zoom.IN;
+		else if  (desc.endsWith("_minus")) return PTZ_Zoom.OUT;
+		else return null;
+	}
+	
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		
 		String ctxDesc =  v.getContentDescription().toString();
 		PTZ_Direction ptzDirection = getPTZDirectionByContentDescription(ctxDesc);
+		PTZ_Zoom ptzZoom = getPTZZoomByContentDescription(ctxDesc);
+		
 		if (event.getAction()==MotionEvent.ACTION_DOWN)
 		{
 			//Toast.makeText(getActivity(), "Action Down " + ctxDesc, Toast.LENGTH_LONG).show();
 			Log.d(TAG, "Action Down:" + ctxDesc);
 			if (ptzDirection!=null)
 				this.ptzCommandReceiver.onPTZstartMove(ptzDirection);
+			else if (ptzZoom!=null)
+				this.ptzCommandReceiver.onPTZstartZoom(ptzZoom);
 		}
 		
 		else if (event.getAction()==MotionEvent.ACTION_UP)
@@ -98,6 +118,8 @@ public class PTZ_ControllerFragment extends Fragment implements OnTouchListener{
 			Log.d(TAG, "Action Up:" + ctxDesc);
 			if (ptzDirection!=null)
 				this.ptzCommandReceiver.onPTZstopMove(ptzDirection);
+			else if (ptzZoom!=null)
+				this.ptzCommandReceiver.onPTZstopZoom(ptzZoom);
 		}
 		
 		
