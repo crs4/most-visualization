@@ -61,7 +61,7 @@
      
      <ImageButton
         android:id="@+id/but_move_home"
-        android:contentDescription="ptz_button_home"
+        android:contentDescription="ptz_home"
  		android:src="@drawable/ptz_house" 
  		android:layout_width="50dp"
         android:layout_height="50dp"
@@ -112,7 +112,7 @@
 
 
 <GridLayout 
-    android:id="@+id/zoom_buttons_grid"
+    android:id="@+id/zoom_snap_buttons_grid"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:columnCount="1"
@@ -129,15 +129,6 @@
         />
         
          <ImageButton
-	        android:id="@+id/but_snapshot"
-	        android:layout_width="50dp"
-	        android:layout_height="50dp"
-	        android:layout_gravity="fill"
-	        android:contentDescription="ptz_button_snapshot"
-	        android:src="@drawable/ptz_snapshot"
-        />
-      
-       <ImageButton
         android:id="@+id/but_zoom_out"
         android:layout_width="50dp"
         android:layout_height="50dp"
@@ -145,6 +136,17 @@
         android:contentDescription="ptz_button_magnify_minus"
         android:src="@drawable/ptz_magnify_minus_75"
         />
+        
+         <ImageButton
+	        android:id="@+id/but_snapshot"
+	        android:layout_width="50dp"
+	        android:layout_height="50dp"
+	        android:layout_gravity="fill"
+	        android:contentDescription="ptz_snapshot"
+	        android:src="@drawable/ptz_snapshot"
+        />
+      
+      
        
     </GridLayout>
   </LinearLayout>

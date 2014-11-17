@@ -54,9 +54,9 @@ public final class R {
         public static int but_move_SW=0x7f060012;
         public static int but_move_W=0x7f06000f;
         public static int but_move_home=0x7f060010;
-        public static int but_snapshot=0x7f060017;
+        public static int but_snapshot=0x7f060018;
         public static int but_zoom_in=0x7f060016;
-        public static int but_zoom_out=0x7f060018;
+        public static int but_zoom_out=0x7f060017;
         public static int button_cancel=0x7f060005;
         public static int button_ok=0x7f060004;
         public static int button_pause=0x7f06001b;
@@ -72,7 +72,7 @@ public final class R {
         public static int textState=0x7f06000a;
         public static int textUri=0x7f060007;
         public static int txtErrorMsg=0x7f060001;
-        public static int zoom_buttons_grid=0x7f060015;
+        public static int zoom_snap_buttons_grid=0x7f060015;
     }
     public static final class layout {
         public static int istream_header=0x7f030000;

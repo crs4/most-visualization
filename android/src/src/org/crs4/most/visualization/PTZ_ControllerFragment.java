@@ -13,14 +13,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.View.OnTouchListener;
+import android.widget.GridLayout;
+import android.widget.ImageButton;
 
 
 
 public class PTZ_ControllerFragment extends Fragment implements OnTouchListener{
 
-	private static String TAG="PTZ_ControllerFragment";
+	private static final String TAG="PTZ_ControllerFragment";
+	private static final String PAN_TILT_PANEL_VISIBILITY = "PAN_TILT_PANEL_VISIBILITY";
+	private static final String ZOOM_PANEL_VISIBILITY = "ZOOM_PANEL_VISIBILITY";
+	private static final String SNAPSHOT_VISIBILITY = "SNAPSHOT_VISIBILITY";
 	
 	public interface IPtzCommandReceiver {
 		
@@ -41,10 +47,23 @@ public class PTZ_ControllerFragment extends Fragment implements OnTouchListener{
 	 * Provides a new istance of this fragment
 	 * @return the PTZ_ControllerFragment instance
 	 */
-	 public static  PTZ_ControllerFragment newInstance() {
-		 PTZ_ControllerFragment ptz = new PTZ_ControllerFragment();
+	public static  PTZ_ControllerFragment newInstance() {
+		  return PTZ_ControllerFragment.newInstance(true,true,true);
+	    }
+	
+	public static  PTZ_ControllerFragment newInstance(boolean panTiltPanelVisible, boolean zoomPanelVisible, boolean snapShotVisible) {
+		PTZ_ControllerFragment ptz = new PTZ_ControllerFragment();
+		 
+		Bundle args = new Bundle();
+		    args.putBoolean(PAN_TILT_PANEL_VISIBILITY, panTiltPanelVisible);
+		    args.putBoolean(ZOOM_PANEL_VISIBILITY, zoomPanelVisible);
+		    args.putBoolean(SNAPSHOT_VISIBILITY, snapShotVisible); 
+	        ptz.setArguments(args);
+
 	     return ptz;
 	    }
+	 
+	 
 
 	 @Override
 	  public void onAttach(Activity activity) {
@@ -60,6 +79,11 @@ public class PTZ_ControllerFragment extends Fragment implements OnTouchListener{
 	       // this.streamsView = (ListView) rootView.findViewById(R.id.listStreams);
 	      
 	        setupButtonListeners(rootView);
+	        
+	          this.setPanTiltPanelVisible(rootView,getArguments().getBoolean(PAN_TILT_PANEL_VISIBILITY));
+	          this.setSnaphotVisible(rootView,getArguments().getBoolean(SNAPSHOT_VISIBILITY));
+	          this.setZoomPanelVisible(rootView, getArguments().getBoolean(ZOOM_PANEL_VISIBILITY));
+	          
 	        return rootView;
           }
 
@@ -70,8 +94,58 @@ public class PTZ_ControllerFragment extends Fragment implements OnTouchListener{
 	    // Toast.makeText(getActivity(), "Found views:" + String.valueOf(ptzButtons.size()), Toast.LENGTH_LONG).show();
 	     for (View v : ptzButtons)
 		           v.setOnTouchListener(this);
+	     
+	     ImageButton butHome = (ImageButton) rootView.findViewById(R.id.but_move_home);
+	     butHome.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				ptzCommandReceiver.onGoHome();
+			}});
+	     
+	     
+	     ImageButton butSnapshot = (ImageButton) rootView.findViewById(R.id.but_snapshot);
+	     butSnapshot.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					ptzCommandReceiver.onSnaphot();
+				}});
+	     }
+	
+	
+	private void setPanTiltPanelVisible(View rootView,  boolean visibile)
+	{
+		GridLayout ptPanel = (GridLayout) rootView.findViewById(R.id.pt_buttons_grid);
+		if (visibile)
+			ptPanel.setVisibility(View.VISIBLE);
+		else
+			ptPanel.setVisibility(View.GONE);
 	}
-
+	
+	private void setZoomPanelVisible(View rootView, boolean visibile)
+	{
+		ImageButton  butZoomIn = (ImageButton) rootView.findViewById(R.id.but_zoom_in);
+		ImageButton  butZoomOut = (ImageButton) rootView.findViewById(R.id.but_zoom_out);
+		if (visibile)
+		{
+			butZoomIn.setVisibility(View.VISIBLE);
+			butZoomOut.setVisibility(View.VISIBLE);
+		}
+		else
+		{
+			butZoomIn.setVisibility(View.GONE);
+			butZoomOut.setVisibility(View.GONE);
+		}
+	}
+	
+	private void setSnaphotVisible(View rootView,  boolean visibile)
+	{
+		ImageButton  butSnap = (ImageButton) rootView.findViewById(R.id.but_snapshot);
+		if (visibile)
+			butSnap.setVisibility(View.VISIBLE);
+		else
+			butSnap.setVisibility(View.GONE);
+	}
+	
 	private PTZ_Direction getPTZDirectionByContentDescription(String desc)
 	{
 		if (desc.endsWith("_nw")) return PTZ_Direction.UP_LEFT;

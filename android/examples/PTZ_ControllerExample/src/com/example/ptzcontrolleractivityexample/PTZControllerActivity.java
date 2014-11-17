@@ -60,7 +60,8 @@ public class PTZControllerActivity extends ActionBarActivity implements Handler.
 	private PTZ_Manager ptzManager =  null;
 
 	private String streamingUri;
-
+	private Properties uriProps = null;
+	
 	private StreamViewerFragment streamViewerFragment;
 	
     @Override
@@ -76,7 +77,7 @@ public class PTZControllerActivity extends ActionBarActivity implements Handler.
         	StreamingLib streamingLib = new StreamingLibBackend();
             
             
-            this.ptzControllerFragment = PTZ_ControllerFragment.newInstance();
+            this.ptzControllerFragment = PTZ_ControllerFragment.newInstance(true,true,true);
             
     	  	// First of all, initialize the library 
 			streamingLib.initLib(this.getApplicationContext());
@@ -85,7 +86,7 @@ public class PTZControllerActivity extends ActionBarActivity implements Handler.
 	    	HashMap<String,String> stream1_params = new HashMap<String,String>();
 	    	stream1_params.put("name", "Stream_1");
 	    	
-	    	Properties uriProps = getUriProperties("uri.properties.default");
+	    	this.uriProps = getUriProperties("uri.properties.default");
        	 	
             this.ptzManager = new PTZ_Manager(this, uriProps.getProperty("uri_ptz") , uriProps.getProperty("username_ptz"), uriProps.getProperty("password_ptz"));
             
@@ -191,14 +192,14 @@ public class PTZControllerActivity extends ActionBarActivity implements Handler.
 
 	@Override
 	public void onGoHome() {
-		// TODO Auto-generated method stub
+		String homePreset = this.uriProps.getProperty("home_preset_ptz");
+		this.ptzManager.goTo(homePreset);
 		
 	}
 
 	@Override
 	public void onSnaphot() {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
