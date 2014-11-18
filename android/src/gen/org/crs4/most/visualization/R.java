@@ -11,76 +11,92 @@ public final class R {
     public static final class attr {
     }
     public static final class drawable {
-        public static int ic_launcher=0x7f020000;
-        public static int progress_vertical=0x7f020001;
-        public static int ptz_arrow_e=0x7f020002;
-        public static int ptz_arrow_n=0x7f020003;
-        public static int ptz_arrow_ne=0x7f020004;
-        public static int ptz_arrow_nw=0x7f020005;
-        public static int ptz_arrow_s=0x7f020006;
-        public static int ptz_arrow_se=0x7f020007;
-        public static int ptz_arrow_sw=0x7f020008;
-        public static int ptz_arrow_w=0x7f020009;
-        public static int ptz_arrows_in=0x7f02000a;
-        public static int ptz_house=0x7f02000b;
-        public static int ptz_magnify=0x7f02000c;
-        public static int ptz_magnify_minus=0x7f02000d;
-        public static int ptz_magnify_minus_75=0x7f02000e;
-        public static int ptz_magnify_plus=0x7f02000f;
-        public static int ptz_snapshot=0x7f020010;
-        public static int seek_thumb=0x7f020011;
-        public static int seek_thumb_normal=0x7f020012;
-        public static int seek_thumb_normal_vert=0x7f020013;
-        public static int seek_thumb_normal_wide=0x7f020014;
-        public static int seek_thumb_normal_wide_vert=0x7f020015;
-        public static int seek_thumb_pressed=0x7f020016;
-        public static int seek_thumb_pressed_vert=0x7f020017;
-        public static int seek_thumb_pressed_wide=0x7f020018;
-        public static int seek_thumb_pressed_wide_vert=0x7f020019;
-        public static int seek_thumb_selected=0x7f02001a;
-        public static int seek_thumb_selected_vert=0x7f02001b;
-        public static int seek_thumb_selected_wide=0x7f02001c;
-        public static int seek_thumb_selected_wide_vert=0x7f02001d;
-        public static int seek_thumb_wide=0x7f02001e;
-        public static int zoom_progress=0x7f02001f;
+        public static int antartica1=0x7f020000;
+        public static int antartica10=0x7f020001;
+        public static int antartica2=0x7f020002;
+        public static int antartica3=0x7f020003;
+        public static int antartica4=0x7f020004;
+        public static int antartica5=0x7f020005;
+        public static int antartica6=0x7f020006;
+        public static int antartica7=0x7f020007;
+        public static int antartica8=0x7f020008;
+        public static int antartica9=0x7f020009;
+        public static int ic_launcher=0x7f02000a;
+        public static int progress_vertical=0x7f02000b;
+        public static int ptz_arrow_e=0x7f02000c;
+        public static int ptz_arrow_n=0x7f02000d;
+        public static int ptz_arrow_ne=0x7f02000e;
+        public static int ptz_arrow_nw=0x7f02000f;
+        public static int ptz_arrow_s=0x7f020010;
+        public static int ptz_arrow_se=0x7f020011;
+        public static int ptz_arrow_sw=0x7f020012;
+        public static int ptz_arrow_w=0x7f020013;
+        public static int ptz_arrows_in=0x7f020014;
+        public static int ptz_house=0x7f020015;
+        public static int ptz_magnify=0x7f020016;
+        public static int ptz_magnify_minus=0x7f020017;
+        public static int ptz_magnify_minus_75=0x7f020018;
+        public static int ptz_magnify_plus=0x7f020019;
+        public static int ptz_snapshot=0x7f02001a;
+        public static int seek_thumb=0x7f02001b;
+        public static int seek_thumb_normal=0x7f02001c;
+        public static int seek_thumb_normal_vert=0x7f02001d;
+        public static int seek_thumb_normal_wide=0x7f02001e;
+        public static int seek_thumb_normal_wide_vert=0x7f02001f;
+        public static int seek_thumb_pressed=0x7f020020;
+        public static int seek_thumb_pressed_vert=0x7f020021;
+        public static int seek_thumb_pressed_wide=0x7f020022;
+        public static int seek_thumb_pressed_wide_vert=0x7f020023;
+        public static int seek_thumb_selected=0x7f020024;
+        public static int seek_thumb_selected_vert=0x7f020025;
+        public static int seek_thumb_selected_wide=0x7f020026;
+        public static int seek_thumb_selected_wide_vert=0x7f020027;
+        public static int seek_thumb_wide=0x7f020028;
+        public static int zoom_progress=0x7f020029;
     }
     public static final class id {
-        public static int but_move_E=0x7f060011;
-        public static int but_move_N=0x7f06000d;
-        public static int but_move_NE=0x7f06000e;
-        public static int but_move_NW=0x7f06000c;
-        public static int but_move_S=0x7f060013;
-        public static int but_move_SE=0x7f060014;
-        public static int but_move_SW=0x7f060012;
-        public static int but_move_W=0x7f06000f;
-        public static int but_move_home=0x7f060010;
-        public static int but_snapshot=0x7f060018;
-        public static int but_zoom_in=0x7f060016;
-        public static int but_zoom_out=0x7f060017;
-        public static int button_cancel=0x7f060005;
-        public static int button_ok=0x7f060004;
-        public static int button_pause=0x7f06001b;
-        public static int button_play=0x7f06001a;
-        public static int editLatency=0x7f060003;
-        public static int editUri=0x7f060002;
-        public static int listStreams=0x7f060000;
-        public static int pt_buttons_grid=0x7f06000b;
-        public static int streamSurface=0x7f060019;
-        public static int textLatency=0x7f060009;
-        public static int textName=0x7f060006;
-        public static int textSize=0x7f060008;
-        public static int textState=0x7f06000a;
-        public static int textUri=0x7f060007;
-        public static int txtErrorMsg=0x7f060001;
-        public static int zoom_snap_buttons_grid=0x7f060015;
+        public static int Gallery01=0x7f060000;
+        public static int ImageView01=0x7f060001;
+        public static int but_move_E=0x7f060013;
+        public static int but_move_N=0x7f06000f;
+        public static int but_move_NE=0x7f060010;
+        public static int but_move_NW=0x7f06000e;
+        public static int but_move_S=0x7f060015;
+        public static int but_move_SE=0x7f060016;
+        public static int but_move_SW=0x7f060014;
+        public static int but_move_W=0x7f060011;
+        public static int but_move_home=0x7f060012;
+        public static int but_snapshot=0x7f06001a;
+        public static int but_zoom_in=0x7f060018;
+        public static int but_zoom_out=0x7f060019;
+        public static int button_cancel=0x7f060007;
+        public static int button_ok=0x7f060006;
+        public static int button_pause=0x7f06001f;
+        public static int button_play=0x7f06001e;
+        public static int editLatency=0x7f060005;
+        public static int editUri=0x7f060004;
+        public static int imageFrames=0x7f06001b;
+        public static int listStreams=0x7f060002;
+        public static int pt_buttons_grid=0x7f06000d;
+        public static int slideShowBtn=0x7f06001c;
+        public static int streamSurface=0x7f06001d;
+        public static int textLatency=0x7f06000b;
+        public static int textName=0x7f060008;
+        public static int textSize=0x7f06000a;
+        public static int textState=0x7f06000c;
+        public static int textUri=0x7f060009;
+        public static int txtErrorMsg=0x7f060003;
+        public static int zoom_snap_buttons_grid=0x7f060017;
     }
     public static final class layout {
-        public static int istream_header=0x7f030000;
-        public static int istream_listview=0x7f030001;
-        public static int istream_popup_editor=0x7f030002;
-        public static int istream_row=0x7f030003;
-        public static int ptz_panel=0x7f030004;
-        public static int stream_layout=0x7f030005;
+        public static int gallery_main=0x7f030000;
+        public static int istream_header=0x7f030001;
+        public static int istream_listview=0x7f030002;
+        public static int istream_popup_editor=0x7f030003;
+        public static int istream_row=0x7f030004;
+        public static int ptz_panel=0x7f030005;
+        public static int slide_show=0x7f030006;
+        public static int stream_layout=0x7f030007;
     }
     public static final class string {
         public static int app_name=0x7f040000;
@@ -141,6 +157,25 @@ public final class R {
         public static int AppTheme=0x7f050001;
     }
     public static final class styleable {
+        /** Attributes that can be used with a Gallery1.
+           <p>Includes the following attributes:</p>
+           <table>
+           <colgroup align="left" />
+           <colgroup align="left" />
+           <tr><th>Attribute</th><th>Description</th></tr>
+           <tr><td><code>{@link #Gallery1_android_galleryItemBackground android:galleryItemBackground}</code></td><td></td></tr>
+           </table>
+           @see #Gallery1_android_galleryItemBackground
+         */
+        public static final int[] Gallery1 = {
+            0x0101004c
+        };
+        /**
+          <p>This symbol is the offset where the {@link android.R.attr#galleryItemBackground}
+          attribute's value can be found in the {@link #Gallery1} array.
+          @attr name android:galleryItemBackground
+        */
+        public static final int Gallery1_android_galleryItemBackground = 0;
         /** Attributes that can be used with a ProgressBar.
            <p>Includes the following attributes:</p>
            <table>

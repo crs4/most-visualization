@@ -1,4 +1,4 @@
-package com.example.ptzcontrolleractivityexample;
+package org.crs4.most.visualization.examples;
 
 
 import java.io.IOException;
@@ -38,23 +38,22 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.SurfaceView;
 import android.widget.Toast;
 
 import android.support.v7.app.ActionBarActivity;
 
-public class PTZControllerActivity extends ActionBarActivity implements Handler.Callback, 
+public class PTZ_ImageGalleryActivity extends ActionBarActivity implements Handler.Callback, 
 																		PTZ_ControllerFragment.IPtzCommandReceiver , 
 																		IStreamFragmentCommandListener,
 																		IStreamProvider
 																		
 																		{
 
-	private static String TAG = "PTZControllerActivity";
+	private static String TAG = "PTZ_ImageGalleryActivity";
 	
-	//ID for the menu exit option
-    private final int ID_MENU_EXIT = 1;
 	private boolean exitFromAppRequest = false;
 	
 	private Handler handler;
@@ -64,11 +63,13 @@ public class PTZControllerActivity extends ActionBarActivity implements Handler.
 	
 	private PTZ_ControllerFragment ptzControllerFragment = null;
 	private PTZ_Manager ptzManager =  null;
+	private ImageGalleryFragment imageGalleryFragment = null;
 
 	private String streamingUri;
 	private Properties uriProps = null;
 	
 	private StreamViewerFragment streamViewerFragment;
+	private boolean streamingViewOn = true;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,22 +152,39 @@ public class PTZControllerActivity extends ActionBarActivity implements Handler.
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-	 	//get the MenuItem reference
-	 MenuItem item = 
-	    	menu.add(Menu.NONE,ID_MENU_EXIT,Menu.NONE,R.string.mnu_exit);
-	 return true;
+	
+
+	 MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.options_menu, menu);
+	    return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
     	//check selected menu item
-    	if(item.getItemId() == ID_MENU_EXIT)
+    	if(item.getItemId() == R.id.mnu_exit)
     	{
     		exitFromApp();
     		return true;
     	}
-    	return false;
+    	else if(item.getItemId() == R.id.stream_mode)
+    	{
+    		 if (item.isChecked()) item.setChecked(false);
+             else item.setChecked(true);
+    		 setStreamView();
+
+    	}
+    	else if(item.getItemId() == R.id.gallery_mode)
+    	{
+    		 if (item.isChecked()) item.setChecked(false);
+             else item.setChecked(true); 
+    		 setGalleryView();
+
+    	}
+    	
+    	return super.onOptionsItemSelected(item);
+
     }
 
 
@@ -204,6 +222,44 @@ public class PTZControllerActivity extends ActionBarActivity implements Handler.
 	}
 
 	
+	private void setStreamView() {
+        
+		// nothing to do in this case
+        if (this.streamingViewOn) return;
+        
+	    // Instantiate a new fragment.
+		//if (this.imageGalleryFragment == null)
+	    //this.imageGalleryFragment = new ImageGalleryFragment();
+
+	    // Add the fragment to the activity, pushing this transaction
+	    // on to the back stack.
+	    FragmentTransaction ft = getFragmentManager().beginTransaction();
+	    ft.replace(R.id.container_stream_1, this.stream1Fragment);
+	    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+	    ft.addToBackStack(null);
+	    ft.commit();
+	    
+	    this.streamingViewOn = true;
+	}
+	
+	private void setGalleryView() {
+		 
+        if (!this.streamingViewOn) return;
+        
+		// Instantiate a new fragment.
+		if (this.imageGalleryFragment == null)
+		 this.imageGalleryFragment = new ImageGalleryFragment();
+
+	    // Add the fragment to the activity, pushing this transaction
+	    // on to the back stack.
+	    FragmentTransaction ft = getFragmentManager().beginTransaction();
+	    ft.replace(R.id.container_stream_1, this.imageGalleryFragment);
+	    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+	    ft.addToBackStack(null);
+	    ft.commit();
+	    
+	    this.streamingViewOn = false;
+	}
 	
 	@Override
 	public void onSnaphot() {
@@ -214,7 +270,7 @@ public class PTZControllerActivity extends ActionBarActivity implements Handler.
 			@Override
 			public void onBitmapSaved(ImageDownloader imageDownloader, String filename) {
 				Log.d(TAG, "Saved Image:" + filename);
-				Toast.makeText(PTZControllerActivity.this, "Image saved:" + filename , Toast.LENGTH_LONG).show();
+				Toast.makeText(PTZ_ImageGalleryActivity.this, "Image saved:" + filename , Toast.LENGTH_LONG).show();
 				imageDownloader.logAppFileNames();
 			}
 			
@@ -226,14 +282,14 @@ public class PTZControllerActivity extends ActionBarActivity implements Handler.
 			@Override
 			public void onBitmapDownloadingError(
 					ImageDownloader imageDownloader, Exception ex) {
-					Toast.makeText(PTZControllerActivity.this, "Error downloading Image:" + ex.getMessage(), Toast.LENGTH_LONG).show();
+					Toast.makeText(PTZ_ImageGalleryActivity.this, "Error downloading Image:" + ex.getMessage(), Toast.LENGTH_LONG).show();
 				
 			}
 
 			@Override
 			public void onBitmapSavingError(ImageDownloader imageDownloader,
 					Exception ex) {
-				Toast.makeText(PTZControllerActivity.this, "Error saving Image:" + ex.getMessage(), Toast.LENGTH_LONG).show();
+				Toast.makeText(PTZ_ImageGalleryActivity.this, "Error saving Image:" + ex.getMessage(), Toast.LENGTH_LONG).show();
 				
 			}
 		};
