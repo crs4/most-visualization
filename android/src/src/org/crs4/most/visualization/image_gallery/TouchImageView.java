@@ -6,9 +6,12 @@ import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.util.FloatMath;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnLongClickListener;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 public class TouchImageView extends ImageView {
 
@@ -29,19 +32,51 @@ public class TouchImageView extends ImageView {
 
     Context context;
     
+    private GestureDetector gestureDetector = null;
+    
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event){
+    	return performClick();
+    }
+    
     public TouchImageView(Context context) {
         super(context);
         super.setClickable(true);
         this.context = context;
-
-        matrix.setTranslate(1f, 1f);
+        
+        matrix.setTranslate(1f,1f);
+        matrix.setScale(2.0f, 2.0f);
         setImageMatrix(matrix);
+  
         setScaleType(ScaleType.MATRIX);
+       // Log.d(TAG, "Container Width:" + this.getWidth() + " Drawable:" + this.getDrawable()); 
+       // float centerX = (this.getWidth() - this.getDrawable().getBounds().width())/2.0f;
+       // float centerY = (this.getHeight() - this.getDrawable().getBounds().height())/2.0f;
+        
+        
+        //matrix.setTranslate(centerX, centerY);
+        
+        this.gestureDetector = new GestureDetector(new GestureDetector.SimpleOnGestureListener() {
 
+        	@Override
+        	public boolean onDoubleTap(MotionEvent e) {
+        		Toast.makeText(TouchImageView.this.context, "On Long Click Listener!!!", Toast.LENGTH_LONG).show();
+ 				Log.d(TAG,"DOUBLE TAP EVENT");
+        	 
+                return true;
+        	}
+        }); 
+        	 
+        
         setOnTouchListener(new OnTouchListener() {
 
             @Override
             public boolean onTouch(View v, MotionEvent rawEvent) {
+            	
+            	 if (gestureDetector.onTouchEvent(rawEvent))
+					return true;
+            	
                 WrapMotionEvent event = WrapMotionEvent.wrap(rawEvent);
 
                 // Dump touch event to log
@@ -52,39 +87,46 @@ public class TouchImageView extends ImageView {
                 // Handle touch events here...
                 switch (event.getAction() & MotionEvent.ACTION_MASK) {
                 case MotionEvent.ACTION_DOWN:
+                 
+                	 
                     savedMatrix.set(matrix);
                     start.set(event.getX(), event.getY());
-                    Log.d(TAG, "mode=DRAG");
+                    //Log.d(TAG, "mode=DRAG");
                     mode = DRAG;
                     break;
                 case MotionEvent.ACTION_POINTER_DOWN:
+                	 
                     oldDist = spacing(event);
                     Log.d(TAG, "oldDist=" + oldDist);
                     if (oldDist > 10f) {
                         savedMatrix.set(matrix);
                         midPoint(mid, event);
                         mode = ZOOM;
-                        Log.d(TAG, "mode=ZOOM");
+                        //Log.d(TAG, "mode=ZOOM");
                     }
                     break;
                 case MotionEvent.ACTION_UP:
+                	 
                     int xDiff = (int) Math.abs(event.getX() - start.x);
                     int yDiff = (int) Math.abs(event.getY() - start.y);
                     if (xDiff < 8 && yDiff < 8){
                         performClick();
                     }
+                   
+                    
                 case MotionEvent.ACTION_POINTER_UP:
                     mode = NONE;
-                    Log.d(TAG, "mode=NONE");
+                    //Log.d(TAG, "mode=NONE");
                     break;
                 case MotionEvent.ACTION_MOVE:
                     if (mode == DRAG) {
-                        // ...
+                    	 
                         matrix.set(savedMatrix);
                         matrix.postTranslate(event.getX() - start.x, event.getY() - start.y);
                     } else if (mode == ZOOM) {
+                  
                         float newDist = spacing(event);
-                        Log.d(TAG, "newDist=" + newDist);
+                        //Log.d(TAG, "newDist=" + newDist);
                         if (newDist > 10f) {
                             matrix.set(savedMatrix);
                             float scale = newDist / oldDist;
@@ -133,6 +175,7 @@ public class TouchImageView extends ImageView {
         setImageMatrix(matrix);
     }
 
+    
 
     /** Show an event in the LogCat view, for debugging */
 	@SuppressWarnings("unused")

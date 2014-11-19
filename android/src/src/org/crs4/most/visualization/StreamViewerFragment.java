@@ -18,6 +18,7 @@ import org.crs4.most.streaming.IStream;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
@@ -33,6 +34,7 @@ import android.widget.ImageButton;
 public class StreamViewerFragment extends Fragment {
 	 
 	 public static final String FRAGMENT_STREAM_ID_KEY = "stream_fragment_stream_id_key";
+	 private static final String TAG = "StreamViewerFragment";
 	 
 	 private IStreamFragmentCommandListener cmdListener = null;
 	 private SurfaceView surfaceView = null;
@@ -61,11 +63,13 @@ public class StreamViewerFragment extends Fragment {
 	 public void onCreate(Bundle savedInstanceState)
 	 {
 		 super.onCreate(savedInstanceState);
+		 Log.d(TAG,"ON CREATE STREAM VIEWER");
 	 }
 	 
 	@Override 
 	public void onActivityCreated(Bundle bundle){
 		super.onActivityCreated(bundle);
+		Log.d(TAG,"ON ACTIVITY_CREATED STREAM VIEWER");
 		StreamViewerFragment.this.cmdListener.onSurfaceViewCreated(getStreamId(),this.surfaceView);
 	}
 	 
@@ -76,6 +80,7 @@ public class StreamViewerFragment extends Fragment {
 	    */
 	   public void onAttach(Activity activity) {
 		   super.onAttach(activity);
+		   Log.d(TAG,"ON ATTACH STREAM VIEWER");
 		   this.cmdListener = (IStreamFragmentCommandListener) activity;
 	   }
 	   
@@ -85,6 +90,7 @@ public class StreamViewerFragment extends Fragment {
 	   public void onDetach()
 	   {
 		  super.onDetach();
+		  Log.d(TAG,"ON DETACH STREAM VIEWER");
 		  this.cmdListener.onSurfaceViewDestroyed(getStreamId());
 		  
 	   }
@@ -93,6 +99,7 @@ public class StreamViewerFragment extends Fragment {
 	    public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	            Bundle savedInstanceState)
 	          {
+	    	 	Log.d(TAG,"ON CREATE_VIEW STREAM VIEWER");
 		        View rootView = inflater.inflate(R.layout.stream_layout, container, false);
 		        
 		        this.surfaceView = (SurfaceView) rootView.findViewById(R.id.streamSurface);

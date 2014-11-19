@@ -1,19 +1,22 @@
 package org.crs4.most.visualization.image_gallery;
 
-import org.crs4.most.visualization.R;
-import org.crs4.most.visualization.R.drawable;
-import org.crs4.most.visualization.R.id;
-import org.crs4.most.visualization.R.layout;
-import org.crs4.most.visualization.R.styleable;
+import java.io.File;
 
-import android.app.Activity;
+import org.crs4.most.streaming.utils.ImageDownloader;
+import org.crs4.most.visualization.R;
+
+
 import android.app.Fragment;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
@@ -29,6 +32,8 @@ import android.widget.Toast;
 
 public class ImageGalleryFragment extends Fragment {
 	
+	private static final String TAG = "ImageGalleryFragment";
+	/*
 	Integer[] pics = { R.drawable.antartica1, R.drawable.antartica2,
 			R.drawable.antartica3, R.drawable.antartica4,
 			R.drawable.antartica5, R.drawable.antartica6,
@@ -38,6 +43,9 @@ public class ImageGalleryFragment extends Fragment {
 			R.drawable.antartica5, R.drawable.antartica6,
 			R.drawable.antartica7, R.drawable.antartica8,
 			R.drawable.antartica9, R.drawable.antartica10 };
+	*/
+	
+	File [] pics = null;
 	
 	LinearLayout imageView;
 	private View rootView;
@@ -58,19 +66,25 @@ public class ImageGalleryFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         
-
+       // load images from the internal storage of the activity attached to this fragment
+        this.pics = ImageDownloader.getInternalImages(getActivity());
+        
 		Gallery ga = (Gallery) this.rootView.findViewById(R.id.Gallery01);
 		ga.setAdapter(new ImageAdapter(getActivity()));
 
 		imageView = (LinearLayout) this.rootView.findViewById(R.id.ImageView01);
+		imageView.setBackgroundColor(Color.BLACK);
+		
 		ga.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
+				/*
 				Toast.makeText(
 						getActivity(),
 						"You have selected picture " + (arg2 + 1)
 								+ " of Antartica", Toast.LENGTH_SHORT).show();
+				*/
 				try {
 				imageView.removeAllViews();
 				} catch (Exception e) {
@@ -78,7 +92,12 @@ public class ImageGalleryFragment extends Fragment {
 				}
 				TouchImageView touchImageView = new TouchImageView(
 						getActivity());
-				touchImageView.setImageResource(pics[arg2]);
+				
+				//touchImageView.setImageResource(pics[arg2]);
+				touchImageView.setImageDrawable(Drawable.createFromPath(pics[arg2].toString()));
+				
+				
+				
 				LayoutParams lp=new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 				imageView.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
 				touchImageView.setLayoutParams(lp);
@@ -123,7 +142,10 @@ public class ImageGalleryFragment extends Fragment {
 		@Override
 		public View getView(int arg0, View arg1, ViewGroup arg2) {
 			ImageView iv = new ImageView(ctx);
-			iv.setImageResource(pics[arg0]);
+			// Set image resource
+			//iv.setImageResource(pics[arg0]);
+			iv.setImageDrawable(Drawable.createFromPath(pics[arg0].toString()));
+			
 			iv.setScaleType(ImageView.ScaleType.FIT_XY);
 			iv.setLayoutParams(new Gallery.LayoutParams(150, 120));
 			iv.setBackgroundResource(imageBackground);

@@ -330,7 +330,7 @@ public class PTZ_ImageGalleryActivity extends ActionBarActivity implements Handl
 	
 	 private void exitFromApp() {
 			this.exitFromAppRequest = true;
-			if (this.stream1!=null)
+			if (this.stream1!=null  && this.stream1.getState()!= StreamState.DEINITIALIZED)
 			{
 				this.stream1.destroy();
 			}
@@ -351,11 +351,13 @@ public class PTZ_ImageGalleryActivity extends ActionBarActivity implements Handl
 
 	@Override
 	public void onSurfaceViewCreated(String streamId, SurfaceView surfaceView) {
+		Log.d(TAG, "Called onSurfaceViewCreated: preparing native stream...");
 		this.stream1.prepare(surfaceView);
 	}
 
 	@Override
 	public void onSurfaceViewDestroyed(String streamId) {
+		Log.d(TAG, "Called onSurfaceViewDestroyed: destroying native stream...");
 		this.stream1.destroy();
 	}
 
