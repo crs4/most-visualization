@@ -6,15 +6,19 @@ import org.crs4.most.streaming.utils.ImageDownloader;
 import org.crs4.most.visualization.R;
 
 
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
@@ -33,19 +37,10 @@ import android.widget.Toast;
 public class ImageGalleryFragment extends Fragment {
 	
 	private static final String TAG = "ImageGalleryFragment";
-	/*
-	Integer[] pics = { R.drawable.antartica1, R.drawable.antartica2,
-			R.drawable.antartica3, R.drawable.antartica4,
-			R.drawable.antartica5, R.drawable.antartica6,
-			R.drawable.antartica7, R.drawable.antartica8,
-			R.drawable.antartica9, R.drawable.antartica10 ,
-			R.drawable.antartica3, R.drawable.antartica4,
-			R.drawable.antartica5, R.drawable.antartica6,
-			R.drawable.antartica7, R.drawable.antartica8,
-			R.drawable.antartica9, R.drawable.antartica10 };
-	*/
 	
-	File [] pics = null;
+	
+	private File [] pics = null;
+	private ImageAdapter imageAdapter = null;
 	
 	LinearLayout imageView;
 	private View rootView;
@@ -62,6 +57,48 @@ public class ImageGalleryFragment extends Fragment {
 	}
 
 	
+	private void showDeleteMessageAlert(final int imageIndex){
+		 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+		 alertDialogBuilder.setTitle("Image Deletion Request");
+		 alertDialogBuilder.setMessage(String.format( "Do you want to cancel the image %s ?" , this.pics[imageIndex].getName()));
+		 alertDialogBuilder.setPositiveButton("Yes",new DialogInterface.OnClickListener() {
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				
+				ImageDownloader.deleteInternalFile(getActivity(), pics[imageIndex].getName());
+				reloadGalleyImages();
+				dialog.cancel();
+				
+			}
+			 
+		 });
+		 
+		 alertDialogBuilder.setNegativeButton("No",new DialogInterface.OnClickListener() {
+
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.cancel();
+					
+				}
+				 
+			 });
+		 
+		 AlertDialog alertDialog = alertDialogBuilder.create();
+		 alertDialog.show();
+	}
+	
+	private void reloadGalleyImages()
+	{
+		this.pics = ImageDownloader.getInternalImages(getActivity());
+		if (this.imageAdapter!=null)
+		{
+			this.imageView.removeAllViews();
+			this.imageAdapter.notifyDataSetChanged();
+		}
+		
+	}
+	
 	@Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -70,7 +107,8 @@ public class ImageGalleryFragment extends Fragment {
         this.pics = ImageDownloader.getInternalImages(getActivity());
         
 		Gallery ga = (Gallery) this.rootView.findViewById(R.id.Gallery01);
-		ga.setAdapter(new ImageAdapter(getActivity()));
+		this.imageAdapter = new ImageAdapter(getActivity());
+		ga.setAdapter(this.imageAdapter);
 
 		imageView = (LinearLayout) this.rootView.findViewById(R.id.ImageView01);
 		imageView.setBackgroundColor(Color.BLACK);
@@ -79,19 +117,24 @@ public class ImageGalleryFragment extends Fragment {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
-				/*
-				Toast.makeText(
-						getActivity(),
-						"You have selected picture " + (arg2 + 1)
-								+ " of Antartica", Toast.LENGTH_SHORT).show();
-				*/
+				
+				final int imageIndex = arg2;
 				try {
 				imageView.removeAllViews();
 				} catch (Exception e) {
 					e.getMessage();
 				}
-				TouchImageView touchImageView = new TouchImageView(
-						getActivity());
+				
+				GestureDetector gestureDetector = new GestureDetector(getActivity(), new GestureDetector.SimpleOnGestureListener() {
+
+			        	@Override
+			        	public boolean onDoubleTap(MotionEvent e) {
+			        	    showDeleteMessageAlert(imageIndex);
+			                return true;
+			        	}
+			        }); 
+			        	 
+				TouchImageView touchImageView = new TouchImageView(getActivity(), gestureDetector);
 				
 				//touchImageView.setImageResource(pics[arg2]);
 				touchImageView.setImageDrawable(Drawable.createFromPath(pics[arg2].toString()));

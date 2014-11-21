@@ -40,10 +40,11 @@ public class TouchImageView extends ImageView {
     	return performClick();
     }
     
-    public TouchImageView(Context context) {
+    public TouchImageView(Context context , final GestureDetector gestureDetector) {
         super(context);
         super.setClickable(true);
         this.context = context;
+        this.gestureDetector = gestureDetector;
         
         matrix.setTranslate(1f,1f);
         matrix.setScale(2.0f, 2.0f);
@@ -57,17 +58,7 @@ public class TouchImageView extends ImageView {
         
         //matrix.setTranslate(centerX, centerY);
         
-        this.gestureDetector = new GestureDetector(new GestureDetector.SimpleOnGestureListener() {
-
-        	@Override
-        	public boolean onDoubleTap(MotionEvent e) {
-        		Toast.makeText(TouchImageView.this.context, "On Long Click Listener!!!", Toast.LENGTH_LONG).show();
- 				Log.d(TAG,"DOUBLE TAP EVENT");
-        	 
-                return true;
-        	}
-        }); 
-        	 
+       
         
         setOnTouchListener(new OnTouchListener() {
 
