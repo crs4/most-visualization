@@ -32,7 +32,9 @@ import org.crs4.most.visualization.image_gallery.ImageGalleryFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.res.AssetManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.drawable.GradientDrawable.Orientation;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -41,6 +43,12 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.SurfaceView;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.FrameLayout;
+import android.widget.Gallery;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import android.support.v7.app.ActionBarActivity;
@@ -68,8 +76,13 @@ public class PTZ_ImageGalleryActivity extends ActionBarActivity implements Handl
 	private String streamingUri;
 	private Properties uriProps = null;
 	
-	private StreamViewerFragment streamViewerFragment;
 	private boolean streamingViewOn = true;
+	
+	
+	private int land_gallery_container_id = 0x7f010001;
+	private FrameLayout ptzFrameLayout = null;  
+	private FrameLayout galleryFrameLayout = null;
+	private FrameLayout inspectorFrameLayout = null; 
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,7 +119,9 @@ public class PTZ_ImageGalleryActivity extends ActionBarActivity implements Handl
 	    	// Instance the first StreamViewer fragment where to render the first stream by passing the stream name as its ID.
 	    	this.stream1Fragment = StreamViewerFragment.newInstance(stream1.getName());
 	    	this.streamInspectorFragment = StreamInspectorFragment.newInstance();
-	    	 
+	    	
+	    	this.ptzFrameLayout = (FrameLayout) findViewById(R.id.container_ptz_controller);
+	    	this.inspectorFrameLayout = (FrameLayout) findViewById(R.id.container_stream_inspector);
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -123,6 +138,58 @@ public class PTZ_ImageGalleryActivity extends ActionBarActivity implements Handl
 		
     }
 
+    private boolean showGalleryInLandscapeOrientation()
+    {
+    	if (!(this.getResources().getConfiguration().orientation==Configuration.ORIENTATION_LANDSCAPE))
+    		return false;
+    	
+    	if (galleryFrameLayout==null)
+    		{galleryFrameLayout = new FrameLayout(this);
+    		galleryFrameLayout.setId(land_gallery_container_id);
+    		}
+    	
+    	     LinearLayout controlsLayout = (LinearLayout)   findViewById(R.id.land_ctl_frames_container);
+    	     
+    		Log.d(TAG, "ControlLayout is null? " + String.valueOf(controlsLayout==null));
+    		controlsLayout.removeAllViews();
+    	    controlsLayout.addView(galleryFrameLayout, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT,1));
+    	    
+    	   
+    	    FragmentTransaction ft = getFragmentManager()
+    				.beginTransaction();
+    	    ft.replace(land_gallery_container_id, imageGalleryFragment);
+    	    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+		    ft.addToBackStack(null);
+    	    ft.commit();
+    	   
+    	    
+    	    return true;
+    }
+    
+    private boolean showCameraControlsInLandscapeOrientation()
+    {
+    	if (!(this.getResources().getConfiguration().orientation==Configuration.ORIENTATION_LANDSCAPE))
+    		return false;
+    	
+    	LinearLayout controlsLayout = (LinearLayout)   findViewById(R.id.land_ctl_frames_container);
+    	
+    	//View rootView =  getLayoutInflater().inflate(R.layout.activity_main, null);
+    	//LinearLayout inflatedLayout = (LinearLayout) rootView.findViewById(R.id.land_ctl_frames_container);
+    	//FrameLayout ptzFrameLayout = (FrameLayout) rootView.findViewById(R.id.container_ptz_controller);
+    	//inflatedLayout.removeView(this.ptzFrameLayout);
+    	controlsLayout.removeAllViews();
+    	
+    	FragmentTransaction ft = getFragmentManager()
+				.beginTransaction();
+	    ft.replace(R.id.container_ptz_controller, ptzControllerFragment);
+	    ft.commit();
+	    
+	    controlsLayout.setLayoutParams(new LinearLayout.LayoutParams(0,LayoutParams.MATCH_PARENT,1));
+    	controlsLayout.addView(this.ptzFrameLayout, new  FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT));
+    	controlsLayout.addView(this.inspectorFrameLayout, new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT));
+    	return true;
+    }
+    
     private Properties getUriProperties(String FileName) {
 		Properties properties = new Properties();
         try {
@@ -233,12 +300,16 @@ public class PTZ_ImageGalleryActivity extends ActionBarActivity implements Handl
 
 	    // Add the fragment to the activity, pushing this transaction
 	    // on to the back stack.
+        
+        if (!showCameraControlsInLandscapeOrientation())
+        {
 	    FragmentTransaction ft = getFragmentManager().beginTransaction();
 	    ft.replace(R.id.container_stream_1, this.stream1Fragment);
 	    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 	    ft.addToBackStack(null);
 	    ft.commit();
-	    
+        }
+        
 	    this.streamingViewOn = true;
 	}
 	
@@ -249,15 +320,18 @@ public class PTZ_ImageGalleryActivity extends ActionBarActivity implements Handl
 		// Instantiate a new fragment.
 		if (this.imageGalleryFragment == null)
 		 this.imageGalleryFragment = new ImageGalleryFragment();
-
-	    // Add the fragment to the activity, pushing this transaction
-	    // on to the back stack.
-	    FragmentTransaction ft = getFragmentManager().beginTransaction();
-	    ft.replace(R.id.container_stream_1, this.imageGalleryFragment);
-	    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-	    ft.addToBackStack(null);
-	    ft.commit();
-	    
+      
+		if (!showGalleryInLandscapeOrientation())
+		{
+			 // Add the fragment to the activity, pushing this transaction
+		    // on to the back stack.
+		    FragmentTransaction ft = getFragmentManager().beginTransaction();
+		    ft.replace(R.id.container_stream_1, this.imageGalleryFragment);
+		    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+		    ft.addToBackStack(null);
+		    ft.commit();
+		}
+	   
 	    this.streamingViewOn = false;
 	}
 	

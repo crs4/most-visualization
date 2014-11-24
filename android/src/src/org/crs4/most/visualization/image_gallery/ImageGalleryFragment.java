@@ -138,9 +138,7 @@ public class ImageGalleryFragment extends Fragment {
 				
 				//touchImageView.setImageResource(pics[arg2]);
 				touchImageView.setImageDrawable(Drawable.createFromPath(pics[arg2].toString()));
-				
-				
-				
+
 				LayoutParams lp=new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 				imageView.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
 				touchImageView.setLayoutParams(lp);
