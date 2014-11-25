@@ -123,6 +123,14 @@ public class StreamInspectorFragment extends Fragment {
 	    	this.streamsArrayAdapter.notifyDataSetChanged();
 	    }
 	 
+	 public void refreshData()
+	 {
+		 if (this.streamsArrayAdapter!=null)
+		 {
+			 this.streamsArrayAdapter.notifyDataSetChanged();
+		 }
+	 }
+	 
 	 private void filterHeaderView(List<StreamProperty> streamProperties, ViewGroup header)
 	 {
 		 if (streamProperties!=null)

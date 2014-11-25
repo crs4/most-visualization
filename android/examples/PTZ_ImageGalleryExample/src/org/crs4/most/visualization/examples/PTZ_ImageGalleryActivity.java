@@ -53,6 +53,7 @@ import android.widget.Toast;
 
 import android.support.v7.app.ActionBarActivity;
 
+
 public class PTZ_ImageGalleryActivity extends ActionBarActivity implements Handler.Callback, 
 																		PTZ_ControllerFragment.IPtzCommandReceiver , 
 																		IStreamFragmentCommandListener,
@@ -124,7 +125,6 @@ public class PTZ_ImageGalleryActivity extends ActionBarActivity implements Handl
 	    	this.inspectorFrameLayout = (FrameLayout) findViewById(R.id.container_stream_inspector);
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     	
@@ -173,20 +173,10 @@ public class PTZ_ImageGalleryActivity extends ActionBarActivity implements Handl
     	
     	LinearLayout controlsLayout = (LinearLayout)   findViewById(R.id.land_ctl_frames_container);
     	
-    	//View rootView =  getLayoutInflater().inflate(R.layout.activity_main, null);
-    	//LinearLayout inflatedLayout = (LinearLayout) rootView.findViewById(R.id.land_ctl_frames_container);
-    	//FrameLayout ptzFrameLayout = (FrameLayout) rootView.findViewById(R.id.container_ptz_controller);
-    	//inflatedLayout.removeView(this.ptzFrameLayout);
     	controlsLayout.removeAllViews();
-    	
-    	FragmentTransaction ft = getFragmentManager()
-				.beginTransaction();
-	    ft.replace(R.id.container_ptz_controller, ptzControllerFragment);
-	    ft.commit();
-	    
-	    controlsLayout.setLayoutParams(new LinearLayout.LayoutParams(0,LayoutParams.MATCH_PARENT,1));
-    	controlsLayout.addView(this.ptzFrameLayout, new  FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT));
+	    controlsLayout.addView(this.ptzFrameLayout, new  FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT));
     	controlsLayout.addView(this.inspectorFrameLayout, new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT));
+    	
     	return true;
     }
     
