@@ -48,7 +48,7 @@ StreamInspectorFragment
 
 .. java:type:: public class StreamInspectorFragment extends Fragment
 
-   This fragment provides a way for visually getting real time informations about a list of \ :java:ref:`IStream`\  objects. Also, you can specify a filter for getting only the stream propertires you are interested in. You can attach this fragment to any activity, provided that it implements the \ :java:ref:`StreamInspectorFragment.IStreamProvider`\  interface.
+   This fragment provides a way for visually getting and/or updating the video properties of a list of \ :java:ref:`IStream`\  objects. Also, you can specify a filter for getting only a subset of stream properties you are interested in. You can attach this fragment to any activity, provided that it implements the \ :java:ref:`StreamInspectorFragment.IStreamProvider`\  interface.
 
 Methods
 -------
@@ -79,6 +79,14 @@ onCreateView
 
 .. java:method:: @Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
    :outertype: StreamInspectorFragment
+
+refreshData
+^^^^^^^^^^^
+
+.. java:method:: public void refreshData()
+   :outertype: StreamInspectorFragment
+
+   Force the reloading of the stream data of the underlying adapter
 
 updateStreamStateInfo
 ^^^^^^^^^^^^^^^^^^^^^

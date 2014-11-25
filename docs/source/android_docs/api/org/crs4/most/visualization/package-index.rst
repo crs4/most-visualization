@@ -8,6 +8,8 @@ org.crs4.most.visualization
 
    IStreamArrayAdapter
    IStreamFragmentCommandListener
+   PTZ_ControllerFragment
+   PTZ_ControllerFragment-IPtzCommandReceiver
    StreamInspectorFragment
    StreamInspectorFragment-IStreamProvider
    StreamViewerFragment

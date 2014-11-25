@@ -48,7 +48,7 @@ import android.widget.RadioButton;
  * <li> how to switch among three streaming modality: the H264 streaming mode, the motion jpeg mode and the still image mode </li>
  *
  */
-public class StillImageExampleActivity extends ActionBarActivity implements Handler.Callback, IStreamFragmentCommandListener , IStreamProvider {
+public class StreamInspectorExampleActivity extends ActionBarActivity implements Handler.Callback, IStreamFragmentCommandListener , IStreamProvider {
 	
 	private boolean exitFromAppRequest = false;
 	//ID for the menu exit option

@@ -53,7 +53,17 @@ import android.widget.Toast;
 
 import android.support.v7.app.ActionBarActivity;
 
-
+/**
+ * This example explains you:
+ *  <li> how to play a stream on a *StreamViewerFragment* 
+ *  <li> how to get and/or update the properties of the stream by using a *StreamInspectorFragment* 
+ *  <li> how to remotely control pan, tilt and zoom values of an Axis PTZ Webcam by using a *PTZ_ControllerFragment*
+ *  <li> how to make snapshots of the stream and save them into the internal storage
+ *  <li> how to open an Image Gallery containing all the stream snaphots, by using a *ImageGalleryFragment* 
+ *  <li> how to select an image from the gallery, zoom in/out and move it by touch screen gestures
+ *  <li> how to delete an image from the gallery (simply by a double tap on it)
+ *
+ */
 public class PTZ_ImageGalleryActivity extends ActionBarActivity implements Handler.Callback, 
 																		PTZ_ControllerFragment.IPtzCommandReceiver , 
 																		IStreamFragmentCommandListener,
@@ -98,6 +108,7 @@ public class PTZ_ImageGalleryActivity extends ActionBarActivity implements Handl
         	StreamingLib streamingLib = new StreamingLibBackend();
             
             
+        	// Instance a new PTZ Controller Fragment
             this.ptzControllerFragment = PTZ_ControllerFragment.newInstance(true,true,true);
             
     	  	// First of all, initialize the library 
@@ -109,6 +120,8 @@ public class PTZ_ImageGalleryActivity extends ActionBarActivity implements Handl
 	    	
 	    	this.uriProps = getUriProperties("uri.properties.default");
        	 	
+	    	
+	    	// Instance tje PTZ Manager
             this.ptzManager = new PTZ_Manager(this, uriProps.getProperty("uri_ptz") , uriProps.getProperty("username_ptz"), uriProps.getProperty("password_ptz"));
             
             
@@ -117,9 +130,11 @@ public class PTZ_ImageGalleryActivity extends ActionBarActivity implements Handl
 	    	 
 	    	this.stream1 = streamingLib.createStream(stream1_params, this.handler);
 	    	Log.d(TAG,"STREAM 1 INSTANCE");
+	    	
 	    	// Instance the first StreamViewer fragment where to render the first stream by passing the stream name as its ID.
 	    	this.stream1Fragment = StreamViewerFragment.newInstance(stream1.getName());
 	    	this.streamInspectorFragment = StreamInspectorFragment.newInstance();
+	    	
 	    	
 	    	this.ptzFrameLayout = (FrameLayout) findViewById(R.id.container_ptz_controller);
 	    	this.inspectorFrameLayout = (FrameLayout) findViewById(R.id.container_stream_inspector);
@@ -128,7 +143,7 @@ public class PTZ_ImageGalleryActivity extends ActionBarActivity implements Handl
 			e.printStackTrace();
 		}
     	
-    	// add the first fragment to the first container
+    	// add all fragments to their containers
     	FragmentTransaction fragmentTransaction = getFragmentManager()
 				.beginTransaction();
 		fragmentTransaction.add(R.id.container_stream_1, stream1Fragment);
@@ -284,20 +299,13 @@ public class PTZ_ImageGalleryActivity extends ActionBarActivity implements Handl
 		// nothing to do in this case
         if (this.streamingViewOn) return;
         
-	    // Instantiate a new fragment.
-		//if (this.imageGalleryFragment == null)
-	    //this.imageGalleryFragment = new ImageGalleryFragment();
-
-	    // Add the fragment to the activity, pushing this transaction
-	    // on to the back stack.
-        
         if (!showCameraControlsInLandscapeOrientation())
         {
-	    FragmentTransaction ft = getFragmentManager().beginTransaction();
-	    ft.replace(R.id.container_stream_1, this.stream1Fragment);
-	    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-	    ft.addToBackStack(null);
-	    ft.commit();
+		    FragmentTransaction ft = getFragmentManager().beginTransaction();
+		    ft.replace(R.id.container_stream_1, this.stream1Fragment);
+		    ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+		    ft.addToBackStack(null);
+		    ft.commit();
         }
         
 	    this.streamingViewOn = true;

@@ -26,10 +26,9 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TextView;
 
 /**
- * This fragment provides a way for visually getting real time informations about a list of {@link IStream} objects.
- * Also, you can specify a filter for getting only the stream propertires you are interested in.
+ * This fragment provides a way for visually getting and/or updating the video properties of a list of {@link IStream} objects.
+ * Also, you can specify a filter for getting only a subset of stream properties you are interested in.
  * You can attach this fragment to any activity, provided that it implements the {@link StreamInspectorFragment.IStreamProvider} interface.
- *  
  */
 public class StreamInspectorFragment extends Fragment {
 	
@@ -123,6 +122,10 @@ public class StreamInspectorFragment extends Fragment {
 	    	this.streamsArrayAdapter.notifyDataSetChanged();
 	    }
 	 
+	 
+	 /**
+	  * Force the reloading of the stream data of the underlying adapter
+	  */
 	 public void refreshData()
 	 {
 		 if (this.streamsArrayAdapter!=null)
