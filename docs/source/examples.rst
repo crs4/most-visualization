@@ -11,20 +11,20 @@ All the following examples are located into the folder *examples/android*.
   - how to play a stream on a *StreamViewerFragment* 
   - how to get and/or update the properties of the stream by using a *StreamInspectorFragment*
   - how to change the Stream Rendering mode. You can choose among the following 3 modalities:
-    - rstp streamning (the continous stream that the user can play or pause by clicking the playerr buttons provided by the StreamViewer fragment)
-    - still-image (you load a snapshot from the renmote camera by clicking on a button)
-    - timed still-images (the system loads a jpeg image from the remote camera every # seconds, as specified by the user)
+     - rstp streamning (the continous stream that the user can play or pause by clicking the player buttons provided by the StreamViewer fragment)
+     - still-image (you load a snapshot from the renmote camera by clicking on a button)
+     - timed still-images (the system loads a jpeg image from the remote camera every # seconds, as specified by the user)
    
  * **PTZ_ControllerExample** This example explains you:
-   - how to play a stream on a *StreamViewerFragment* 
-   - how to get and/or update the properties of the stream by using a *StreamInspectorFragment*
-   - how to remotely control pan, tilt and zoom values of an Axis PTZ Webcam by using a *PTZ_ControllerFragment*
-   - how to make snapshots of the stream and save them into the internal storage
+  - how to play a stream on a *StreamViewerFragment* 
+  - how to get and/or update the properties of the stream by using a *StreamInspectorFragment*
+  - how to remotely control pan, tilt and zoom values of an Axis PTZ Webcam by using a *PTZ_ControllerFragment*
+  - how to make snapshots of the stream and save them into the internal storage
    
  * **PTZ_ImageGalleryExample** This example contains all the features of the *PTZ_ControllerExample* example, and in addition,  explains you: 
-   - how to open an Image Gallery containing all the stream snaphots, by using a *ImageGalleryFragment* 
-   - how to select an image from the gallery, zoom in/out and move it by touch screen gestures
-   - how to delete an image from the gallery (simply by a double tap on it)
+  - how to open an Image Gallery containing all the stream snaphots, by using a *ImageGalleryFragment* 
+  - how to select an image from the gallery, zoom in/out and move it by touch screen gestures
+  - how to delete an image from the gallery (simply by a double tap on it)
   
    
 For running the Android examples, open your preferred IDE (e.g Eclipse) and do the following changes:

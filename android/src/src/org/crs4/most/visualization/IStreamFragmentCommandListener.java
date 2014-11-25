@@ -13,6 +13,10 @@ package org.crs4.most.visualization;
 
 import android.view.SurfaceView;
 
+/**
+ * This interface must be implemented by activities attached to the {@link StreamViewerFragment} fragment
+ *
+ */
 public interface IStreamFragmentCommandListener {
 
 	/**

@@ -32,8 +32,6 @@
 
 .. java:import:: android.view View
 
-.. java:import:: android.view View.OnLongClickListener
-
 .. java:import:: android.view ViewGroup
 
 .. java:import:: android.view ViewGroup.LayoutParams
@@ -49,8 +47,6 @@
 .. java:import:: android.widget ImageView
 
 .. java:import:: android.widget LinearLayout
-
-.. java:import:: android.widget Toast
 
 ImageGalleryFragment.ImageAdapter
 =================================

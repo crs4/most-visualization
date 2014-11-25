@@ -36,6 +36,8 @@ PTZ_ControllerFragment
 
 .. java:type:: public class PTZ_ControllerFragment extends Fragment implements OnTouchListener
 
+   This fragment provides you a set of visual panels and buttons to be used as a GUI frontend for handling remote PTZ webcams. This fragment expects the attached activity implements the \ :java:ref:`IPtzCommandReceiver`\  interface, because it notifies to this interface all the GUI actions (e.g button clicks)
+
 Methods
 -------
 newInstance
@@ -44,7 +46,7 @@ newInstance
 .. java:method:: public static PTZ_ControllerFragment newInstance()
    :outertype: PTZ_ControllerFragment
 
-   Provides a new istance of this fragment
+   Provides a new instance of this fragment, with all panels visible
 
    :return: the PTZ_ControllerFragment instance
 
@@ -53,6 +55,12 @@ newInstance
 
 .. java:method:: public static PTZ_ControllerFragment newInstance(boolean panTiltPanelVisible, boolean zoomPanelVisible, boolean snapShotVisible)
    :outertype: PTZ_ControllerFragment
+
+   Provides a new instance of this fragment, with a selection of desired panels
+
+   :param panTiltPanelVisible: set the pan-tilt panel visible or not
+   :param zoomPanelVisible: set the zoom panel visible or not
+   :param snapShotVisible: set the snapshot button visible or not
 
 onAttach
 ^^^^^^^^

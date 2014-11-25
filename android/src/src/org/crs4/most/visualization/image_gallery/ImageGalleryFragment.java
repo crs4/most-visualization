@@ -20,7 +20,6 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
@@ -29,15 +28,19 @@ import android.widget.BaseAdapter;
 import android.widget.Gallery;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Toast;
+
 
 
 // GALLERY DEPRECATED ->>>>> http://stackoverflow.com/questions/15833889/options-for-replacing-the-deprecated-gallery
 
+/**
+ * 
+ * This fragment allows you to embed in your activity an image gallery.
+ *
+ */
 public class ImageGalleryFragment extends Fragment {
 	
 	private static final String TAG = "ImageGalleryFragment";
-	
 	
 	private File [] pics = null;
 	private ImageAdapter imageAdapter = null;
@@ -67,7 +70,7 @@ public class ImageGalleryFragment extends Fragment {
 			public void onClick(DialogInterface dialog, int which) {
 				
 				ImageDownloader.deleteInternalFile(getActivity(), pics[imageIndex].getName());
-				reloadGalleyImages();
+				reloadGalleryImages();
 				dialog.cancel();
 				
 			}
@@ -88,7 +91,10 @@ public class ImageGalleryFragment extends Fragment {
 		 alertDialog.show();
 	}
 	
-	private void reloadGalleyImages()
+	/**
+	 * Reloads the images contained in to the internal storage
+	 */
+	public void reloadGalleryImages()
 	{
 		this.pics = ImageDownloader.getInternalImages(getActivity());
 		if (this.imageAdapter!=null)
@@ -107,6 +113,7 @@ public class ImageGalleryFragment extends Fragment {
         this.pics = ImageDownloader.getInternalImages(getActivity());
         
 		Gallery ga = (Gallery) this.rootView.findViewById(R.id.Gallery01);
+		 
 		this.imageAdapter = new ImageAdapter(getActivity());
 		ga.setAdapter(this.imageAdapter);
 

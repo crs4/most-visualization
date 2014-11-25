@@ -32,8 +32,6 @@
 
 .. java:import:: android.view View
 
-.. java:import:: android.view View.OnLongClickListener
-
 .. java:import:: android.view ViewGroup
 
 .. java:import:: android.view ViewGroup.LayoutParams
@@ -50,8 +48,6 @@
 
 .. java:import:: android.widget LinearLayout
 
-.. java:import:: android.widget Toast
-
 ImageGalleryFragment
 ====================
 
@@ -59,6 +55,8 @@ ImageGalleryFragment
    :noindex:
 
 .. java:type:: public class ImageGalleryFragment extends Fragment
+
+   This fragment allows you to embed in your activity an image gallery.
 
 Fields
 ------
@@ -83,4 +81,12 @@ onCreateView
    :outertype: ImageGalleryFragment
 
    Called when the activity is first created.
+
+reloadGalleryImages
+^^^^^^^^^^^^^^^^^^^
+
+.. java:method:: public void reloadGalleryImages()
+   :outertype: ImageGalleryFragment
+
+   Reloads the images contained in to the internal storage
 

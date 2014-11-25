@@ -37,6 +37,8 @@ PTZ_ControllerFragment.IPtzCommandReceiver
 .. java:type:: public interface IPtzCommandReceiver
    :outertype: PTZ_ControllerFragment
 
+   An activity must implement this interface to be able to receive notifications from the attached PTZ_ControllerFragment
+
 Methods
 -------
 onGoHome
@@ -45,11 +47,17 @@ onGoHome
 .. java:method:: public void onGoHome()
    :outertype: PTZ_ControllerFragment.IPtzCommandReceiver
 
+   Called when the user clicks on the home button of the pan-tilt panel
+
 onPTZstartMove
 ^^^^^^^^^^^^^^
 
 .. java:method:: public void onPTZstartMove(PTZ_Direction dir)
    :outertype: PTZ_ControllerFragment.IPtzCommandReceiver
+
+   Called when the user presses one button of the pan-tilt panel
+
+   :param dir: the required moving direction
 
 onPTZstartZoom
 ^^^^^^^^^^^^^^
@@ -57,11 +65,19 @@ onPTZstartZoom
 .. java:method:: public void onPTZstartZoom(PTZ_Zoom dir)
    :outertype: PTZ_ControllerFragment.IPtzCommandReceiver
 
+   Called when the user presses one button of the zoom panel
+
+   :param dir: the required zooming direction
+
 onPTZstopMove
 ^^^^^^^^^^^^^
 
 .. java:method:: public void onPTZstopMove(PTZ_Direction dir)
    :outertype: PTZ_ControllerFragment.IPtzCommandReceiver
+
+   Called when the user releases one button of the pan-tilt panel
+
+   :param the: moving direction before this stop command
 
 onPTZstopZoom
 ^^^^^^^^^^^^^
@@ -69,9 +85,15 @@ onPTZstopZoom
 .. java:method:: public void onPTZstopZoom(PTZ_Zoom dir)
    :outertype: PTZ_ControllerFragment.IPtzCommandReceiver
 
+   Called when the user releases one button of the zoom panel
+
+   :param the: zooming direction before this stop command
+
 onSnaphot
 ^^^^^^^^^
 
 .. java:method:: public void onSnaphot()
    :outertype: PTZ_ControllerFragment.IPtzCommandReceiver
+
+   Called when the user clicks on the snapshot button
 

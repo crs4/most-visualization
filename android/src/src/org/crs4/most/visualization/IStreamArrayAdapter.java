@@ -26,6 +26,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+/**
+ * This adapter is internally used from the {@link StreamInspectorFragment} for representing IStream data.
+ *  
+ */
 class IStreamArrayAdapter extends ArrayAdapter<IStream> {
    
 	private List<StreamProperty> streamProperties = null;

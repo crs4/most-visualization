@@ -20,7 +20,11 @@ import android.widget.GridLayout;
 import android.widget.ImageButton;
 
 
-
+/**
+ * This fragment provides you a set of visual panels and buttons to be used as a GUI frontend for handling remote PTZ webcams.
+ * This fragment expects the attached activity implements the  {@link IPtzCommandReceiver} interface, because
+ * it notifies to this interface all the GUI actions (e.g button clicks)
+ */
 public class PTZ_ControllerFragment extends Fragment implements OnTouchListener{
 
 	private static final String TAG="PTZ_ControllerFragment";
@@ -28,15 +32,44 @@ public class PTZ_ControllerFragment extends Fragment implements OnTouchListener{
 	private static final String ZOOM_PANEL_VISIBILITY = "ZOOM_PANEL_VISIBILITY";
 	private static final String SNAPSHOT_VISIBILITY = "SNAPSHOT_VISIBILITY";
 	
+	/**
+	 * An activity must implement this interface to be able to receive notifications from the attached PTZ_ControllerFragment
+	 *  
+	 */
 	public interface IPtzCommandReceiver {
 		
+		/**
+		 * Called when the user presses one button of the pan-tilt panel
+		 * @param dir the required moving direction 
+		 */
 		public void onPTZstartMove(PTZ_Direction dir);
+		
+		/**
+		 * Called when the user releases one button of the pan-tilt panel
+		 * @param the moving direction before this stop command
+		 */
 		public void onPTZstopMove(PTZ_Direction dir);
 		
+		/**
+		 * Called when the user presses one button of the zoom panel
+		 * @param dir the required zooming direction 
+		 */
 		public void onPTZstartZoom(PTZ_Zoom dir);
+		
+		/**
+		 * Called when the user releases one button of the zoom panel
+		 * @param the zooming direction before this stop command
+		 */
 		public void onPTZstopZoom(PTZ_Zoom dir);
 		
+		/**
+		 * Called when the user clicks on the home button of the pan-tilt panel
+		 */
 		public void onGoHome();
+		
+		/**
+		 * Called when the user clicks on the snapshot button
+		 */
 		public void onSnaphot();
 		
 	}
@@ -44,13 +77,20 @@ public class PTZ_ControllerFragment extends Fragment implements OnTouchListener{
 	private IPtzCommandReceiver ptzCommandReceiver = null;
 	
 	/**
-	 * Provides a new istance of this fragment
+	 * Provides a new instance of this fragment, with all panels visible
 	 * @return the PTZ_ControllerFragment instance
 	 */
 	public static  PTZ_ControllerFragment newInstance() {
 		  return PTZ_ControllerFragment.newInstance(true,true,true);
 	    }
 	
+	/**
+	 * Provides a new instance of this fragment, with a selection of desired panels
+	 * @param panTiltPanelVisible set the pan-tilt panel visible or not
+	 * @param zoomPanelVisible set the zoom panel visible or not
+	 * @param snapShotVisible set the snapshot button visible or not
+	 * @return
+	 */
 	public static  PTZ_ControllerFragment newInstance(boolean panTiltPanelVisible, boolean zoomPanelVisible, boolean snapShotVisible) {
 		PTZ_ControllerFragment ptz = new PTZ_ControllerFragment();
 		 
