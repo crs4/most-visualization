@@ -6,6 +6,8 @@
 
 .. java:import:: android.app Fragment
 
+.. java:import:: android.util Log
+
 .. java:import:: android.view LayoutInflater
 
 .. java:import:: android.view SurfaceView

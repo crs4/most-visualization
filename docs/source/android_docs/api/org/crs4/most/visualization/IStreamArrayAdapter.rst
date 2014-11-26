@@ -28,6 +28,8 @@ IStreamArrayAdapter
 
 .. java:type::  class IStreamArrayAdapter extends ArrayAdapter<IStream>
 
+   This adapter is internally used from the \ :java:ref:`StreamInspectorFragment`\  for representing IStream data.
+
 Constructors
 ------------
 IStreamArrayAdapter

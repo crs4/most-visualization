@@ -26,6 +26,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+/**
+ * This adapter is internally used from the {@link StreamInspectorFragment} for representing IStream data.
+ *  
+ */
 class IStreamArrayAdapter extends ArrayAdapter<IStream> {
    
 	private List<StreamProperty> streamProperties = null;
@@ -65,41 +69,60 @@ class IStreamArrayAdapter extends ArrayAdapter<IStream> {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        IStream myStream = getItem(position);
-        viewHolder.name.setText(myStream.getName());
-        viewHolder.uri.setText(myStream.getProperty(StreamProperty.URI).toString());
-        if (myStream.getProperty(StreamProperty.VIDEO_SIZE)!=null)
-        	viewHolder.videoSize.setText(myStream.getProperty(StreamProperty.VIDEO_SIZE).toString());
-        else
-        	viewHolder.videoSize.setText("n.a");
-        viewHolder.latency.setText("" + myStream.getProperty(StreamProperty.LATENCY)+ " ms");
-        viewHolder.status.setText(myStream.getState().toString());
-        if (myStream.getState()==StreamState.ERROR)
-        	viewHolder.status.setBackgroundColor(Color.RED);
-        else if (myStream.getState()==StreamState.PLAYING_REQUEST)
-        	viewHolder.status.setBackgroundColor(0xFFFFA500); // ORANGE COLOR
-        else
-        	viewHolder.status.setBackgroundColor(Color.GREEN);
         
-        this.filterViewColumns(viewHolder);
+        IStream myStream = getItem(position);
+        this.filterViewColumns(myStream, viewHolder);
         
         return convertView;
     }
     
-    private void filterViewColumns(ViewHolder viewHolder)
+    private void filterViewColumns(IStream myStream, ViewHolder viewHolder)
     {
     	if (this.streamProperties!=null)
     	{
     		if (!this.streamProperties.contains(StreamProperty.NAME))
     				{ viewHolder.name.setVisibility(View.GONE);}
+    		else
+    		{
+    			viewHolder.name.setText(myStream.getName());
+    		};
+    		
+    		
     		if (!this.streamProperties.contains(StreamProperty.URI))
 					{ viewHolder.uri.setVisibility(View.GONE);}
+    		else{
+    			viewHolder.uri.setText(myStream.getProperty(StreamProperty.URI).toString());
+    		};
+    		
     		if (!this.streamProperties.contains(StreamProperty.VIDEO_SIZE))
 			{ viewHolder.videoSize.setVisibility(View.GONE);}
+    		else
+    		{
+    			if (myStream.getProperty(StreamProperty.VIDEO_SIZE)!=null)
+    	        	viewHolder.videoSize.setText(myStream.getProperty(StreamProperty.VIDEO_SIZE).toString());
+    	        else
+    	        	viewHolder.videoSize.setText("n.a");
+    		};
+    		
     		if (!this.streamProperties.contains(StreamProperty.LATENCY))
 			{ viewHolder.latency.setVisibility(View.GONE);}
+    		else
+    		{
+    			viewHolder.latency.setText("" + myStream.getProperty(StreamProperty.LATENCY)+ " ms");
+    		};
+    		
     		if (!this.streamProperties.contains(StreamProperty.STATE))
 			{ viewHolder.videoSize.setVisibility(View.GONE);}
+    		else 
+    		{
+    			 viewHolder.status.setText(myStream.getState().toString());
+    			 if (myStream.getState()==StreamState.ERROR)
+    		        	viewHolder.status.setBackgroundColor(Color.RED);
+    		        else if (myStream.getState()==StreamState.PLAYING_REQUEST)
+    		        	viewHolder.status.setBackgroundColor(0xFFFFA500); // ORANGE COLOR
+    		        else
+    		        	viewHolder.status.setBackgroundColor(Color.GREEN);
+    		};
     	}
     }
     

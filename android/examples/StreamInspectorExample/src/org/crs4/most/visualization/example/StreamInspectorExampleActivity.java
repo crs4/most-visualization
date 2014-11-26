@@ -36,7 +36,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -49,7 +48,7 @@ import android.widget.RadioButton;
  * <li> how to switch among three streaming modality: the H264 streaming mode, the motion jpeg mode and the still image mode </li>
  *
  */
-public class StillImageExampleActivity extends ActionBarActivity implements Handler.Callback, IStreamFragmentCommandListener , IStreamProvider {
+public class StreamInspectorExampleActivity extends ActionBarActivity implements Handler.Callback, IStreamFragmentCommandListener , IStreamProvider {
 	
 	private boolean exitFromAppRequest = false;
 	//ID for the menu exit option
@@ -148,7 +147,7 @@ public class StillImageExampleActivity extends ActionBarActivity implements Hand
                 break;
             case R.id.radio_motion_jpeg:
                 if (checked)
-                     setMotionJpegMode();
+                     setTimedStillImageMode();
                 break;
         }
     }
@@ -184,7 +183,7 @@ public class StillImageExampleActivity extends ActionBarActivity implements Hand
     	this.currentMode = StreamMode.STILL_IMAGE;
     }
    
-    private void setMotionJpegMode()
+    private void setTimedStillImageMode()
     {
     	Button butLoad = (Button) findViewById(R.id.but_load);
     	butLoad.setEnabled(false);
@@ -207,7 +206,7 @@ public class StillImageExampleActivity extends ActionBarActivity implements Hand
      * Use a TimerTask for scheduling a remote image loading at fixed rate 
      * @param framePerMin
      */
-    private void playMotionJpeg(int framePerMin)
+    private void playTimedStillImages(int framePerMin)
     {
     	if (this.motionTimer!=null)
 			this.motionTimer.cancel();
@@ -293,10 +292,9 @@ public class StillImageExampleActivity extends ActionBarActivity implements Hand
 				Log.d(TAG, "handleMessage: Current Event:" + infoMsg);
 				
 				
-				
 				// for simplicity, in this example we only handle events of type STREAM_EVENT
 				if (myEvent.getEventType()==StreamingEventType.STREAM_EVENT)
-					if (myEvent.getEvent()== StreamingEvent.STREAM_STATE_CHANGED || myEvent.getEvent()== StreamingEvent.STREAM_ERROR)
+					if (myEvent.getEvent()==StreamingEvent.STREAM_STATE_CHANGED || myEvent.getEvent()== StreamingEvent.STREAM_ERROR)
 					{
 						if (this.stream1.getState()==StreamState.DEINITIALIZED && this.exitFromAppRequest)
 						{
@@ -322,14 +320,14 @@ public class StillImageExampleActivity extends ActionBarActivity implements Hand
 		Log.d(TAG,"Setting stream on play state");
 		if (currentMode==StreamMode.STREAMING)
 		{   
-			this.playMotionJpeg(0);
+			this.playTimedStillImages(0);
 			this.stream1.play();
 		}
 		else if (currentMode==StreamMode.MOTION_JPEG)
 		{   
 			this.stream1.pause();
 			String framePerMinutes = ((EditText) findViewById(R.id.txt_frame_rate)).getText().toString();
-			playMotionJpeg(Integer.parseInt(framePerMinutes));
+			playTimedStillImages(Integer.parseInt(framePerMinutes));
 		}
 	}
 
@@ -338,7 +336,7 @@ public class StillImageExampleActivity extends ActionBarActivity implements Hand
 	public void onPause(String streamId) {
 		Log.d(TAG,"Setting stream on pause state");
 		this.stream1.pause();
-		this.playMotionJpeg(0);
+		this.playTimedStillImages(0);
 	}
 
 

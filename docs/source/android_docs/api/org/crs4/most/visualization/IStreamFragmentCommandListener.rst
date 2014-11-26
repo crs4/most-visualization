@@ -8,6 +8,8 @@ IStreamFragmentCommandListener
 
 .. java:type:: public interface IStreamFragmentCommandListener
 
+   This interface must be implemented by activities attached to the \ :java:ref:`StreamViewerFragment`\  fragment
+
 Methods
 -------
 onPause
