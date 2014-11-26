@@ -341,9 +341,18 @@ public class PTZ_ImageGalleryActivity extends ActionBarActivity implements Handl
 		IBitmapReceiver receiver = new IBitmapReceiver() {	
 			@Override
 			public void onBitmapSaved(ImageDownloader imageDownloader, String filename) {
-				Log.d(TAG, "Saved Image:" + filename);
+				Log.d(TAG, "Saved Image::" + filename);
+				Log.d(TAG, "Before toast---");
 				Toast.makeText(PTZ_ImageGalleryActivity.this, "Image saved:" + filename , Toast.LENGTH_LONG).show();
-				imageDownloader.logAppFileNames();
+				Log.d(TAG, "After toast---");
+				//imageDownloader.logAppFileNames();
+				
+				if (imageGalleryFragment!=null)
+				{
+					imageGalleryFragment.reloadGalleryImages();
+					imageGalleryFragment.selectImage(0);
+				}
+				
 			}
 			
 			@Override
@@ -355,7 +364,7 @@ public class PTZ_ImageGalleryActivity extends ActionBarActivity implements Handl
 			public void onBitmapDownloadingError(
 					ImageDownloader imageDownloader, Exception ex) {
 					Toast.makeText(PTZ_ImageGalleryActivity.this, "Error downloading Image:" + ex.getMessage(), Toast.LENGTH_LONG).show();
-				
+					
 			}
 
 			@Override

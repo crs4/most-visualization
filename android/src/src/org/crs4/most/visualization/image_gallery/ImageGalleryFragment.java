@@ -125,35 +125,53 @@ public class ImageGalleryFragment extends Fragment {
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
 				
-				final int imageIndex = arg2;
-				try {
-				imageView.removeAllViews();
-				} catch (Exception e) {
-					e.getMessage();
-				}
-				
-				GestureDetector gestureDetector = new GestureDetector(getActivity(), new GestureDetector.SimpleOnGestureListener() {
-
-			        	@Override
-			        	public boolean onDoubleTap(MotionEvent e) {
-			        	    showDeleteMessageAlert(imageIndex);
-			                return true;
-			        	}
-			        }); 
-			        	 
-				TouchImageView touchImageView = new TouchImageView(getActivity(), gestureDetector);
-				
-				//touchImageView.setImageResource(pics[arg2]);
-				touchImageView.setImageDrawable(Drawable.createFromPath(pics[arg2].toString()));
-
-				LayoutParams lp=new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-				imageView.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
-				touchImageView.setLayoutParams(lp);
-				imageView.addView(touchImageView);
+			   selectImage(arg2);
 			}
 
 		});
         
+		// try to select the first image, if present, the first time this gallery is opened by the attached activity
+		selectImage(0);
+	}
+	
+	/**
+	 * Select an image from the gallery, by index array
+	 * @param imageIndex the index of the image (the index 0 is the newest image)
+	 */
+	public void selectImage(final int imageIndex)
+	{
+		try {
+		imageView.removeAllViews();
+		} catch (Exception e) {
+			e.getMessage();
+		}
+		
+		// if there is no image in the gallery, simply return...
+		if (this.pics.length<1)
+		{
+			Log.d(TAG, "No image found in the gallery. Image selecting ignored");
+			return;
+		}
+		
+		
+		GestureDetector gestureDetector = new GestureDetector(getActivity(), new GestureDetector.SimpleOnGestureListener() {
+
+	        	@Override
+	        	public boolean onDoubleTap(MotionEvent e) {
+	        	    showDeleteMessageAlert(imageIndex);
+	                return true;
+	        	}
+	        }); 
+	        	 
+		TouchImageView touchImageView = new TouchImageView(getActivity(), gestureDetector);
+		
+		//touchImageView.setImageResource(pics[arg2]);
+		touchImageView.setImageDrawable(Drawable.createFromPath(pics[imageIndex].toString()));
+
+		LayoutParams lp=new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+		imageView.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
+		touchImageView.setLayoutParams(lp);
+		imageView.addView(touchImageView);
 	}
 
 	public class ImageAdapter extends BaseAdapter {
