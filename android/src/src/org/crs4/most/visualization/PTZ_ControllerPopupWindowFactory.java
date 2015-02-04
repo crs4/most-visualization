@@ -3,13 +3,15 @@ package org.crs4.most.visualization;
 import java.util.ArrayList;
  
 
+ 
+
 import org.crs4.most.streaming.enums.PTZ_Direction;
 import org.crs4.most.streaming.enums.PTZ_Zoom;
 
-import android.app.Activity;
-import android.app.DialogFragment;
-import android.app.Fragment;
-import android.os.Bundle;
+
+import android.app.ActionBar.LayoutParams;
+import android.content.Context;
+import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -19,6 +21,8 @@ import android.view.ViewGroup;
 import android.view.View.OnTouchListener;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
+import android.widget.PopupWindow;
+import android.widget.Toast;
 
 
 /**
@@ -26,9 +30,9 @@ import android.widget.ImageButton;
  * This fragment expects the attached activity implements the  {@link IPtzCommandReceiver} interface, because
  * it notifies to this interface all the GUI actions (e.g button clicks)
  */
-public class PTZ_ControllerFragment extends DialogFragment implements OnTouchListener{
+public class PTZ_ControllerPopupWindowFactory  implements OnTouchListener{
 
-	private static final String TAG="PTZ_ControllerFragment";
+	private static final String TAG="PTZ_ControllerPopupWindowFactory";
 	private static final String PAN_TILT_PANEL_VISIBILITY = "PAN_TILT_PANEL_VISIBILITY";
 	private static final String ZOOM_PANEL_VISIBILITY = "ZOOM_PANEL_VISIBILITY";
 	private static final String SNAPSHOT_VISIBILITY = "SNAPSHOT_VISIBILITY";
@@ -76,14 +80,9 @@ public class PTZ_ControllerFragment extends DialogFragment implements OnTouchLis
 	}
 	
 	private IPtzCommandReceiver ptzCommandReceiver = null;
+	private PopupWindow popupWindow;
+	private Context context;
 	
-	/**
-	 * Provides a new instance of this fragment, with all panels visible
-	 * @return the PTZ_ControllerFragment instance
-	 */
-	public static  PTZ_ControllerFragment newInstance() {
-		  return PTZ_ControllerFragment.newInstance(true,true,true);
-	    }
 	
 	/**
 	 * Provides a new instance of this fragment, with a selection of desired panels
@@ -92,41 +91,38 @@ public class PTZ_ControllerFragment extends DialogFragment implements OnTouchLis
 	 * @param snapShotVisible set the snapshot button visible or not
 	 * @return
 	 */
-	public static  PTZ_ControllerFragment newInstance(boolean panTiltPanelVisible, boolean zoomPanelVisible, boolean snapShotVisible) {
-		PTZ_ControllerFragment ptz = new PTZ_ControllerFragment();
+	public  PTZ_ControllerPopupWindowFactory(Context context, IPtzCommandReceiver ptzReceiver, boolean panTiltPanelVisible, boolean zoomPanelVisible, boolean snapShotVisible) {
+		
+		this.context = context;
+		this.ptzCommandReceiver = ptzReceiver;
 		 
-		Bundle args = new Bundle();
-		    args.putBoolean(PAN_TILT_PANEL_VISIBILITY, panTiltPanelVisible);
-		    args.putBoolean(ZOOM_PANEL_VISIBILITY, zoomPanelVisible);
-		    args.putBoolean(SNAPSHOT_VISIBILITY, snapShotVisible); 
-	        ptz.setArguments(args);
-
-	     return ptz;
-	    }
-	 
-	 
-
-	 @Override
-	  public void onAttach(Activity activity) {
-		   super.onAttach(activity);
-		   this.ptzCommandReceiver = (IPtzCommandReceiver) activity;
-	   }
-	 
-	@Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState)
-          {
-	        View rootView = inflater.inflate(R.layout.ptz_panel, container, false);
-	       // this.streamsView = (ListView) rootView.findViewById(R.id.listStreams);
+		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		
+		 View rootView = inflater.inflate(R.layout.ptz_panel, null);
 	      
 	        setupButtonListeners(rootView);
 	        
-	          this.setPanTiltPanelVisible(rootView,getArguments().getBoolean(PAN_TILT_PANEL_VISIBILITY));
-	          this.setSnaphotVisible(rootView,getArguments().getBoolean(SNAPSHOT_VISIBILITY));
-	          this.setZoomPanelVisible(rootView, getArguments().getBoolean(ZOOM_PANEL_VISIBILITY));
+	          this.setPanTiltPanelVisible(rootView ,panTiltPanelVisible);
+	          this.setSnaphotVisible(rootView ,zoomPanelVisible);
+	          this.setZoomPanelVisible(rootView , snapShotVisible);
 	          
-	        return rootView;
-          }
+		
+		 
+		 this.popupWindow = new PopupWindow(rootView,
+	                LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, true);
+		 
+		 this.popupWindow.setBackgroundDrawable (new BitmapDrawable());
+		
+	    
+	    }
+	 
+	 
+    public PopupWindow getPopupWindow()
+    {
+    	Toast.makeText(this.context, "Getting PopupWindow" , Toast.LENGTH_LONG).show();
+    	return this.popupWindow;
+    }
+	 
 
 	private void setupButtonListeners(View rootView) {
 		
@@ -212,6 +208,8 @@ public class PTZ_ControllerFragment extends DialogFragment implements OnTouchLis
 	
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
+		if (v==null || v.getContentDescription()==null)
+			return false;
 		
 		String ctxDesc =  v.getContentDescription().toString();
 		PTZ_Direction ptzDirection = getPTZDirectionByContentDescription(ctxDesc);
@@ -219,7 +217,7 @@ public class PTZ_ControllerFragment extends DialogFragment implements OnTouchLis
 		
 		if (event.getAction()==MotionEvent.ACTION_DOWN)
 		{
-			//Toast.makeText(getActivity(), "Action Down " + ctxDesc, Toast.LENGTH_LONG).show();
+			Toast.makeText(this.context, "Action Down " + ctxDesc, Toast.LENGTH_LONG).show();
 			Log.d(TAG, "Action Down:" + ctxDesc);
 			if (ptzDirection!=null)
 				this.ptzCommandReceiver.onPTZstartMove(ptzDirection);

@@ -165,7 +165,7 @@ public final class R {
           attribute's value can be found in the {@link #Gallery1} array.
           @attr name android:galleryItemBackground
         */
-        public static final int Gallery1_android_galleryItemBackground = 0;
+        public static int Gallery1_android_galleryItemBackground = 0;
         /** Attributes that can be used with a ProgressBar.
            <p>Includes the following attributes:</p>
            <table>
@@ -199,49 +199,49 @@ public final class R {
           attribute's value can be found in the {@link #ProgressBar} array.
           @attr name android:max
         */
-        public static final int ProgressBar_android_max = 2;
+        public static int ProgressBar_android_max = 2;
         /**
           <p>This symbol is the offset where the {@link android.R.attr#maxHeight}
           attribute's value can be found in the {@link #ProgressBar} array.
           @attr name android:maxHeight
         */
-        public static final int ProgressBar_android_maxHeight = 1;
+        public static int ProgressBar_android_maxHeight = 1;
         /**
           <p>This symbol is the offset where the {@link android.R.attr#maxWidth}
           attribute's value can be found in the {@link #ProgressBar} array.
           @attr name android:maxWidth
         */
-        public static final int ProgressBar_android_maxWidth = 0;
+        public static int ProgressBar_android_maxWidth = 0;
         /**
           <p>This symbol is the offset where the {@link android.R.attr#minHeight}
           attribute's value can be found in the {@link #ProgressBar} array.
           @attr name android:minHeight
         */
-        public static final int ProgressBar_android_minHeight = 7;
+        public static int ProgressBar_android_minHeight = 7;
         /**
           <p>This symbol is the offset where the {@link android.R.attr#minWidth}
           attribute's value can be found in the {@link #ProgressBar} array.
           @attr name android:minWidth
         */
-        public static final int ProgressBar_android_minWidth = 6;
+        public static int ProgressBar_android_minWidth = 6;
         /**
           <p>This symbol is the offset where the {@link android.R.attr#progress}
           attribute's value can be found in the {@link #ProgressBar} array.
           @attr name android:progress
         */
-        public static final int ProgressBar_android_progress = 3;
+        public static int ProgressBar_android_progress = 3;
         /**
           <p>This symbol is the offset where the {@link android.R.attr#progressDrawable}
           attribute's value can be found in the {@link #ProgressBar} array.
           @attr name android:progressDrawable
         */
-        public static final int ProgressBar_android_progressDrawable = 5;
+        public static int ProgressBar_android_progressDrawable = 5;
         /**
           <p>This symbol is the offset where the {@link android.R.attr#secondaryProgress}
           attribute's value can be found in the {@link #ProgressBar} array.
           @attr name android:secondaryProgress
         */
-        public static final int ProgressBar_android_secondaryProgress = 4;
+        public static int ProgressBar_android_secondaryProgress = 4;
         /** Attributes that can be used with a SeekBar.
            <p>Includes the following attributes:</p>
            <table>
@@ -262,13 +262,13 @@ public final class R {
           attribute's value can be found in the {@link #SeekBar} array.
           @attr name android:thumb
         */
-        public static final int SeekBar_android_thumb = 0;
+        public static int SeekBar_android_thumb = 0;
         /**
           <p>This symbol is the offset where the {@link android.R.attr#thumbOffset}
           attribute's value can be found in the {@link #SeekBar} array.
           @attr name android:thumbOffset
         */
-        public static final int SeekBar_android_thumbOffset = 1;
+        public static int SeekBar_android_thumbOffset = 1;
         /** Attributes that can be used with a Theme.
            <p>Includes the following attributes:</p>
            <table>
@@ -287,6 +287,6 @@ public final class R {
           attribute's value can be found in the {@link #Theme} array.
           @attr name android:disabledAlpha
         */
-        public static final int Theme_android_disabledAlpha = 0;
+        public static int Theme_android_disabledAlpha = 0;
     };
 }
