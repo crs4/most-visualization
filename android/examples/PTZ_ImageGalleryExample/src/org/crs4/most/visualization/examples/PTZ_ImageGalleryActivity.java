@@ -25,6 +25,7 @@ import org.crs4.most.visualization.IStreamFragmentCommandListener;
 import org.crs4.most.visualization.PTZ_ControllerFragment;
 import org.crs4.most.visualization.StreamInspectorFragment;
 import org.crs4.most.visualization.StreamViewerFragment;
+import org.crs4.most.visualization.IPtzCommandReceiver;
 import org.crs4.most.visualization.StreamInspectorFragment.IStreamProvider;
 import org.crs4.most.visualization.image_gallery.ImageGalleryFragment;
 
@@ -65,7 +66,7 @@ import android.support.v7.app.ActionBarActivity;
  *
  */
 public class PTZ_ImageGalleryActivity extends ActionBarActivity implements Handler.Callback, 
-																		PTZ_ControllerFragment.IPtzCommandReceiver , 
+																		IPtzCommandReceiver , 
 																		IStreamFragmentCommandListener,
 																		IStreamProvider
 																		

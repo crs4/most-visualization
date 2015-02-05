@@ -22,6 +22,7 @@ import org.crs4.most.streaming.ptz.PTZ_Manager;
 import org.crs4.most.streaming.utils.ImageDownloader;
 import org.crs4.most.streaming.utils.ImageDownloader.IBitmapReceiver;
 import org.crs4.most.visualization.IStreamFragmentCommandListener;
+import org.crs4.most.visualization.IPtzCommandReceiver;
 import org.crs4.most.visualization.PTZ_ControllerFragment;
 import org.crs4.most.visualization.StreamInspectorFragment;
 import org.crs4.most.visualization.StreamViewerFragment;
@@ -45,7 +46,7 @@ import android.widget.Toast;
 import android.support.v7.app.ActionBarActivity;
 
 public class PTZControllerActivity extends ActionBarActivity implements Handler.Callback, 
-																		PTZ_ControllerFragment.IPtzCommandReceiver , 
+																		IPtzCommandReceiver , 
 																		IStreamFragmentCommandListener,
 																		IStreamProvider
 																		

@@ -13,6 +13,7 @@ import android.app.ActionBar.LayoutParams;
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -37,47 +38,13 @@ public class PTZ_ControllerPopupWindowFactory  implements OnTouchListener{
 	private static final String ZOOM_PANEL_VISIBILITY = "ZOOM_PANEL_VISIBILITY";
 	private static final String SNAPSHOT_VISIBILITY = "SNAPSHOT_VISIBILITY";
 	
-	/**
-	 * An activity must implement this interface to be able to receive notifications from the attached PTZ_ControllerFragment
-	 *  
-	 */
-	public interface IPtzCommandReceiver {
-		
-		/**
-		 * Called when the user presses one button of the pan-tilt panel
-		 * @param dir the required moving direction 
-		 */
-		public void onPTZstartMove(PTZ_Direction dir);
-		
-		/**
-		 * Called when the user releases one button of the pan-tilt panel
-		 * @param the moving direction before this stop command
-		 */
-		public void onPTZstopMove(PTZ_Direction dir);
-		
-		/**
-		 * Called when the user presses one button of the zoom panel
-		 * @param dir the required zooming direction 
-		 */
-		public void onPTZstartZoom(PTZ_Zoom dir);
-		
-		/**
-		 * Called when the user releases one button of the zoom panel
-		 * @param the zooming direction before this stop command
-		 */
-		public void onPTZstopZoom(PTZ_Zoom dir);
-		
-		/**
-		 * Called when the user clicks on the home button of the pan-tilt panel
-		 */
-		public void onGoHome();
-		
-		/**
-		 * Called when the user clicks on the snapshot button
-		 */
-		public void onSnaphot();
-		
-	}
+	// variables for hand
+	private float mDx;
+    private float mDy;
+	private int mCurrentX=100;
+	private int mCurrentY=100;
+	
+	
 	
 	private IPtzCommandReceiver ptzCommandReceiver = null;
 	private PopupWindow popupWindow;
@@ -85,16 +52,26 @@ public class PTZ_ControllerPopupWindowFactory  implements OnTouchListener{
 	
 	
 	/**
-	 * Provides a new instance of this fragment, with a selection of desired panels
+	 * Creates anew floating popupWindow, with a selection of desired panels
+	 * @param context the context where to render the popup Window
+	 * @param ptzReceiver the remote object to be notified about the button events 
 	 * @param panTiltPanelVisible set the pan-tilt panel visible or not
 	 * @param zoomPanelVisible set the zoom panel visible or not
 	 * @param snapShotVisible set the snapshot button visible or not
-	 * @return
+	 * @param xPos the initial X position of the popupWindow
+	 * @param yPos the initial y position of the popupWindow
 	 */
-	public  PTZ_ControllerPopupWindowFactory(Context context, IPtzCommandReceiver ptzReceiver, boolean panTiltPanelVisible, boolean zoomPanelVisible, boolean snapShotVisible) {
+	public  PTZ_ControllerPopupWindowFactory(Context context, IPtzCommandReceiver ptzReceiver, 
+			boolean panTiltPanelVisible, 
+			boolean zoomPanelVisible, 
+			boolean snapShotVisible,
+			int xPos,
+			int yPos) {
 		
 		this.context = context;
 		this.ptzCommandReceiver = ptzReceiver;
+		this.mCurrentX = xPos;
+		this.mCurrentY = yPos;
 		 
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		
@@ -112,15 +89,43 @@ public class PTZ_ControllerPopupWindowFactory  implements OnTouchListener{
 	                LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, true);
 		 
 		 this.popupWindow.setBackgroundDrawable (new BitmapDrawable());
-		
+		 this.popupWindow.setTouchable(true);
+		 this.popupWindow.setFocusable(true);
+		 this.popupWindow.setTouchInterceptor(new OnTouchListener() {
+		    	
+	    	    
+	            
+	            @Override
+	            public boolean onTouch(View v, MotionEvent event) {
+	                int action = event.getAction();
+	                if (action == MotionEvent.ACTION_DOWN) {
+	                    mDx = mCurrentX - event.getRawX();
+	                    mDy = mCurrentY - event.getRawY();
+	                } else
+	                if (action == MotionEvent.ACTION_MOVE) {
+	                    mCurrentX = (int) (event.getRawX() + mDx);
+	                    mCurrentY = (int) (event.getRawY() + mDy);
+	                    popupWindow.update(mCurrentX, mCurrentY, -1, -1);
+	                }
+	                return false;
+	            }
+	        });
 	    
 	    }
 	 
-	 
+	/**
+	 * 
+	 * @return the created popup Window
+	 */
     public PopupWindow getPopupWindow()
     {
     	Toast.makeText(this.context, "Getting PopupWindow" , Toast.LENGTH_LONG).show();
     	return this.popupWindow;
+    }
+    
+    public void show()
+    {
+    	this.popupWindow.showAtLocation(this.popupWindow.getContentView(), Gravity.NO_GRAVITY, mCurrentX, mCurrentY);
     }
 	 
 
