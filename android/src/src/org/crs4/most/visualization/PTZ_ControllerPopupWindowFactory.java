@@ -27,9 +27,10 @@ import android.widget.Toast;
 
 
 /**
- * This fragment provides you a set of visual panels and buttons to be used as a GUI frontend for handling remote PTZ webcams.
- * This fragment expects the attached activity implements the  {@link IPtzCommandReceiver} interface, because
+ * This Factory class provides you an interactive visual panel containing a set of buttons to be used as a GUI frontend for handling remote PTZ webcams.
+ * You need to pass a {@link IPtzCommandReceiver} interface to the factory method of this class, because
  * it notifies to this interface all the GUI actions (e.g button clicks)
+ * Note that the created window implements the {@link android.view.View.OnTouchListener} interface, so you can move it to the desired position on the screen.
  */
 public class PTZ_ControllerPopupWindowFactory  implements OnTouchListener{
 
@@ -41,8 +42,8 @@ public class PTZ_ControllerPopupWindowFactory  implements OnTouchListener{
 	// variables for hand
 	private float mDx;
     private float mDy;
-	private int mCurrentX=100;
-	private int mCurrentY=100;
+	private int mCurrentX=100; // initial xPos
+	private int mCurrentY=100; // initial yPos
 	
 	
 	
@@ -52,9 +53,9 @@ public class PTZ_ControllerPopupWindowFactory  implements OnTouchListener{
 	
 	
 	/**
-	 * Creates anew floating popupWindow, with a selection of desired panels
+	 * Creates a new floating popupWindow, containing a set of optional panels to be viewed
 	 * @param context the context where to render the popup Window
-	 * @param ptzReceiver the remote object to be notified about the button events 
+	 * @param ptzReceiver the remote object to use as the target of all user notifications
 	 * @param panTiltPanelVisible set the pan-tilt panel visible or not
 	 * @param zoomPanelVisible set the zoom panel visible or not
 	 * @param snapShotVisible set the snapshot button visible or not
@@ -119,10 +120,13 @@ public class PTZ_ControllerPopupWindowFactory  implements OnTouchListener{
 	 */
     public PopupWindow getPopupWindow()
     {
-    	Toast.makeText(this.context, "Getting PopupWindow" , Toast.LENGTH_LONG).show();
+    	//Toast.makeText(this.context, "Getting PopupWindow" , Toast.LENGTH_LONG).show();
     	return this.popupWindow;
     }
     
+    /**
+     * Show the popupWindow at the current location
+     */
     public void show()
     {
     	this.popupWindow.showAtLocation(this.popupWindow.getContentView(), Gravity.NO_GRAVITY, mCurrentX, mCurrentY);
@@ -222,7 +226,7 @@ public class PTZ_ControllerPopupWindowFactory  implements OnTouchListener{
 		
 		if (event.getAction()==MotionEvent.ACTION_DOWN)
 		{
-			Toast.makeText(this.context, "Action Down " + ctxDesc, Toast.LENGTH_LONG).show();
+			//Toast.makeText(this.context, "Action Down " + ctxDesc, Toast.LENGTH_LONG).show();
 			Log.d(TAG, "Action Down:" + ctxDesc);
 			if (ptzDirection!=null)
 				this.ptzCommandReceiver.onPTZstartMove(ptzDirection);

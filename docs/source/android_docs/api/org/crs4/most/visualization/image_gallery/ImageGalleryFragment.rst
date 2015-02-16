@@ -90,3 +90,13 @@ reloadGalleryImages
 
    Reloads the images contained in to the internal storage
 
+selectImage
+^^^^^^^^^^^
+
+.. java:method:: public void selectImage(int imageIndex)
+   :outertype: ImageGalleryFragment
+
+   Select an image from the gallery, by index array
+
+   :param imageIndex: the index of the image (the index 0 is the newest image)
+

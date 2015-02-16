@@ -6,10 +6,11 @@ org.crs4.most.visualization
 .. toctree::
    :maxdepth: 1
 
+   IPtzCommandReceiver
    IStreamArrayAdapter
    IStreamFragmentCommandListener
    PTZ_ControllerFragment
-   PTZ_ControllerFragment-IPtzCommandReceiver
+   PTZ_ControllerPopupWindowFactory
    StreamInspectorFragment
    StreamInspectorFragment-IStreamProvider
    StreamViewerFragment

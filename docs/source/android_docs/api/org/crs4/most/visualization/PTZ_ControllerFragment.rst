@@ -6,6 +6,8 @@
 
 .. java:import:: android.app Activity
 
+.. java:import:: android.app DialogFragment
+
 .. java:import:: android.app Fragment
 
 .. java:import:: android.os Bundle
@@ -34,7 +36,7 @@ PTZ_ControllerFragment
 .. java:package:: org.crs4.most.visualization
    :noindex:
 
-.. java:type:: public class PTZ_ControllerFragment extends Fragment implements OnTouchListener
+.. java:type:: public class PTZ_ControllerFragment extends DialogFragment implements OnTouchListener
 
    This fragment provides you a set of visual panels and buttons to be used as a GUI frontend for handling remote PTZ webcams. This fragment expects the attached activity implements the \ :java:ref:`IPtzCommandReceiver`\  interface, because it notifies to this interface all the GUI actions (e.g button clicks)
 
