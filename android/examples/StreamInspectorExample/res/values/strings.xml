@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">StreamInspectorExample</string>
+    <string name="stream_mode">Streaming Mode</string>
+    <string name="still_image_mode">Still Image Mode</string>
+    <string name="motion_jpeg_mode">Timed Still Image Mode</string>
+    <string name="mnu_exit">Exit</string>
+</resources>
