@@ -14,8 +14,8 @@ The project consists of a set of frameworks that deal with different aspects and
 Visualization Framework
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-The Visualization Framework allows you to include in your mobile applications graphical modules capable of rendering , inspecting and changing properties of IStream objects.
-
+The Visualization Framework allows you to include into your mobile applications visual and interactive widgets capable of rendering , inspecting and changing properties of IStream objects.
+This framework internally uses the `Android Touch Gallery Library  <https://github.com/Dreddik/AndroidTouchGallery>`_  for rendering images and the `MOST Streaming Library  <https://github.com/crs4/most-streaming>`_ for managing audio/video streams.
 
 TREE:
 

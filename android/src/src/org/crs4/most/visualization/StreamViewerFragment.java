@@ -10,9 +10,6 @@
 package org.crs4.most.visualization;
 
 
-
- 
-
 import org.crs4.most.streaming.IStream;
 
 import android.os.Bundle;
