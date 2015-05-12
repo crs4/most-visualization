@@ -63,7 +63,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Most Viualization'
+project = u'Most Visualization'
 copyright = u'2014-15, Healthcare Flows - CRS4'
 
 # The version info for the project you're documenting, acts as replacement for
