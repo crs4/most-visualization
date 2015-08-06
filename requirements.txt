@@ -1,2 +1,2 @@
-django-reroute
-requests
+javalang==0.9.5
+javasphinx==0.9.11
