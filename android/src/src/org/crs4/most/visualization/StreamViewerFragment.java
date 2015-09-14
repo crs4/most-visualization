@@ -15,13 +15,18 @@ import org.crs4.most.streaming.IStream;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.Fragment;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 /**
  * This fragment represents a visual container for an {@link IStream}. It can be attached to any Activity, provided that it implements the {@link IStreamFragmentCommandListener} interface.
@@ -35,7 +40,10 @@ public class StreamViewerFragment extends Fragment {
 	 
 	 private IStreamFragmentCommandListener cmdListener = null;
 	 private SurfaceView surfaceView = null;
+	 private View streamCover = null;
+	 private TextView txtHiddenSurface = null;
 	 
+	 private boolean playerButtonsVisible = true;
 	 /**
 	  * Intances a new StreamViewerFragment
 	  * @param streamId the id of the stream to render
@@ -67,6 +75,7 @@ public class StreamViewerFragment extends Fragment {
 	public void onActivityCreated(Bundle bundle){
 		super.onActivityCreated(bundle);
 		Log.d(TAG,"ON ACTIVITY_CREATED STREAM VIEWER");
+		setPlayerButtonsVisible(this.playerButtonsVisible);
 		StreamViewerFragment.this.cmdListener.onSurfaceViewCreated(getStreamId(),this.surfaceView);
 	}
 	 
@@ -79,6 +88,8 @@ public class StreamViewerFragment extends Fragment {
 		   super.onAttach(activity);
 		   Log.d(TAG,"ON ATTACH STREAM VIEWER");
 		   this.cmdListener = (IStreamFragmentCommandListener) activity;
+		   
+		   
 	   }
 	   
 	   
@@ -100,6 +111,8 @@ public class StreamViewerFragment extends Fragment {
 		        View rootView = inflater.inflate(R.layout.stream_layout, container, false);
 		        
 		        this.surfaceView = (SurfaceView) rootView.findViewById(R.id.streamSurface);
+		        this.streamCover =  rootView.findViewById(R.id.hidecontainer);
+		        this.txtHiddenSurface = (TextView) rootView.findViewById(R.id.txtHiddenSurface);
 		        
 		        ImageButton butPlay = (ImageButton)  rootView.findViewById(R.id.button_play);
 		        butPlay.setOnClickListener(new OnClickListener() {
@@ -119,7 +132,25 @@ public class StreamViewerFragment extends Fragment {
 	        return rootView;
 	          }
 	    
-	 
+	
+	   /**
+	    * Set the stream visible
+	    */
+	  public void setStreamVisible()
+	  {  
+		  this.streamCover.setVisibility(View.INVISIBLE);
+	  }
+	  
+	  
+	  /**
+	   * Set the stream invisible
+	   * @param message an optional message to show instead of the stream
+	   */
+	  public void setStreamInvisible(String message)
+	  {  
+	  		this.streamCover.setVisibility(View.VISIBLE);
+	  		this.txtHiddenSurface.setText(message);
+	  }
 	    
 	 /**
 	  * Set the player buttons visible or not
@@ -127,6 +158,10 @@ public class StreamViewerFragment extends Fragment {
 	  */
 	 public void setPlayerButtonsVisible(boolean value)
 	 {
+		 this.playerButtonsVisible = value;
+		 
+		 if (getView()==null) return;
+		 
 		 ImageButton butPlay = (ImageButton)  getView().findViewById(R.id.button_play);
 		 ImageButton butPause = (ImageButton)  getView().findViewById(R.id.button_pause);
 		 
@@ -141,6 +176,5 @@ public class StreamViewerFragment extends Fragment {
 			 butPlay.setVisibility(View.INVISIBLE);
 			 butPause.setVisibility(View.INVISIBLE);
 		 }
-		 
 	 }
 }
