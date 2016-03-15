@@ -68,6 +68,13 @@ docs/_build/
 *.sqlite3
 settings.py
 
+# Android Studio
+*.iml
+.gradle
+local.properties
+.idea
+build
+captures
 
 #IOS Examples
 

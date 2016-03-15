@@ -1,0 +1,36 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
+
+    defaultConfig {
+        minSdkVersion 8
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+        setProperty("archivesBaseName", "MOSTVisualization")
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    repositories {
+        flatDir {
+            // need to change this, maybe with a Maven Local repo?
+            dirs "../../../../../most-streaming/android/src/MOSTStreaming/MOSTStreaming/build/outputs/aar/"
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile(name: "MOSTStreaming-arm-debug", ext: "aar")
+    compile 'com.android.support:support-v4'
+    compile 'com.android.support:appcompat-v7:23.2.1'
+    testCompile 'junit:junit:4.12'
+}
