@@ -22,7 +22,7 @@ android {
     repositories {
         flatDir {
             // need to change this, maybe with a Maven Local repo?
-            dirs "../../../../../most-streaming/android/src/MOSTStreaming/MOSTStreaming/build/outputs/aar/"
+            dirs "../../../../../most-streaming/android/android_studio/MOSTStreamingLib/MOSTStreaming/build/outputs/aar/"
         }
     }
 }

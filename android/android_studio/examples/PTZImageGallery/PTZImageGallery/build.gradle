@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.0.2"
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
 
     defaultConfig {
-        applicationId "it.crs4.most.visualization.ptzcontroller"
-        minSdkVersion 14
-        targetSdkVersion 21
+        applicationId "it.crs4.most.visualization.ptzimagegallery"
+        minSdkVersion 8
+        targetSdkVersion 23
         versionCode 1
         versionName "1.0"
     }
@@ -17,11 +17,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
     repositories {
 //        mavenLocal()
         flatDir {
             dirs "../../../MOSTVisualizationLib/MOSTVisualization/build/outputs/aar/",
-                 "../../../../../../most-streaming/android/android_studio/MOSTStreamingLib/MOSTStreaming/build/outputs/aar/"
+                    "../../../../../../most-streaming/android/android_studio/MOSTStreamingLib/MOSTStreaming/build/outputs/aar/"
 
         }
     }
@@ -31,6 +32,7 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile(name: "MOSTStreaming-arm-debug", ext: "aar")
     compile(name: "MOSTVisualization-debug", ext: "aar")
+    compile 'com.android.support:support-v4'
+    compile 'com.android.support:appcompat-v7:23.2.1'
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:21.0.2'
 }

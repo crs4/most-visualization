@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item android:id="@+id/stream_mode"
+              android:title="@string/streaming_mode"
+               />
+        <item android:id="@+id/gallery_mode"
+              android:title="@string/gallery_mode" />
+    </group>
+    <item android:id="@+id/mnu_exit"
+              android:title="@string/mnu_exit" />
+</menu>
