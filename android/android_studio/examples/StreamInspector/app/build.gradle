@@ -1,28 +1,28 @@
-apply plugin: 'com.android.library'
+apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
 
     defaultConfig {
+        applicationId "it.crs4.most.visualization.streaminspector"
         minSdkVersion 11
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
-        setProperty("archivesBaseName", "MOSTVisualization")
     }
-
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
     repositories {
+//        mavenLocal()
         flatDir {
-            // need to change this, maybe with a Maven Local repo?
-            dirs "../../../../../most-streaming/android/android_studio/MOSTStreamingLib/MOSTStreaming/build/outputs/aar/"
+            dirs "../../../MOSTVisualizationLib/MOSTVisualization/build/outputs/aar/",
+                 "../../../../../../most-streaming/android/android_studio/MOSTStreamingLib/MOSTStreaming/build/outputs/aar/"
+
         }
     }
 }
@@ -30,6 +30,7 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile(name: "MOSTStreaming-arm-debug", ext: "aar")
+    compile(name: "MOSTVisualization-debug", ext: "aar")
     compile 'com.android.support:support-v4'
     compile 'com.android.support:appcompat-v7:23.2.1'
     testCompile 'junit:junit:4.12'
