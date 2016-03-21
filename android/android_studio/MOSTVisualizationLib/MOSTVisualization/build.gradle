@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'maven'
 
 android {
     compileSdkVersion 23
@@ -20,17 +21,34 @@ android {
     }
 
     repositories {
-        flatDir {
-            // need to change this, maybe with a Maven Local repo?
-            dirs "../../../../../most-streaming/android/android_studio/MOSTStreamingLib/MOSTStreaming/build/outputs/aar/"
-        }
+        mavenLocal()
     }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile(name: "MOSTStreaming-arm-debug", ext: "aar")
+    compile group: 'it.crs4.most.streaming', name: 'MOSTStreaming', version: '1.0', ext: 'aar'
+    //compile 'com.google.protobuf:protobuf-java:2.4.0a'
     compile 'com.android.support:support-v4'
     compile 'com.android.support:appcompat-v7:23.2.1'
     testCompile 'junit:junit:4.12'
 }
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository url:  mavenLocal().url
+
+            pom.version = '1.0'
+            pom.groupId = 'it.crs4.most.visualization'
+            pom.artifactId = 'MOSTVisualization'
+        }
+    }
+}
+
+/*
+artifacts {
+    archives file('build/outputs/aar/MOSTVisualization-debug.aar')
+}
+*/
+
