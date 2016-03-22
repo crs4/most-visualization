@@ -1,5 +1,7 @@
 apply plugin: 'com.android.library'
-apply plugin: 'maven'
+//apply plugin: 'maven'
+
+apply plugin: 'maven-publish'
 
 android {
     compileSdkVersion 23
@@ -10,7 +12,6 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
-        setProperty("archivesBaseName", "MOSTVisualization")
     }
 
     buildTypes {
@@ -34,21 +35,48 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            repository url:  mavenLocal().url
+//
+//uploadArchives {
+//    repositories {
+//        mavenDeployer {
+//
+//            repository url:  mavenLocal().url
+//
+//            pom.version = '1.0'
+//            pom.groupId = 'it.crs4.most.visualization'
+//            pom.artifactId = 'MOSTVisualization'
+//        }
+//
+//    }
+//}
 
-            pom.version = '1.0'
-            pom.groupId = 'it.crs4.most.visualization'
-            pom.artifactId = 'MOSTVisualization'
+
+//
+//artifacts {
+//    archives file: file('build/outputs/aar/MOSTVisualization-debug.aar'), name: 'debug', 'type': 'aar'
+//}
+
+
+
+
+
+publishing {
+
+    repositories {
+        maven {
+
+            url mavenLocal().url
+        }
+    }
+    publications {
+        aar(MavenPublication) {
+            groupId 'it.crs4.most.visualization'
+            version = '1.0'
+            artifactId 'MOSTVisualization'
+
+            // Tell maven to prepare the generated "*.aar" file for publishing
+            artifact("build/outputs/aar/MOSTVisualization-debug.aar")
+
         }
     }
 }
-
-/*
-artifacts {
-    archives file('build/outputs/aar/MOSTVisualization-debug.aar')
-}
-*/
-
