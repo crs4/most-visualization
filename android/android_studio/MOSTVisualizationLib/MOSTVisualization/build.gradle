@@ -1,6 +1,4 @@
 apply plugin: 'com.android.library'
-//apply plugin: 'maven'
-
 apply plugin: 'maven-publish'
 
 android {
@@ -21,9 +19,9 @@ android {
         }
     }
 
-    repositories {
-        mavenLocal()
-    }
+//    repositories {
+//        mavenLocal()
+//    }
 }
 
 dependencies {
@@ -34,30 +32,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.2.1'
     testCompile 'junit:junit:4.12'
 }
-
-//
-//uploadArchives {
-//    repositories {
-//        mavenDeployer {
-//
-//            repository url:  mavenLocal().url
-//
-//            pom.version = '1.0'
-//            pom.groupId = 'it.crs4.most.visualization'
-//            pom.artifactId = 'MOSTVisualization'
-//        }
-//
-//    }
-//}
-
-
-//
-//artifacts {
-//    archives file: file('build/outputs/aar/MOSTVisualization-debug.aar'), name: 'debug', 'type': 'aar'
-//}
-
-
-
 
 
 publishing {
