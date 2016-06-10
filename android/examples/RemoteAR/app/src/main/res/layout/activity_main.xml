@@ -16,7 +16,8 @@
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:weightSum="1">
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
@@ -45,17 +46,21 @@
                 android:text="Remote Camera"
                 android:id="@+id/play_remote" />
         </LinearLayout>
+            <ToggleButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textOn="Edit Mode on"
+                android:textOff="Edit Mode off"
+                android:id="@+id/editModeButton"
+                android:layout_gravity="center_horizontal" />
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_horizontal"
-            android:id="@+id/stream_container">
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_horizontal"
+                android:id="@+id/stream_container">
 
-        </FrameLayout>
+            </FrameLayout>
 
     </LinearLayout>
-
-
-
 </RelativeLayout>

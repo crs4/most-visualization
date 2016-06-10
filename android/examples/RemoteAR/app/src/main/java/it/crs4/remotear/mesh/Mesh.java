@@ -209,7 +209,6 @@ public class Mesh{
 		gl.glRotatef(rx, 1, 0, 0);
 		gl.glRotatef(ry, 0, 1, 0);
 		gl.glRotatef(rz, 0, 0, 1);
-        Log.d(TAG, "ry " + ry);
 
 		// Point out the where the color buffer is.
 		gl.glDrawElements(GL10.GL_TRIANGLES, numOfIndices,

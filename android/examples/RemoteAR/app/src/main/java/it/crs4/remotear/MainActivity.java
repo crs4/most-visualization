@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.SurfaceView;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 
 import java.io.File;
@@ -40,6 +41,7 @@ import it.crs4.zmqlib.pubsub.ZMQPublisher;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import org.artoolkit.ar.base.ARToolKit;
 import org.artoolkit.ar.base.assets.AssetHelper;
@@ -72,6 +74,7 @@ public class MainActivity extends Activity implements
     private EditText rtspUri;
     private Button playRemoteButton;
     private Button playLocalButton;
+    private ToggleButton editButton;
     protected RemoteCaptureCameraPreview preview;
     protected TouchGLSurfaceView glView;
     protected TouchARRenderer renderer;
@@ -102,6 +105,7 @@ public class MainActivity extends Activity implements
 //        rtspUri = (EditText) findViewById(R.id.rtspUri);
         playRemoteButton = (Button) findViewById(R.id.play_remote);
         playLocalButton = (Button) findViewById(R.id.play_local);
+        editButton = (ToggleButton) findViewById(R.id.editModeButton);
 
         playRemoteButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -113,6 +117,14 @@ public class MainActivity extends Activity implements
                 playLocal();
             }
         });
+        editButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (glView != null){
+                    glView.setEditMode(isChecked);
+                }
+            }
+        });
+
 
     }
 

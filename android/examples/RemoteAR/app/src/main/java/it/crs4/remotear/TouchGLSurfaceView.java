@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 import it.crs4.remotear.TouchARRenderer;
+import it.crs4.remotear.mesh.Plane;
 
 /**
  * Created by mauro on 24/05/16.
@@ -17,6 +18,16 @@ public class TouchGLSurfaceView extends GLSurfaceView {
     protected float mPreviousX;
     protected float mPreviousY;
     protected TouchARRenderer renderer;
+
+    public boolean isEditMode() {
+        return editMode;
+    }
+
+    public void setEditMode(boolean editMode) {
+        this.editMode = editMode;
+    }
+
+    private boolean editMode = false;
 
     public TouchARRenderer getRenderer() {
         return renderer;
@@ -48,25 +59,33 @@ public class TouchGLSurfaceView extends GLSurfaceView {
 
         switch (e.getAction()) {
             case MotionEvent.ACTION_MOVE:
-                Log.d(TAG, "ACTION_MOVE");
+                if (!editMode){
+                    Log.d(TAG, "ACTION_MOVE");
 
-                float dx = x - mPreviousX;
-                float dy = y - mPreviousY;
+                    float dx = x - mPreviousX;
+                    float dy = y - mPreviousY;
 
-                // reverse direction of rotation above the mid-line
-                if (y > getHeight() / 2) {
-                    dx = dx * -1 ;
+                    // reverse direction of rotation above the mid-line
+                    if (y > getHeight() / 2) {
+                        dx = dx * -1 ;
+                    }
+
+                    // reverse direction of rotation to left of the mid-line
+                    if (x < getWidth() / 2) {
+                        dy = dy * -1 ;
+                    }
+
+                    renderer.setAngle(
+                            renderer.getAngle() +
+                                    ((dx + dy) * TOUCH_SCALE_FACTOR));
+                    requestRender();
                 }
 
-                // reverse direction of rotation to left of the mid-line
-                if (x < getWidth() / 2) {
-                    dy = dy * -1 ;
-                }
+            case MotionEvent.ACTION_UP:
+                Log.d(TAG, "ACTION_UP: x " + x + " y " + y);
 
-                renderer.setAngle(
-                        renderer.getAngle() +
-                                ((dx + dy) * TOUCH_SCALE_FACTOR));
-                requestRender();
+                Plane plane = new Plane(30, 30);
+                renderer.addMesh(plane, x, y);
         }
 
         mPreviousX = x;
