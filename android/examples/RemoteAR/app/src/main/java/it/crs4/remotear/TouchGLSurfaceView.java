@@ -29,7 +29,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
         this.editMode = editMode;
     }
 
-    private boolean editMode = true;
+    private boolean editMode = false;
 
     public TouchARRenderer getRenderer() {
         return renderer;

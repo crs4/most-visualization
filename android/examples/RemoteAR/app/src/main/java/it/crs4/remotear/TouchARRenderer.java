@@ -86,7 +86,9 @@ public class TouchARRenderer extends ARRenderer implements Handler.Callback{
                 @Override
                 public void handleMessage(Message inputMessage) {
                     JSONObject json = (JSONObject) inputMessage.obj;
+
                     try {
+                        String meshId = json.getString("id");
                         String msgType = (String) json.get("msgType");
                         Mesh mesh;
                         if(msgType.equals("newObj")) {
@@ -94,7 +96,8 @@ public class TouchARRenderer extends ARRenderer implements Handler.Callback{
                             addMesh(mesh);
                         }
                         else{
-                            mesh = meshes.get(json.getString("id"));
+
+                            mesh = meshes.get(meshId);
                         }
                         if (mesh != null) {
                             mesh.setCoordinates(
@@ -106,7 +109,9 @@ public class TouchARRenderer extends ARRenderer implements Handler.Callback{
                                     Float.valueOf(json.get("rz").toString())
                             );
                         }
-
+                        else {
+                            Log.e(TAG, "mesh with id " + meshId + " not found!");
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     } catch (MeshFactory.MeshCreationFail meshCreationFail) {
@@ -136,6 +141,7 @@ public class TouchARRenderer extends ARRenderer implements Handler.Callback{
 
         group.add(cube);
         group.add(pyramid);
+        meshes.put(group.getId(), group);
 
         return  true;
     }
