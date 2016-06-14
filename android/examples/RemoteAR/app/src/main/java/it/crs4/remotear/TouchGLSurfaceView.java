@@ -7,17 +7,19 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 import it.crs4.remotear.TouchARRenderer;
+import it.crs4.remotear.mesh.Group;
 import it.crs4.remotear.mesh.Plane;
 
 /**
  * Created by mauro on 24/05/16.
  */
 public class TouchGLSurfaceView extends GLSurfaceView {
-    private String TAG = "it.crs4.remotear.TouchGLSurfaceView";
+    private String TAG = "TouchGLSurfaceView";
     protected final float TOUCH_SCALE_FACTOR = 180.0f / 320;
     protected float mPreviousX;
     protected float mPreviousY;
     protected TouchARRenderer renderer;
+    private Group meshGroup;
 
     public boolean isEditMode() {
         return editMode;
@@ -27,13 +29,14 @@ public class TouchGLSurfaceView extends GLSurfaceView {
         this.editMode = editMode;
     }
 
-    private boolean editMode = false;
+    private boolean editMode = true;
 
     public TouchARRenderer getRenderer() {
         return renderer;
     }
 
     public void setRenderer(TouchARRenderer renderer) {
+        Log.d(TAG, "inside setRenderer ");
         this.renderer = renderer;
         super.setRenderer((Renderer) renderer);
         setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
@@ -82,16 +85,28 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                 }
 
             case MotionEvent.ACTION_UP:
-                Log.d(TAG, "ACTION_UP: x " + x + " y " + y);
+                if(editMode){
+                    Plane plane = new Plane(30, 30);
+                    plane.publisher = renderer.publisher;
+                    renderer.addMesh(plane, x, y);
+                    plane.publish();
+                }
 
-                Plane plane = new Plane(30, 30);
-                renderer.addMesh(plane, x, y);
+
+//            case MotionEvent.ACTION_DOWN:
+//                if(editMode){
+//                    Plane plane = new Plane(30, 30);
+//
+//
+//                }
+
         }
 
         mPreviousX = x;
         mPreviousY = y;
         return true;
     }
+
 
 
 }

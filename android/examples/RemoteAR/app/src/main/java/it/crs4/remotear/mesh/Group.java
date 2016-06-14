@@ -1,11 +1,16 @@
 package it.crs4.remotear.mesh;
 
+import org.json.JSONException;
+
 import java.util.Vector;
 import javax.microedition.khronos.opengles.GL10;
 
 public class Group extends Mesh {
 	private Vector<Mesh> children = new Vector<Mesh>();
-	
+
+    public Group(String id){
+        this.id = id;
+    }
 	@Override
 	public void draw(GL10 gl) {
 
@@ -17,7 +22,12 @@ public class Group extends Mesh {
 	    }
 	}
 
-	/**
+    @Override
+    public String toJson() throws JSONException {
+        return getBaseJsonObj().toString(); //FIXME
+    }
+
+    /**
 	 * @param location
 	 * @param object
 	 * @see java.util.Vector#add(int, java.lang.Object)

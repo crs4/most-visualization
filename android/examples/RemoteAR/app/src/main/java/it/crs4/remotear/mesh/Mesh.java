@@ -8,6 +8,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
+import java.util.UUID;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -20,7 +21,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.zeromq.ZMQ;
 
-public class Mesh{
+public abstract  class Mesh{
 	// Our vertex buffer.
 	private FloatBuffer verticesBuffer = null;
 
@@ -37,34 +38,53 @@ public class Mesh{
 	private FloatBuffer colorBuffer = null;
 
     public IPublisher publisher;
-    private int id;
+
+    public String getId() {
+        return id;
+    }
+
+    protected String id;
     private String TAG = "MESH";
 
-    public Mesh(){}
+    protected void setId(String id){
+        this.id = id != null ? id: UUID.randomUUID().toString();
+    }
 
-    public Mesh(int id){
-        this.id = id;
+    public Mesh(){
+        setId(null);
+    }
+
+    public Mesh(String id){
+        setId(id);
     }
 
     public float getX() {
         return x;
     }
 
+    protected JSONObject getBaseJsonObj() throws JSONException{
+        JSONObject obj = new JSONObject();
+
+        obj.put("id", id);
+        obj.put("x", x);
+        obj.put("y", y);
+        obj.put("z", z);
+        obj.put("rx", rx);
+        obj.put("ry", ry);
+        obj.put("rz", rz);
+        return obj;
+    }
+
     protected void publishCoordinate(){
         if (publisher != null){
-            JSONObject msg = new JSONObject();
             try {
-                msg.put("id", id);
-                msg.put("x", x);
-                msg.put("y", y);
-                msg.put("z", z);
-                msg.put("rx", rx);
-                msg.put("ry", ry);
-                msg.put("rz", rz);
-            } catch (JSONException e) {
+                JSONObject base = getBaseJsonObj();
+                base.put("msgType", "coord");
+                publisher.send(base.toString());
+            }
+            catch (JSONException e){
                 e.printStackTrace();
             }
-            publisher.send(msg.toString());
         }
     }
 
@@ -261,4 +281,21 @@ public class Mesh{
 		colorBuffer.put(colors);
 		colorBuffer.position(0);
 	}
+
+    public String toJson () throws JSONException{
+        return getBaseJsonObj().toString();
+    }
+
+    public void publish(){
+
+        if (publisher != null){
+            try {
+                JSONObject base = getBaseJsonObj();
+                base.put("msgType", "newObj");
+                publisher.send(base.toString());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

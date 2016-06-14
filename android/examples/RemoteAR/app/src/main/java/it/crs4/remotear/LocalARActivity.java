@@ -39,7 +39,7 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
     protected ARRenderer renderer;
     protected FrameLayout mainLayout;
     private CaptureCameraPreview preview;
-    private GLSurfaceView glView;
+    private TouchGLSurfaceView glView;
 //    private TouchGLSurfaceView glView;
     private boolean firstUpdate = false;
 
@@ -88,7 +88,9 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
         super.onResume();
         this.preview = new CaptureCameraPreview(this, this);
         Log.i("ARActivity", "onResume(): CaptureCameraPreview created");
-        this.glView = new GLSurfaceView(this);
+//        this.glView = new GLSurfaceView(this);
+        this.glView = new TouchGLSurfaceView(this);
+
         ActivityManager activityManager = (ActivityManager)this.getSystemService("activity");
         ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
         boolean supportsEs2 = configurationInfo.reqGlEsVersion >= 131072;
@@ -110,8 +112,10 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
         }
 
 //        this.glView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
+        Log.d(TAG, "ready to call setRenderer with " + (this.renderer !=null));
         this.glView.getHolder().setFormat(-3);
-        this.glView.setRenderer(this.renderer);
+        this.glView.setRenderer((TouchARRenderer) this.renderer);
+        Log.d(TAG, "setRenderer called");
         this.glView.setRenderMode(0);
         this.glView.setZOrderMediaOverlay(true);
         Log.i("ARActivity", "onResume(): GLSurfaceView created");
@@ -214,7 +218,7 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
 
 
     protected ARRenderer supplyRenderer() {
-            String address = "156.148.33.66:5555";
+            String address = "156.148.33.87:5555";
             ZMQSubscriber subscriber = new ZMQSubscriber(address);
             Thread subThread = new Thread(subscriber);
             subThread.start();

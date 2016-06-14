@@ -158,6 +158,7 @@ public class MainActivity extends Activity implements
                     IStream stream = MainActivity.this.stream1;
 //                    int width = stream.getVideoSize().getWidth();
 //                    int height = stream.getVideoSize().getHeight();
+                    //FIXME
                     int width = 704;
                     int height = 576;
                     Log.d(TAG, "width " + width);

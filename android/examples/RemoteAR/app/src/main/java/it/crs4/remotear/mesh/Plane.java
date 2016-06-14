@@ -1,17 +1,37 @@
 package it.crs4.remotear.mesh;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.UUID;
+
+import it.crs4.most.visualization.StreamViewerFragment;
+
 public class Plane extends Mesh {
+    float width;
+    float height;
+
 	public Plane() {
-		this(1, 1, 1, 1);
+        this(1, 1, 1, 1);
+	}
+    public Plane(String id) {
+        this(1, 1, 1, 1, id);
 	}
 
-	public Plane(float width, float height) {
-		this(width, height, 1, 1);
+	public Plane(float width, float height) {this(width, height, 1, 1);}
+
+    public Plane(float width, float height, String id) {
+		this(width, height, 1, 1, id);
 	}
 
-	public Plane(float width, float height, int widthSegments,
-			int heightSegments) {
-		float[] vertices = new float[(widthSegments + 1) * (heightSegments + 1)
+	public Plane(float width, float height, int widthSegments, int heightSegments) {
+        this(width, height, widthSegments, heightSegments, null);
+    }
+	public Plane(float width, float height, int widthSegments, int heightSegments, String id) {
+        this.width = width;
+        this.height = height;
+
+        float[] vertices = new float[(widthSegments + 1) * (heightSegments + 1)
 				* 3];
 		short[] indices = new short[(widthSegments + 1) * (heightSegments + 1)
 				* 6];
@@ -49,5 +69,25 @@ public class Plane extends Mesh {
 
 		setIndices(indices);
 		setVertices(vertices);
+        this.id = id != null ? id: UUID.randomUUID().toString();
 	}
+
+	@Override
+	public String toJson() throws JSONException {
+		JSONObject obj = getBaseJsonObj();
+        obj.put("width", width);
+        obj.put("height", height);
+		obj.put("class", "Plane");
+
+		return obj.toString();
+	}
+
+	@Override
+	public JSONObject getBaseJsonObj() throws JSONException{
+		JSONObject base = super.getBaseJsonObj();
+		base.put("height", height);
+		base.put("width", width);
+		return base;
+	}
+
 }

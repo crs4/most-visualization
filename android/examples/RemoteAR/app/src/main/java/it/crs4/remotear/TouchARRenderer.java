@@ -18,12 +18,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 //import org.artoolkit.ar.base.rendering.Cube;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import it.crs4.remotear.mesh.Cube;
 import it.crs4.remotear.mesh.Group;
 import it.crs4.remotear.mesh.Mesh;
+import it.crs4.remotear.mesh.MeshFactory;
 import it.crs4.remotear.mesh.Pyramid;
 import it.crs4.zmqlib.pubsub.BaseSubscriber;
 import it.crs4.zmqlib.pubsub.IPublisher;
@@ -35,7 +38,7 @@ public class TouchARRenderer extends ARRenderer implements Handler.Callback{
     protected  volatile  float angle = 0 ;
     protected  float previousAngle = 0;
     private int markerID = -1;
-    private volatile  Group group = new Group();
+    private volatile  Group group = new Group("arrow");
     private Pyramid pyramid = new Pyramid(40f, 80f, 40f);
     private Cube cube = new Cube(60f, 20f, 20f);
     private Handler handler;
@@ -44,7 +47,8 @@ public class TouchARRenderer extends ARRenderer implements Handler.Callback{
     protected String TAG = "TouchARRenderer";
     protected int height;
     protected int width;
-    private final ArrayList<Mesh> meshes = new ArrayList<Mesh>();
+//    private final ArrayList<Mesh> meshes = new ArrayList<Mesh>();
+    private final HashMap<String, Mesh> meshes = new HashMap<String, Mesh>();
     private GL10 gl;
 
 
@@ -83,16 +87,30 @@ public class TouchARRenderer extends ARRenderer implements Handler.Callback{
                 public void handleMessage(Message inputMessage) {
                     JSONObject json = (JSONObject) inputMessage.obj;
                     try {
-                        group.setCoordinates(
-                                Float.valueOf(json.get("x").toString()),
-                                Float.valueOf(json.get("y").toString()),
-                                Float.valueOf(json.get("z").toString()),
-                                Float.valueOf(json.get("rx").toString()),
-                                Float.valueOf(json.get("ry").toString()),
-                                Float.valueOf(json.get("rz").toString())
-                        );
+                        String msgType = (String) json.get("msgType");
+                        Mesh mesh;
+                        if(msgType.equals("newObj")) {
+                            mesh = MeshFactory.createMesh(json);
+                            addMesh(mesh);
+                        }
+                        else{
+                            mesh = meshes.get(json.getString("id"));
+                        }
+                        if (mesh != null) {
+                            mesh.setCoordinates(
+                                    Float.valueOf(json.get("x").toString()),
+                                    Float.valueOf(json.get("y").toString()),
+                                    Float.valueOf(json.get("z").toString()),
+                                    Float.valueOf(json.get("rx").toString()),
+                                    Float.valueOf(json.get("ry").toString()),
+                                    Float.valueOf(json.get("rz").toString())
+                            );
+                        }
+
                     } catch (JSONException e) {
                         e.printStackTrace();
+                    } catch (MeshFactory.MeshCreationFail meshCreationFail) {
+                        meshCreationFail.printStackTrace();
                     }
                 }
             };
@@ -148,8 +166,10 @@ public class TouchARRenderer extends ARRenderer implements Handler.Callback{
             group.draw(gl);
 
             synchronized (meshes){
-                for (Iterator<Mesh> iterator = meshes.iterator(); iterator.hasNext();) {
-                    Mesh mesh = iterator.next();
+                for (Iterator iterator = meshes.entrySet().iterator(); iterator.hasNext();) {
+                    Map.Entry pair = (Map.Entry)iterator.next();
+//                    Mesh mesh = iterator.next();
+                    Mesh mesh = (Mesh) pair.getValue();
                     gl.glPushMatrix();
                     mesh.draw(gl);
                     gl.glPopMatrix();
@@ -172,11 +192,12 @@ public class TouchARRenderer extends ARRenderer implements Handler.Callback{
     }
 
     public void addMesh(Mesh mesh){
-        meshes.add(mesh);
+        synchronized (meshes){
+            meshes.put(mesh.getId(), mesh);
+        }
     }
 
     public void addMesh(Mesh mesh, float winX, float winY){
-
         float [] modelView = new float[16];
         Matrix.setIdentityM(modelView, 0);
 //        getMatrix(gl, GL10.GL_MODELVIEW, modelView);
@@ -228,16 +249,13 @@ public class TouchARRenderer extends ARRenderer implements Handler.Callback{
 
         Log.d(TAG, "adding mesh in x " + x + " y " + y +" z " + z);
         synchronized (meshes){
-            meshes.add(mesh);
+            addMesh(mesh);
         }
+
     }
 
-    public boolean removeMesh(Mesh mesh){
-        return meshes.remove(mesh);
-    }
-
-    public Mesh removeMesh(int index){
-        return meshes.remove(index);
+    public Mesh removeMesh(Mesh mesh){
+        return meshes.remove(mesh.getId());
     }
 
     @Override
@@ -247,6 +265,8 @@ public class TouchARRenderer extends ARRenderer implements Handler.Callback{
     }
 
 
+
+//  Code from:  https://groups.google.com/forum/#!topic/android-developers/nSv1Pjp5jLY
     private static final float[] _tempGluUnProjectData = new float[40];
     private static final int     _temp_m   = 0;
     private static final int     _temp_A   = 16;
