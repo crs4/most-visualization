@@ -22,7 +22,17 @@ public class TouchGLSurfaceView extends GLSurfaceView {
     protected float mPreviousY;
     protected TouchARRenderer renderer;
     private Group meshGroup;
-    private enum Mode {Rotate, Edit, Move};
+    public enum Mode {Rotate, Edit, Move};
+    private boolean mDrawing = false;
+
+    public Mode getMode() {
+        return mode;
+    }
+
+    public void setMode(Mode mode) {
+        this.mode = mode;
+    }
+
     private Mode mode = Mode.Move;
     private ScaleGestureDetector mScaleDetector;
     private boolean mScaling = false;
@@ -79,7 +89,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
         // and other input controls. In this case, you are only
         // interested in events where the touch position changed.
 
-        if (e.getPointerCount() > 1) {
+        if (mode == Mode.Move && e.getPointerCount() > 1) {
             mScaleDetector.onTouchEvent(e);
         }
         else{
@@ -120,23 +130,24 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                             mesh.setX(mesh.getX() + dx);
                             mesh.setY(mesh.getY() - dy);
                             break;
+
+                        case Edit:
+                            draw(x, y);
+                            break;
                     }
                     break;
                 case MotionEvent.ACTION_UP:
                     if(mode == Mode.Edit){
-                        Plane plane = new Plane(30, 30);
-                        plane.publisher = renderer.publisher;
-                        renderer.addMesh(plane, x, y);
-                        plane.publish();
+                        mDrawing = false;
                     }
                     break;
 
-                //            case MotionEvent.ACTION_DOWN:
-                //                if(editMode){
-                //                    Plane plane = new Plane(30, 30);
-                //
-                //
-                //                }
+                case MotionEvent.ACTION_DOWN:
+                    if(mode == Mode.Edit){
+                        mDrawing = true;
+                    }
+                    break;
+
 
             }
 
@@ -146,5 +157,13 @@ public class TouchGLSurfaceView extends GLSurfaceView {
 
         }
         return true;
+    }
+
+    private void draw(float x, float y){
+        Plane plane = new Plane(30, 30);
+        plane.publisher = renderer.publisher;
+        renderer.addMesh(plane, x, y);
+        plane.publish();
+
     }
 }
