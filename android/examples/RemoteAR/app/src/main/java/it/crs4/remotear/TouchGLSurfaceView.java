@@ -5,9 +5,11 @@ import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 
 import it.crs4.remotear.TouchARRenderer;
 import it.crs4.remotear.mesh.Group;
+import it.crs4.remotear.mesh.Mesh;
 import it.crs4.remotear.mesh.Plane;
 
 /**
@@ -20,16 +22,10 @@ public class TouchGLSurfaceView extends GLSurfaceView {
     protected float mPreviousY;
     protected TouchARRenderer renderer;
     private Group meshGroup;
-
-    public boolean isEditMode() {
-        return editMode;
-    }
-
-    public void setEditMode(boolean editMode) {
-        this.editMode = editMode;
-    }
-
-    private boolean editMode = false;
+    private enum Mode {Rotate, Edit, Move};
+    private Mode mode = Mode.Move;
+    private ScaleGestureDetector mScaleDetector;
+    private boolean mScaling = false;
 
     public TouchARRenderer getRenderer() {
         return renderer;
@@ -44,12 +40,38 @@ public class TouchGLSurfaceView extends GLSurfaceView {
 
     public TouchGLSurfaceView(Context context) {
         super(context);
+        initScaleDetector(context);
     }
 
 
     public TouchGLSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        initScaleDetector(context);
     }
+
+    private void initScaleDetector(Context context){
+        mScaleDetector = new ScaleGestureDetector(context,
+            new ScaleGestureDetector.SimpleOnScaleGestureListener(){
+                @Override
+                public boolean onScale(ScaleGestureDetector detector) {
+                    TouchGLSurfaceView.this.mScaling = true;
+                    float currentScaleFactor = detector.getScaleFactor();
+                    Log.d(TAG, "currentScaleFactor " + currentScaleFactor);
+                    Mesh mesh = renderer.getMesh("arrow");
+                    if (currentScaleFactor < 1){
+                        mesh.setZ(mesh.getZ() - 5f);
+                    }
+                    else{
+                        mesh.setZ(mesh.getZ() + 5f);
+                    }
+
+                    return true;
+                }
+
+            });
+
+    }
+
 
     @Override
     public boolean onTouchEvent(MotionEvent e) {
@@ -57,56 +79,72 @@ public class TouchGLSurfaceView extends GLSurfaceView {
         // and other input controls. In this case, you are only
         // interested in events where the touch position changed.
 
-        float x = e.getX();
-        float y = e.getY();
+        if (e.getPointerCount() > 1) {
+            mScaleDetector.onTouchEvent(e);
+        }
+        else{
+            if (mScaling){
+                mScaling = false;
+                return true;
+            }
+            float x = e.getX();
+            float y = e.getY();
 
-        switch (e.getAction()) {
-            case MotionEvent.ACTION_MOVE:
-                if (!editMode){
+            float dx = x - mPreviousX;
+            float dy = y - mPreviousY;
+
+            switch (e.getAction()) {
+                case MotionEvent.ACTION_MOVE:
                     Log.d(TAG, "ACTION_MOVE");
+                    switch (mode) {
+                        case Rotate:
+                            Log.d(TAG, "Rotate");
+                            // reverse direction of rotation above the mid-line
+                            if (y > getHeight() / 2) {
+                                dx = dx * -1;
+                            }
 
-                    float dx = x - mPreviousX;
-                    float dy = y - mPreviousY;
+                            // reverse direction of rotation to left of the mid-line
+                            if (x < getWidth() / 2) {
+                                dy = dy * -1;
+                            }
 
-                    // reverse direction of rotation above the mid-line
-                    if (y > getHeight() / 2) {
-                        dx = dx * -1 ;
+                            renderer.setAngle(
+                                    renderer.getAngle() +
+                                            ((dx + dy) * TOUCH_SCALE_FACTOR));
+                            requestRender();
+                            break;
+                        case Move:
+                            Log.d(TAG, "Move");
+                            Mesh mesh =renderer.getMesh("arrow");
+                            mesh.setX(mesh.getX() + dx);
+                            mesh.setY(mesh.getY() - dy);
+                            break;
                     }
-
-                    // reverse direction of rotation to left of the mid-line
-                    if (x < getWidth() / 2) {
-                        dy = dy * -1 ;
+                    break;
+                case MotionEvent.ACTION_UP:
+                    if(mode == Mode.Edit){
+                        Plane plane = new Plane(30, 30);
+                        plane.publisher = renderer.publisher;
+                        renderer.addMesh(plane, x, y);
+                        plane.publish();
                     }
+                    break;
 
-                    renderer.setAngle(
-                            renderer.getAngle() +
-                                    ((dx + dy) * TOUCH_SCALE_FACTOR));
-                    requestRender();
-                }
+                //            case MotionEvent.ACTION_DOWN:
+                //                if(editMode){
+                //                    Plane plane = new Plane(30, 30);
+                //
+                //
+                //                }
 
-            case MotionEvent.ACTION_UP:
-                if(editMode){
-                    Plane plane = new Plane(30, 30);
-                    plane.publisher = renderer.publisher;
-                    renderer.addMesh(plane, x, y);
-                    plane.publish();
-                }
+            }
 
+            mPreviousX = x;
+            mPreviousY = y;
 
-//            case MotionEvent.ACTION_DOWN:
-//                if(editMode){
-//                    Plane plane = new Plane(30, 30);
-//
-//
-//                }
 
         }
-
-        mPreviousX = x;
-        mPreviousY = y;
         return true;
     }
-
-
-
 }

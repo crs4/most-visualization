@@ -120,7 +120,7 @@ public class MainActivity extends Activity implements
         editButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (glView != null){
-                    glView.setEditMode(isChecked);
+//                    glView.setEditMode(isChecked);
                 }
             }
         });

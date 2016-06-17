@@ -203,6 +203,10 @@ public class TouchARRenderer extends ARRenderer implements Handler.Callback{
         }
     }
 
+    public Mesh getMesh(String id){
+        return meshes.get(id);
+    }
+
     public void addMesh(Mesh mesh, float winX, float winY){
         float [] modelView = new float[16];
         Matrix.setIdentityM(modelView, 0);
