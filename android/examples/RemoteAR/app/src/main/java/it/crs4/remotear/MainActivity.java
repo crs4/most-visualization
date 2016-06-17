@@ -40,6 +40,7 @@ import it.crs4.zmqlib.pubsub.ZMQPublisher;
 
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.RadioButton;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -74,7 +75,6 @@ public class MainActivity extends Activity implements
     private EditText rtspUri;
     private Button playRemoteButton;
     private Button playLocalButton;
-    private ToggleButton editButton;
     protected RemoteCaptureCameraPreview preview;
     protected TouchGLSurfaceView glView;
     protected TouchARRenderer renderer;
@@ -105,7 +105,6 @@ public class MainActivity extends Activity implements
 //        rtspUri = (EditText) findViewById(R.id.rtspUri);
         playRemoteButton = (Button) findViewById(R.id.play_remote);
         playLocalButton = (Button) findViewById(R.id.play_local);
-        editButton = (ToggleButton) findViewById(R.id.editModeButton);
 
         playRemoteButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -117,16 +116,28 @@ public class MainActivity extends Activity implements
                 playLocal();
             }
         });
-        editButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (glView != null){
-                    glView.setMode(isChecked? TouchGLSurfaceView.Mode.Edit: TouchGLSurfaceView.Mode.Move);
+    }
 
-                }
+    public void onRadioButtonClicked(View view) {
+        if (glView != null){
+            boolean checked = ((RadioButton) view).isChecked();
+
+            // Check which radio button was clicked
+            switch(view.getId()) {
+                case R.id.radio_move:
+                    if (checked)
+                        glView.setMode(TouchGLSurfaceView.Mode.Move);
+                        break;
+                case R.id.radio_rotate:
+                    if (checked)
+                        glView.setMode(TouchGLSurfaceView.Mode.Rotate);
+                        break;
+                case R.id.radio_edit:
+                    if (checked)
+                        glView.setMode(TouchGLSurfaceView.Mode.Edit);
+                        break;
             }
-        });
-
-
+        }
     }
 
     public void playLocal(){
@@ -319,7 +330,6 @@ public class MainActivity extends Activity implements
 //        this.mainLayout.addView(this.preview, new ViewGroup.LayoutParams(-1, -1));
         this.mainLayout.addView(this.glView, new ViewGroup.LayoutParams(-1, -1));
         Log.i(TAG, "onResume(): Views added to main layout.");
-
 
     }
 

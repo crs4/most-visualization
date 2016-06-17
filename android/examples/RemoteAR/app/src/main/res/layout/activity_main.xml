@@ -46,13 +46,28 @@
                 android:text="Remote Camera"
                 android:id="@+id/play_remote" />
         </LinearLayout>
-            <ToggleButton
+        <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal">
+            <RadioButton android:id="@+id/radio_move"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textOn="Edit Mode on"
-                android:textOff="Edit Mode off"
-                android:id="@+id/editModeButton"
-                android:layout_gravity="center_horizontal" />
+                android:text="Move"
+                android:checked="true"
+                android:onClick="onRadioButtonClicked"/>
+            <RadioButton android:id="@+id/radio_rotate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Rotate"
+                android:onClick="onRadioButtonClicked"/>
+            <RadioButton android:id="@+id/radio_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Edit"
+                android:onClick="onRadioButtonClicked"/>
+        </RadioGroup>
 
             <FrameLayout
                 android:layout_width="match_parent"

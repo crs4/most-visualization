@@ -102,7 +102,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
 
             float dx = x - mPreviousX;
             float dy = y - mPreviousY;
-
+            Mesh mesh = renderer.getMesh("arrow");
             switch (e.getAction()) {
                 case MotionEvent.ACTION_MOVE:
                     Log.d(TAG, "ACTION_MOVE");
@@ -119,14 +119,10 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                                 dy = dy * -1;
                             }
 
-                            renderer.setAngle(
-                                    renderer.getAngle() +
-                                            ((dx + dy) * TOUCH_SCALE_FACTOR));
-                            requestRender();
+                            mesh.setRy(mesh.getRy() + (dx + dy) * TOUCH_SCALE_FACTOR);
                             break;
                         case Move:
                             Log.d(TAG, "Move");
-                            Mesh mesh =renderer.getMesh("arrow");
                             mesh.setX(mesh.getX() + dx);
                             mesh.setY(mesh.getY() - dy);
                             break;
@@ -150,7 +146,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
 
 
             }
-
+            requestRender();
             mPreviousX = x;
             mPreviousY = y;
 
