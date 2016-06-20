@@ -32,6 +32,7 @@ import it.crs4.most.streaming.StreamingEventBundle;
 import it.crs4.most.streaming.StreamingLib;
 import it.crs4.most.streaming.StreamingLibBackend;
 import it.crs4.most.streaming.enums.StreamProperty;
+import it.crs4.most.streaming.enums.StreamState;
 import it.crs4.most.streaming.enums.StreamingEvent;
 import it.crs4.most.streaming.enums.StreamingEventType;
 import it.crs4.most.visualization.IStreamFragmentCommandListener;
@@ -49,7 +50,7 @@ import org.artoolkit.ar.base.assets.AssetHelper;
 import org.artoolkit.ar.base.camera.CameraEventListener;
 
 
-public class MainActivity extends Activity implements
+    public class MainActivity extends Activity implements
 //        Handler.Callback,
         IStreamFragmentCommandListener,
         IStreamProvider,
@@ -80,8 +81,8 @@ public class MainActivity extends Activity implements
     protected TouchARRenderer renderer;
     protected FrameLayout mainLayout;
     private boolean firstUpdate = false;
-
     private boolean arFragmentAdded = false;
+    private boolean mStreamPrepared = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -164,19 +165,33 @@ public class MainActivity extends Activity implements
                 String infoMsg = "Event Type:" + event.getEventType() + " ->" + event.getEvent() + ":" + event.getInfo();
                 Log.d(TAG, "handleMessage: Current Event:" + infoMsg);
 
+                StreamState streamState = ((IStream) event.getData()).getState();
+                Log.d(TAG, "event.getData().streamState " + streamState);
                 if (event.getEventType() == StreamingEventType.STREAM_EVENT &&
-                        event.getEvent() == StreamingEvent.VIDEO_SIZE_CHANGED){
-                    Log.d(TAG, "ready to call cameraPreviewStarted");
-                    IStream stream = MainActivity.this.stream1;
-//                    int width = stream.getVideoSize().getWidth();
-//                    int height = stream.getVideoSize().getHeight();
-                    //FIXME
-                    int width = 704;
-                    int height = 576;
-                    Log.d(TAG, "width " + width);
-                    Log.d(TAG, "height " + height);
-                    MainActivity.this.cameraPreviewStarted(width, height, 25, 0, false);
+                        event.getEvent() == StreamingEvent.STREAM_STATE_CHANGED
 
+                        ){
+                    if(streamState == StreamState.INITIALIZED){
+                        setProperties();
+                        stream1.play();
+
+
+                    }
+                    else if (streamState == StreamState.PLAYING){
+
+                        Log.d(TAG, "event.getData().streamState " + streamState);
+                        Log.d(TAG, "ready to call cameraPreviewStarted");
+                        IStream stream = MainActivity.this.stream1;
+    //                    int width = stream.getVideoSize().getWidth();
+    //                    int height = stream.getVideoSize().getHeight();
+                        //FIXME
+                        int width = 704;
+                        int height = 576;
+                        Log.d(TAG, "width " + width);
+                        Log.d(TAG, "height " + height);
+                        MainActivity.this.cameraPreviewStarted(width, height, 25, 0, false);
+
+                    }
                 }
 
             }
@@ -186,7 +201,7 @@ public class MainActivity extends Activity implements
         }
         else{
             stream1Fragment.setStreamVisible();
-            stream1.play();
+//            stream1.play();
         }
     }
     @Override
@@ -229,8 +244,26 @@ public class MainActivity extends Activity implements
 
     @Override
     public void onSurfaceViewCreated(String streamId, SurfaceView surfaceView) {
-        if (this.stream1 != null)
+        Log.d(TAG, "onSurfaceViewCreated!!!");
+
+//        stream1Fragment.setStreamVisible();
+        if (surfaceView != null && !mStreamPrepared){
+
+            setupStreamLib();
+            prepareRemoteAR();
             this.stream1.prepare(surfaceView);
+            mStreamPrepared = true;
+        }
+    }
+
+    private void setProperties(){
+        StreamProperties sp = new StreamProperties();
+        sp.add(StreamProperty.URI, this.streamingUri);
+        if (!this.stream1.commitProperties(sp)){
+            Log.e(TAG, "failed setting stream properties");
+            throw new RuntimeException("failed setting stream properties");
+        }
+
     }
 
     private void setupStreamLib() {
@@ -254,9 +287,6 @@ public class MainActivity extends Activity implements
             this.stream1 = streamingLib.createStream(stream1_params, this.handler);
             Log.d(TAG, "createStream");
 
-            StreamProperties sp = new StreamProperties();
-            sp.add(StreamProperty.URI, this.streamingUri);
-            this.stream1.commitProperties(sp);
 
 
         } catch (Exception e) {
@@ -403,15 +433,15 @@ public class MainActivity extends Activity implements
         Log.d(TAG, "onFragmentCreate");
         arFragmentAdded = true;
 
-        setupStreamLib();
-        stream1Fragment.setStreamVisible();
-        stream1.play();
+//        setupStreamLib();
+//        stream1Fragment.setStreamVisible();
+//        stream1.play();
 //        Log.d(TAG, "stream1.play on " + stream1.getProperty(StreamProperty.URI));
     }
 
     @Override
     public void onFragmentResume() {
-        prepareRemoteAR();
+//        prepareRemoteAR();
     }
 
 
