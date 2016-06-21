@@ -60,13 +60,13 @@ public class ARFragment extends StreamViewerFragment {
         Log.d(TAG,"ON CREATE STREAM VIEWER");
     }
 
-    @Override
-    public void onActivityCreated(Bundle bundle){
-        super.onActivityCreated(bundle);
-        Log.d(TAG,"ON ACTIVITY_CREATED STREAM VIEWER");
-        setPlayerButtonsVisible(this.playerButtonsVisible);
-        ARFragment.this.cmdListener.onSurfaceViewCreated(getStreamId(),this.surfaceView);
-    }
+//    @Override
+//    public void onActivityCreated(Bundle bundle){
+//        super.onActivityCreated(bundle);
+//        Log.d(TAG,"ON ACTIVITY_CREATED STREAM VIEWER");
+//        setPlayerButtonsVisible(this.playerButtonsVisible);
+//        this.cmdListener.onSurfaceViewCreated(getStreamId(),this.surfaceView);
+//    }
 
 
     @Override
@@ -104,23 +104,23 @@ public class ARFragment extends StreamViewerFragment {
         View rootView = inflater.inflate(R.layout.fragment_ar, container, false);
 
         surfaceView = (SurfaceView) rootView.findViewById(R.id.streamSurface);
-        surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
-            @Override
-            public void surfaceCreated(SurfaceHolder surfaceHolder) {
+//        surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
+//            @Override
+//            public void surfaceCreated(SurfaceHolder surfaceHolder) {
 //                ARFragment.this.cmdListener.onSurfaceViewCreated(getStreamId(), surfaceView);
-            }
-
-            @Override
-            public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-
-            }
-        });
-
+//            }
+//
+//            @Override
+//            public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
+//
+//            }
+//
+//            @Override
+//            public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+//
+//            }
+//        });
+//
         streamCover =  rootView.findViewById(R.id.hidecontainer);
         txtHiddenSurface = (TextView) rootView.findViewById(R.id.txtHiddenSurface);
 
@@ -142,6 +142,7 @@ public class ARFragment extends StreamViewerFragment {
         });
 
         mListener.onFragmentCreate();
+//        setCmdListenerCallback();
         return rootView;
     }
 
@@ -194,6 +195,24 @@ public class ARFragment extends StreamViewerFragment {
     @Override
     public void onResume(){
         super.onResume();
+        //setCmdListenerCallback();
+                surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
+            @Override
+            public void surfaceCreated(SurfaceHolder surfaceHolder) {
+                ARFragment.this.cmdListener.onSurfaceViewCreated(getStreamId(), surfaceView);
+            }
+
+            @Override
+            public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+
+            }
+        });
+
         mListener.onFragmentResume();
 
     }
