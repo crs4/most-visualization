@@ -68,6 +68,12 @@
                 android:text="Edit"
                 android:onClick="onRadioButtonClicked"/>
         </RadioGroup>
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:text="Reset"
+            android:id="@+id/reset_button" />
 
             <FrameLayout
                 android:layout_width="match_parent"

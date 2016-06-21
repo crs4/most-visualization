@@ -37,6 +37,7 @@ import it.crs4.most.streaming.enums.StreamingEvent;
 import it.crs4.most.streaming.enums.StreamingEventType;
 import it.crs4.most.visualization.IStreamFragmentCommandListener;
 import it.crs4.most.visualization.StreamInspectorFragment.IStreamProvider;
+import it.crs4.remotear.mesh.Mesh;
 import it.crs4.zmqlib.pubsub.ZMQPublisher;
 
 import android.view.View;
@@ -76,6 +77,7 @@ public class MainActivity extends Activity implements
     private EditText rtspUri;
     private Button playRemoteButton;
     private Button playLocalButton;
+    private Button resetButton;
     protected RemoteCaptureCameraPreview preview;
     protected TouchGLSurfaceView glView;
     protected TouchARRenderer renderer;
@@ -107,6 +109,7 @@ public class MainActivity extends Activity implements
 //        rtspUri = (EditText) findViewById(R.id.rtspUri);
         playRemoteButton = (Button) findViewById(R.id.play_remote);
         playLocalButton = (Button) findViewById(R.id.play_local);
+        resetButton = (Button) findViewById(R.id.reset_button);
 
         playRemoteButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -116,6 +119,12 @@ public class MainActivity extends Activity implements
         playLocalButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 playLocal();
+            }
+        });
+        resetButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                resetArrowPosition();
+
             }
         });
 
@@ -470,6 +479,15 @@ public class MainActivity extends Activity implements
     public void onDestroy(){
         Log.d(TAG, "onDestroy");
         super.onDestroy();
+    }
+
+    private void resetArrowPosition(){
+        if (glView!= null){
+            Mesh arrow = glView.getRenderer().getMesh("arrow");
+            arrow.setX(0);
+            arrow.setY(0);
+            arrow.setZ(0);
+        }
     }
 
 }
