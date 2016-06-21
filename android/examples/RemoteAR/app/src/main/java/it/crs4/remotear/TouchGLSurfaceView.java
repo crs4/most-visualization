@@ -24,6 +24,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
     private Group meshGroup;
     public enum Mode {Rotate, Edit, Move};
     private boolean mDrawing = false;
+    private boolean mMoving = false;
 
     public Mode getMode() {
         return mode;
@@ -91,14 +92,21 @@ public class TouchGLSurfaceView extends GLSurfaceView {
 
         if (mode == Mode.Move && e.getPointerCount() > 1) {
             mScaleDetector.onTouchEvent(e);
+            mMoving = false;
+//            mScaling = true;
         }
         else{
-            if (mScaling){
-                mScaling = false;
-                return true;
-            }
+
             float x = e.getX();
             float y = e.getY();
+
+            if (mScaling){
+                mScaling = false;
+                mPreviousX = x;
+                mPreviousY = y;
+                return true;
+
+            }
 
             float dx = x - mPreviousX;
             float dy = y - mPreviousY;
@@ -133,15 +141,21 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                     }
                     break;
                 case MotionEvent.ACTION_UP:
+                    Log.d(TAG, "ACTION_UP");
                     if(mode == Mode.Edit){
                         mDrawing = false;
                     }
+                    else
+                        mMoving = false;
                     break;
 
                 case MotionEvent.ACTION_DOWN:
+                    Log.d(TAG, "ACTION_DOWN");
                     if(mode == Mode.Edit){
                         mDrawing = true;
                     }
+                    else
+                        mMoving = true;
                     break;
 
 
