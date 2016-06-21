@@ -50,7 +50,7 @@ import org.artoolkit.ar.base.assets.AssetHelper;
 import org.artoolkit.ar.base.camera.CameraEventListener;
 
 
-    public class MainActivity extends Activity implements
+public class MainActivity extends Activity implements
 //        Handler.Callback,
         IStreamFragmentCommandListener,
         IStreamProvider,
@@ -69,7 +69,7 @@ import org.artoolkit.ar.base.camera.CameraEventListener;
     private boolean streaming_ready = false;
     private boolean streamMainDestroyed = false;
 
-//    private StreamViewerFragment stream1Fragment = null;
+    //    private StreamViewerFragment stream1Fragment = null;
     private ARFragment stream1Fragment = null;
     private String streamingUri;
 
@@ -83,6 +83,7 @@ import org.artoolkit.ar.base.camera.CameraEventListener;
     private boolean firstUpdate = false;
     private boolean arFragmentAdded = false;
     private boolean mStreamPrepared = false;
+    private boolean mRemotePlay = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -117,93 +118,98 @@ import org.artoolkit.ar.base.camera.CameraEventListener;
                 playLocal();
             }
         });
+
+        if(savedInstanceState != null && savedInstanceState.getBoolean("mRemotePlay", false)){
+            playRemote();
+        }
+
     }
 
     public void onRadioButtonClicked(View view) {
-        if (glView != null){
+        if (glView != null) {
             boolean checked = ((RadioButton) view).isChecked();
 
             // Check which radio button was clicked
-            switch(view.getId()) {
+            switch (view.getId()) {
                 case R.id.radio_move:
                     if (checked)
                         glView.setMode(TouchGLSurfaceView.Mode.Move);
-                        break;
+                    break;
                 case R.id.radio_rotate:
                     if (checked)
                         glView.setMode(TouchGLSurfaceView.Mode.Rotate);
-                        break;
+                    break;
                 case R.id.radio_edit:
                     if (checked)
                         glView.setMode(TouchGLSurfaceView.Mode.Edit);
-                        break;
+                    break;
             }
         }
     }
 
-    public void playLocal(){
+    public void playLocal() {
         Intent intent = new Intent(this, LocalARActivity.class);
         startActivity(intent);
     }
 
-    public void playRemote(){
-        if (!arFragmentAdded){
+    public void playRemote() {
+        mRemotePlay = true;
+        if (!arFragmentAdded) {
 
-        this.stream1Fragment = ARFragment.newInstance("stream");
-        // add the first fragment to the first container
-        FragmentTransaction fragmentTransaction = getFragmentManager()
-                .beginTransaction();
-        fragmentTransaction.add(R.id.stream_container, this.stream1Fragment);
-        fragmentTransaction.commit();
-        Log.d(TAG, "fragmentTransaction.commit");
+            this.stream1Fragment = ARFragment.newInstance("stream");
+            // add the first fragment to the first container
+            FragmentTransaction fragmentTransaction = getFragmentManager()
+                    .beginTransaction();
+            fragmentTransaction.add(R.id.stream_container, this.stream1Fragment);
+            fragmentTransaction.commit();
+            Log.d(TAG, "fragmentTransaction.commit");
 
-        this.handler = new Handler(preview);
-        this.handler = new Handler(Looper.getMainLooper()){
-            @Override
-            public void handleMessage(Message streamingMessage) {
-                StreamingEventBundle event = (StreamingEventBundle) streamingMessage.obj;
-                String infoMsg = "Event Type:" + event.getEventType() + " ->" + event.getEvent() + ":" + event.getInfo();
-                Log.d(TAG, "handleMessage: Current Event:" + infoMsg);
+            this.handler = new Handler(preview);
+            this.handler = new Handler(Looper.getMainLooper()) {
+                @Override
+                public void handleMessage(Message streamingMessage) {
+                    StreamingEventBundle event = (StreamingEventBundle) streamingMessage.obj;
+                    String infoMsg = "Event Type:" + event.getEventType() + " ->" + event.getEvent() + ":" + event.getInfo();
+                    Log.d(TAG, "handleMessage: Current Event:" + infoMsg);
 
-                StreamState streamState = ((IStream) event.getData()).getState();
-                Log.d(TAG, "event.getData().streamState " + streamState);
-                if (event.getEventType() == StreamingEventType.STREAM_EVENT &&
-                        event.getEvent() == StreamingEvent.STREAM_STATE_CHANGED
+                    StreamState streamState = ((IStream) event.getData()).getState();
+                    Log.d(TAG, "event.getData().streamState " + streamState);
+                    if (event.getEventType() == StreamingEventType.STREAM_EVENT &&
+                            event.getEvent() == StreamingEvent.STREAM_STATE_CHANGED
 
-                        ){
-                    if(streamState == StreamState.INITIALIZED){
-                        setProperties();
-                        stream1.play();
+                            ) {
+                        if (streamState == StreamState.INITIALIZED) {
+                            setProperties();
+                            stream1.play();
 
 
+                        } else if (streamState == StreamState.PLAYING) {
+
+                            Log.d(TAG, "event.getData().streamState " + streamState);
+                            Log.d(TAG, "ready to call cameraPreviewStarted");
+                            IStream stream = MainActivity.this.stream1;
+                            //                    int width = stream.getVideoSize().getWidth();
+                            //                    int height = stream.getVideoSize().getHeight();
+                            //FIXME
+                            int width = 704;
+                            int height = 576;
+                            Log.d(TAG, "width " + width);
+                            Log.d(TAG, "height " + height);
+                            MainActivity.this.cameraPreviewStarted(width, height, 25, 0, false);
+
+                        }
                     }
-                    else if (streamState == StreamState.PLAYING){
 
-                        Log.d(TAG, "event.getData().streamState " + streamState);
-                        Log.d(TAG, "ready to call cameraPreviewStarted");
-                        IStream stream = MainActivity.this.stream1;
-    //                    int width = stream.getVideoSize().getWidth();
-    //                    int height = stream.getVideoSize().getHeight();
-                        //FIXME
-                        int width = 704;
-                        int height = 576;
-                        Log.d(TAG, "width " + width);
-                        Log.d(TAG, "height " + height);
-                        MainActivity.this.cameraPreviewStarted(width, height, 25, 0, false);
-
-                    }
                 }
 
-            }
-
-        };
-        Log.d(TAG, "this.handler set");
-        }
-        else{
+            };
+            Log.d(TAG, "this.handler set");
+        } else {
             stream1Fragment.setStreamVisible();
 //            stream1.play();
         }
     }
+
     @Override
     public void onSurfaceViewDestroyed(String streamId) {
         if (streamId.equals(MAIN_STREAM))
@@ -213,14 +219,14 @@ import org.artoolkit.ar.base.camera.CameraEventListener;
 
     @Override
     public void onPause(String streamId) {
-        if (streamId.equals(MAIN_STREAM)){
+        if (streamId.equals(MAIN_STREAM)) {
             this.stream1.pause();
         }
     }
 
     @Override
     public void onPlay(String streamId) {
-        if (streamId.equals(MAIN_STREAM)){
+        if (streamId.equals(MAIN_STREAM)) {
             Log.d(TAG, "stream1.play onPlay");
             this.stream1.play();
         }
@@ -247,7 +253,7 @@ import org.artoolkit.ar.base.camera.CameraEventListener;
         Log.d(TAG, "onSurfaceViewCreated!!!");
 
 //        stream1Fragment.setStreamVisible();
-        if (surfaceView != null && !mStreamPrepared){
+        if (surfaceView != null && !mStreamPrepared) {
 
             setupStreamLib();
             prepareRemoteAR();
@@ -256,10 +262,10 @@ import org.artoolkit.ar.base.camera.CameraEventListener;
         }
     }
 
-    private void setProperties(){
+    private void setProperties() {
         StreamProperties sp = new StreamProperties();
         sp.add(StreamProperty.URI, this.streamingUri);
-        if (!this.stream1.commitProperties(sp)){
+        if (!this.stream1.commitProperties(sp)) {
             Log.e(TAG, "failed setting stream properties");
             throw new RuntimeException("failed setting stream properties");
         }
@@ -288,7 +294,6 @@ import org.artoolkit.ar.base.camera.CameraEventListener;
             Log.d(TAG, "createStream");
 
 
-
         } catch (Exception e) {
             streaming_ready = false;
             Log.d(TAG, "ERROR!!!");
@@ -307,7 +312,7 @@ import org.artoolkit.ar.base.camera.CameraEventListener;
         ZMQPublisher publisher = new ZMQPublisher();
         Thread pubThread = new Thread(publisher);
         pubThread.start();
-        return new TouchARRenderer(this ,publisher);
+        return new TouchARRenderer(this, publisher);
     }
 
     /**
@@ -319,9 +324,8 @@ import org.artoolkit.ar.base.camera.CameraEventListener;
     }
 
 
-
-    private void prepareAR(){
-        if(!ARToolKit.getInstance().initialiseNative(this.getCacheDir().getAbsolutePath())) {
+    private void prepareAR() {
+        if (!ARToolKit.getInstance().initialiseNative(this.getCacheDir().getAbsolutePath())) {
             (new AlertDialog.Builder(this)).setMessage("The native library is not loaded. The application cannot continue.").setTitle("Error").setCancelable(true).setNeutralButton(17039360, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
                     MainActivity.this.finish();
@@ -329,7 +333,7 @@ import org.artoolkit.ar.base.camera.CameraEventListener;
             }).show();
         } else {
             this.mainLayout = this.supplyFrameLayout();
-            if(this.mainLayout == null) {
+            if (this.mainLayout == null) {
                 Log.e(TAG, "Error: supplyFrameLayout did not return a layout.");
             } else {
                 this.renderer = this.supplyRenderer();
@@ -337,7 +341,7 @@ import org.artoolkit.ar.base.camera.CameraEventListener;
         }
     }
 
-    private void prepareRemoteAR(){
+    private void prepareRemoteAR() {
 
         prepareAR();
 
@@ -348,7 +352,7 @@ import org.artoolkit.ar.base.camera.CameraEventListener;
 
         this.glView = new TouchGLSurfaceView(this);
 
-        ActivityManager activityManager = (ActivityManager)this.getSystemService(Context.ACTIVITY_SERVICE);
+        ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
         ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
         this.glView.setEGLContextClientVersion(1);
         this.glView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
@@ -367,10 +371,11 @@ import org.artoolkit.ar.base.camera.CameraEventListener;
     @Override
     public void onResume() {
         super.onResume();
+//        setupStreamLib();
 
-    if(this.glView != null) {
-        this.glView.onResume();
-    }
+        if (this.glView != null) {
+            this.glView.onResume();
+        }
     }
 
 
@@ -382,7 +387,7 @@ import org.artoolkit.ar.base.camera.CameraEventListener;
     @Override
     public void cameraPreviewStarted(int width, int height, int rate, int cameraIndex, boolean cameraIsFrontFacing) {
         Log.d(TAG, "cameraPreviewStarted!");
-        if(ARToolKit.getInstance().initialiseAR(width, height, "Data/camera_para.dat", cameraIndex, cameraIsFrontFacing)) {
+        if (ARToolKit.getInstance().initialiseAR(width, height, "Data/camera_para.dat", cameraIndex, cameraIsFrontFacing)) {
             Log.i(TAG, "getGLView(): Camera initialised");
         } else {
             Log.e(TAG, "getGLView(): Error initialising camera. Cannot continue.");
@@ -396,8 +401,8 @@ import org.artoolkit.ar.base.camera.CameraEventListener;
 
     public void cameraPreviewFrame(byte[] frame) {
         Log.d(TAG, "cameraPreviewFrame()!");
-        if(this.firstUpdate) {
-            if(this.renderer.configureARScene()) {
+        if (this.firstUpdate) {
+            if (this.renderer.configureARScene()) {
                 Log.i(TAG, "cameraPreviewFrame(): Scene configured successfully");
             } else {
                 Log.e(TAG, "cameraPreviewFrame(): Error configuring scene. Cannot continue.");
@@ -407,16 +412,15 @@ import org.artoolkit.ar.base.camera.CameraEventListener;
             this.firstUpdate = false;
         }
 
-        if(ARToolKit.getInstance().convertAndDetect(frame)) {
+        if (ARToolKit.getInstance().convertAndDetect(frame)) {
             Log.d(TAG, "detected marker in frame!");
-            if(this.glView != null) {
+            if (this.glView != null) {
                 Log.d(TAG, "request render on glView");
                 this.glView.requestRender();
             }
 
 //            this.onFrameProcessed();
-        }
-        else{
+        } else {
             Log.d(TAG, "no marker found, sorry");
         }
 
@@ -444,5 +448,28 @@ import org.artoolkit.ar.base.camera.CameraEventListener;
 //        prepareRemoteAR();
     }
 
+    @Override
+    public void onPause(){
+        Log.d(TAG, "onPause");
+        super.onPause();
+        mStreamPrepared = false;
+    }
+
+    @Override
+    public  void onSaveInstanceState(Bundle outState){
+        outState.putBoolean("mRemotePlay", mRemotePlay);
+    }
+
+    @Override
+    public void onStop(){
+        Log.d(TAG, "onStop");
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroy(){
+        Log.d(TAG, "onDestroy");
+        super.onDestroy();
+    }
 
 }
