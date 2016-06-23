@@ -39,8 +39,8 @@ public class TouchARRenderer extends ARRenderer implements Handler.Callback{
     protected  float previousAngle = 0;
     private int markerID = -1;
     private volatile  Group group = new Group("arrow");
-    private Pyramid pyramid = new Pyramid(40f, 80f, 40f);
-    private Cube cube = new Cube(60f, 20f, 20f);
+    private Pyramid pyramid = new Pyramid(40f, 20f, 40f);
+    private Cube cube = new Cube(30f, 20f, 30f);
     private Handler handler;
     protected IPublisher publisher;
     protected BaseSubscriber subscriber;
@@ -135,10 +135,9 @@ public class TouchARRenderer extends ARRenderer implements Handler.Callback{
         if (markerID < 0) return false;
 
 //        cube.setX(-20f);
-        pyramid.setRz(90);
+        pyramid.setRz(180);
 //        pyramid.setX(-40f);
-//        pyramid.rx = 90;
-
+        pyramid.setY(-1f*cube.height);
         group.add(cube);
         group.add(pyramid);
         meshes.put(group.getId(), group);
@@ -168,8 +167,6 @@ public class TouchARRenderer extends ARRenderer implements Handler.Callback{
                 group.setRy(angle);
             }
             previousAngle = angle;
-
-            group.draw(gl);
 
             synchronized (meshes){
                 for (Iterator iterator = meshes.entrySet().iterator(); iterator.hasNext();) {
