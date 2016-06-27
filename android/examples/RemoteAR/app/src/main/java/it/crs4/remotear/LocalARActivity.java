@@ -49,6 +49,7 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 //        PreferenceManager.setDefaultValues(this, org.artoolkit.ar.base.R.xml.preferences, false);
 //        this.requestWindowFeature(1);
 //        this.getWindow().addFlags(1024);
@@ -186,6 +187,7 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
         }
 
         if(ARToolKit.getInstance().convertAndDetect(frame)) {
+            Log.d(TAG, "marker detected!");
             if(this.glView != null) {
                 this.glView.requestRender();
             }
