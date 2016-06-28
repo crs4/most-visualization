@@ -51,7 +51,6 @@ public class TouchARRenderer extends ARRenderer implements Handler.Callback{
     private final HashMap<String, Mesh> meshes = new HashMap<String, Mesh>();
     private GL10 gl;
 
-
     public TouchARRenderer(Context context){
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();

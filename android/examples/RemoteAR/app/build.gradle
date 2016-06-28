@@ -1,27 +1,60 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.model.application'
 
-android {
-    compileSdkVersion 21
-    buildToolsVersion "21.0.2"
+model {
 
-    defaultConfig {
-        applicationId "it.crs4.remotear"
-        minSdkVersion 15
-        targetSdkVersion 21
-        versionCode 1
-        versionName "1.0"
-    }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+    android {
+        compileSdkVersion = 21
+        buildToolsVersion = "21.1.2"
+
+        defaultConfig.with {
+            applicationId = "it.crs4.remotear"
+            minSdkVersion.apiLevel = 15
+            targetSdkVersion.apiLevel = 21
+            versionCode = 1
+            versionName = "1.0"
+
+//            buildConfigFields.with {
+//
+//                }
+        }
+
+        ndk.with {
+            moduleName = "AROpticalWrapper"
         }
     }
+
+    android.buildTypes {
+        release {
+            minifyEnabled = false
+            proguardFiles += file('proguard-rules.pro')
+        }
+    }
+
+    android.productFlavors {
+    }
+
+    android.sources {
+//        main.jni {
+//            source {
+//                srcDirs = ['src/main/nop']
+//            }
+//        }
+        main.jniLibs {
+            source {
+                srcDirs = ['src/main/libs']
+            }
+        }
+    }
+
+//    android.compileOptions {
+//        sourceCompatibility JavaVersion.VERSION_1_7
+//        targetCompatibility JavaVersion.VERSION_1_7
+//    }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
+//    testCompile 'junit:junit:4.12'
 
     compile project(':aRBaseLib')
     compile name: "MOSTStreaming", ext: "aar", group: 'it.crs4.most.streaming', version: '1.0'
@@ -33,5 +66,6 @@ dependencies {
     compile 'com.google.android.gms:play-services-appindexing:8.1.0'
     compile 'com.android.support:support-v4:21.0.3'
 
+    compile files('libs/BT200Ctrl.jar')
 
 }

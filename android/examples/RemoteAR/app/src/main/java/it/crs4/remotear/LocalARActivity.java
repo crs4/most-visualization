@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ConfigurationInfo;
 import android.opengl.GLSurfaceView;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -32,6 +33,8 @@ import org.artoolkit.ar.base.rendering.ARRenderer;
 import org.artoolkit.ar.base.rendering.gles20.ARRendererGLES20;
 
 import it.crs4.zmqlib.pubsub.ZMQSubscriber;
+// For Epson Moverio BT-200. BT200Ctrl.jar must be in libs/ folder.
+import jp.epson.moverio.bt200.DisplayControl;
 
 
 public  class LocalARActivity extends Activity implements CameraEventListener {
@@ -164,6 +167,22 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
 
     public void cameraPreviewStarted(int width, int height, int rate, int cameraIndex, boolean cameraIsFrontFacing) {
         if(ARToolKit.getInstance().initialiseAR(width, height, "Data/camera_para.dat", cameraIndex, cameraIsFrontFacing)) {
+            Log.d(TAG, String.format("Build.MANUFACTURER %s", Build.MANUFACTURER));
+            Log.d(TAG, String.format("Build.MODEL %s", Build.MODEL));
+
+            if((Build.MANUFACTURER.equals("EPSON") && Build.MODEL.equals("embt2"))){
+                Log.d(TAG, "loading optical files");
+                OpticalARToolkit opticalARToolkit = new OpticalARToolkit(ARToolKit.getInstance());
+                if ( opticalARToolkit .initialiseAR(
+                        "Data/optical_param_left.dat", "Data/optical_param_right"
+                ) > 0){
+                Log.d(TAG, "loaded optical files");
+                }
+                else {
+                    Log.e("ARActivity", "Error initialising optical device. Cannot continue.");
+                    this.finish();
+                }
+            }
             Log.i("ARActivity", "getGLView(): Camera initialised");
         } else {
             Log.e("ARActivity", "getGLView(): Error initialising camera. Cannot continue.");
