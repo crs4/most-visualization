@@ -3,7 +3,6 @@ package it.crs4.remotear;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ConfigurationInfo;
@@ -12,19 +11,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import org.artoolkit.ar.base.ARActivity;
 import org.artoolkit.ar.base.ARToolKit;
-import org.artoolkit.ar.base.AndroidUtils;
 import org.artoolkit.ar.base.NativeInterface;
 import org.artoolkit.ar.base.camera.CameraEventListener;
 import org.artoolkit.ar.base.camera.CameraPreferencesActivity;
@@ -32,9 +26,11 @@ import org.artoolkit.ar.base.camera.CaptureCameraPreview;
 import org.artoolkit.ar.base.rendering.ARRenderer;
 import org.artoolkit.ar.base.rendering.gles20.ARRendererGLES20;
 
+import it.crs4.remotear.renderer.OpticalRenderer;
+import it.crs4.remotear.renderer.PubSubARRenderer;
 import it.crs4.zmqlib.pubsub.ZMQSubscriber;
-// For Epson Moverio BT-200. BT200Ctrl.jar must be in libs/ folder.
 import jp.epson.moverio.bt200.DisplayControl;
+// For Epson Moverio BT-200. BT200Ctrl.jar must be in libs/ folder.
 
 
 public  class LocalARActivity extends Activity implements CameraEventListener {
@@ -45,6 +41,7 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
     private TouchGLSurfaceView glView;
 //    private TouchGLSurfaceView glView;
     private boolean firstUpdate = false;
+    private OpticalARToolkit mOpticalARToolkit;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -61,6 +58,10 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
 //        this.setRequestedOrientation(0);
 //        AndroidUtils.reportDisplayInformation(this);
         setContentView(R.layout.local_ar);
+        if((Build.MANUFACTURER.equals("EPSON") && Build.MODEL.equals("embt2"))){
+            Log.d(TAG, "loading optical files");
+            mOpticalARToolkit = new OpticalARToolkit(ARToolKit.getInstance());
+        }
     }
 
     protected void onStart() {
@@ -84,6 +85,13 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
                 }
 
             }
+        }
+        if (Build.MANUFACTURER.equals("EPSON") && Build.MODEL.equals("embt2")) {
+            DisplayControl displayControl = new DisplayControl(this);
+            boolean stereo = PreferenceManager.getDefaultSharedPreferences(this).
+                    getBoolean("pref_stereoDisplay", false);
+            displayControl.setMode(DisplayControl.DISPLAY_MODE_3D, stereo);
+
         }
     }
 
@@ -118,7 +126,7 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
 //        this.glView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
         Log.d(TAG, "ready to call setRenderer with " + (this.renderer !=null));
         this.glView.getHolder().setFormat(-3);
-        this.glView.setRenderer((TouchARRenderer) this.renderer);
+        this.glView.setRenderer((PubSubARRenderer) this.renderer);
         Log.d(TAG, "setRenderer called");
         this.glView.setRenderMode(0);
         this.glView.setZOrderMediaOverlay(true);
@@ -170,13 +178,17 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
             Log.d(TAG, String.format("Build.MANUFACTURER %s", Build.MANUFACTURER));
             Log.d(TAG, String.format("Build.MODEL %s", Build.MODEL));
 
-            if((Build.MANUFACTURER.equals("EPSON") && Build.MODEL.equals("embt2"))){
+            if(mOpticalARToolkit != null){
                 Log.d(TAG, "loading optical files");
-                OpticalARToolkit opticalARToolkit = new OpticalARToolkit(ARToolKit.getInstance());
-                if ( opticalARToolkit .initialiseAR(
-                        "Data/optical_param_left.dat", "Data/optical_param_right"
-                ) > 0){
-                Log.d(TAG, "loaded optical files");
+                if ( mOpticalARToolkit.initialiseAR(
+                        "Data/optical_param_left.dat", "Data/optical_param_right") > 0){
+                    Log.d(TAG, "loaded optical files");
+                    Log.d(TAG, "getEyeRproject len " + mOpticalARToolkit.getEyeRproject().length);
+                    for (float f: mOpticalARToolkit.getEyeRproject()
+                         ) {
+                        Log.d(TAG, "optical getEyeRproject " + f);
+                    }
+
                 }
                 else {
                     Log.e("ARActivity", "Error initialising optical device. Cannot continue.");
@@ -206,7 +218,7 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
         }
 
         if(ARToolKit.getInstance().convertAndDetect(frame)) {
-            Log.d(TAG, "marker detected!");
+
             if(this.glView != null) {
                 this.glView.requestRender();
             }
@@ -239,11 +251,17 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
 
 
     protected ARRenderer supplyRenderer() {
-            String address = "156.148.33.87:5555";
-            ZMQSubscriber subscriber = new ZMQSubscriber(address);
-            Thread subThread = new Thread(subscriber);
-            subThread.start();
-            return new TouchARRenderer(this, subscriber);
+        String address = "156.148.33.87:5555";
+        ZMQSubscriber subscriber = new ZMQSubscriber(address);
+        Thread subThread = new Thread(subscriber);
+        subThread.start();
+        if (mOpticalARToolkit != null){
+            Log.d(TAG, "setting OpticalRenderer");
+            return new OpticalRenderer(this, subscriber, mOpticalARToolkit);
+        }
+        else{
+            return new PubSubARRenderer(this, subscriber);
+        }
     }
 
     protected FrameLayout supplyFrameLayout() {

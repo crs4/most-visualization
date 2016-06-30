@@ -1,9 +1,8 @@
-package it.crs4.remotear;
+package it.crs4.remotear.renderer;
 
 import android.content.Context;
 import android.opengl.Matrix;
 import android.graphics.Point;
-import android.opengl.GLES10;
 import android.opengl.GLU;
 import android.os.Handler;
 import android.os.Looper;
@@ -17,10 +16,8 @@ import org.artoolkit.ar.base.rendering.ARRenderer;
 import org.json.JSONException;
 import org.json.JSONObject;
 //import org.artoolkit.ar.base.rendering.Cube;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import it.crs4.remotear.mesh.Cube;
@@ -31,27 +28,25 @@ import it.crs4.remotear.mesh.Pyramid;
 import it.crs4.zmqlib.pubsub.BaseSubscriber;
 import it.crs4.zmqlib.pubsub.IPublisher;
 
-import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-public class TouchARRenderer extends ARRenderer implements Handler.Callback{
+public class PubSubARRenderer extends ARRenderer implements Handler.Callback{
     protected  volatile  float angle = 0 ;
     protected  float previousAngle = 0;
-    private int markerID = -1;
-    private volatile  Group group = new Group("arrow");
-    private Pyramid pyramid = new Pyramid(40f, 20f, 40f);
-    private Cube cube = new Cube(30f, 20f, 30f);
-    private Handler handler;
-    protected IPublisher publisher;
+    protected int markerID = -1;
+    protected volatile  Group group = new Group("arrow");
+    protected Pyramid pyramid = new Pyramid(40f, 20f, 40f);
+    protected Cube cube = new Cube(30f, 20f, 30f);
+    protected Handler handler;
+    public IPublisher publisher;
     protected BaseSubscriber subscriber;
-    protected String TAG = "TouchARRenderer";
+    protected String TAG = "PubSubARRenderer";
     protected int height;
     protected int width;
 //    private final ArrayList<Mesh> meshes = new ArrayList<Mesh>();
-    private final HashMap<String, Mesh> meshes = new HashMap<String, Mesh>();
-    private GL10 gl;
+    protected final HashMap<String, Mesh> meshes = new HashMap<String, Mesh>();
 
-    public TouchARRenderer(Context context){
+    public PubSubARRenderer(Context context){
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
         Point size = new Point();
@@ -61,12 +56,12 @@ public class TouchARRenderer extends ARRenderer implements Handler.Callback{
 
     }
 
-    public TouchARRenderer(Context context, IPublisher publisher){
+    public PubSubARRenderer(Context context, IPublisher publisher){
         this(context);
         setPublisher(publisher);
     }
 
-    public TouchARRenderer(Context context, BaseSubscriber subscriber){
+    public PubSubARRenderer(Context context, BaseSubscriber subscriber){
         this(context);
         setHandler(subscriber);
     }
@@ -122,7 +117,8 @@ public class TouchARRenderer extends ARRenderer implements Handler.Callback{
         }
     }
 
-    public TouchARRenderer(IPublisher publisher, BaseSubscriber subscriber){
+    public PubSubARRenderer(Context context, IPublisher publisher, BaseSubscriber subscriber){
+        this(context);
         setPublisher(publisher);
         setHandler(subscriber);
     }
@@ -148,7 +144,7 @@ public class TouchARRenderer extends ARRenderer implements Handler.Callback{
      * Should be overridden in subclasses and used to perform rendering.
      */
     public void draw(GL10 gl) {
-        this.gl = gl;
+
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 ////
 ////                 Apply the ARToolKit projection matrix

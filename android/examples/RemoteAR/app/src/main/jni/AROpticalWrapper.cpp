@@ -20,12 +20,12 @@ static int setupOptical(const char *optical_param_name, ARdouble m[16], ARdouble
       return (FALSE);
     }
     ARLOGe("*** Optical parameters ***\n");
-    /*
+
     arParamDispOptical(fovy_p, aspect_p, m);
 
     mtxLoadIdentityf(p);
     mtxPerspectivef(p, fovy_p, aspect_p, 10.0, 10000.0);
-    */
+
     return (TRUE);
   }
 

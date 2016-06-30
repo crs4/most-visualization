@@ -84,6 +84,7 @@ LOCAL_PATH := $(ARTOOLKIT_LIBDIR2)
 # ',' chars where each item of the list variable is placed in the variable immediately to the right of "foreach"
 # which can then be used in the construct to the right of the two ','. Careful not to add space characters between
 # the two ',' chars because the space character is the default separator.
+
 $(foreach module,$(MY_SHARED_LIBS),$(eval $(call add_shared_module,$(module))))
 
 # Resets LOCAL_PATH to "[AS project jni dir]"
@@ -134,3 +135,5 @@ LOCAL_SHARED_LIBRARIES += ARWrapper
 #LOCAL_SHARED_LIBRARIES += $(CURL_LIBS)
 
 include $(BUILD_SHARED_LIBRARY)
+
+

@@ -20,7 +20,6 @@ import android.view.SurfaceView;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 
 import java.io.File;
@@ -39,13 +38,13 @@ import it.crs4.most.streaming.enums.StreamingEventType;
 import it.crs4.most.visualization.IStreamFragmentCommandListener;
 import it.crs4.most.visualization.StreamInspectorFragment.IStreamProvider;
 import it.crs4.remotear.mesh.Mesh;
+import it.crs4.remotear.renderer.PubSubARRenderer;
 import it.crs4.zmqlib.pubsub.ZMQPublisher;
 
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.RadioButton;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import org.artoolkit.ar.base.ARToolKit;
 import org.artoolkit.ar.base.assets.AssetHelper;
@@ -81,7 +80,7 @@ public class MainActivity extends Activity implements
     private Button resetButton;
     protected RemoteCaptureCameraPreview preview;
     protected TouchGLSurfaceView glView;
-    protected TouchARRenderer renderer;
+    protected PubSubARRenderer renderer;
     protected FrameLayout mainLayout;
     private boolean firstUpdate = false;
     private boolean arFragmentAdded = false;
@@ -318,11 +317,11 @@ public class MainActivity extends Activity implements
 
     }
 
-    protected TouchARRenderer supplyRenderer() {
+    protected PubSubARRenderer supplyRenderer() {
         ZMQPublisher publisher = new ZMQPublisher();
         Thread pubThread = new Thread(publisher);
         pubThread.start();
-        return new TouchARRenderer(this, publisher);
+        return new PubSubARRenderer(this, publisher);
     }
 
     /**

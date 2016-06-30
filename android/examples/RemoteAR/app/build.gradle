@@ -16,6 +16,8 @@ model {
 //            buildConfigFields.with {
 //
 //                }
+
+
         }
 
         ndk.with {
@@ -45,6 +47,12 @@ model {
             }
         }
     }
+
+
+//    android.packagingOptions {
+//        pickFirst 'lib/armeabi/libARWrapper.so'
+//        pickFirst 'lib/armeabi/libc++_shared.so'
+//    }
 
 //    android.compileOptions {
 //        sourceCompatibility JavaVersion.VERSION_1_7

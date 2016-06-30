@@ -7,7 +7,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 
-import it.crs4.remotear.TouchARRenderer;
+import it.crs4.remotear.renderer.PubSubARRenderer;
 import it.crs4.remotear.mesh.Group;
 import it.crs4.remotear.mesh.Mesh;
 import it.crs4.remotear.mesh.Plane;
@@ -20,7 +20,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
     protected final float TOUCH_SCALE_FACTOR = 180.0f / 320;
     protected float mPreviousX;
     protected float mPreviousY;
-    protected TouchARRenderer renderer;
+    protected PubSubARRenderer renderer;
     private Group meshGroup;
     public enum Mode {Rotate, Edit, Move};
     private boolean mDrawing = false;
@@ -38,11 +38,11 @@ public class TouchGLSurfaceView extends GLSurfaceView {
     private ScaleGestureDetector mScaleDetector;
     private boolean mScaling = false;
 
-    public TouchARRenderer getRenderer() {
+    public PubSubARRenderer getRenderer() {
         return renderer;
     }
 
-    public void setRenderer(TouchARRenderer renderer) {
+    public void setRenderer(PubSubARRenderer renderer) {
         Log.d(TAG, "inside setRenderer ");
         this.renderer = renderer;
         super.setRenderer((Renderer) renderer);
