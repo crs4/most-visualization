@@ -11,11 +11,15 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.artoolkit.ar.base.ARToolKit;
@@ -42,6 +46,7 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
 //    private TouchGLSurfaceView glView;
     private boolean firstUpdate = false;
     private OpticalARToolkit mOpticalARToolkit;
+    private EditText coordX, coordY, coordZ;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -58,9 +63,32 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
 //        this.setRequestedOrientation(0);
 //        AndroidUtils.reportDisplayInformation(this);
         setContentView(R.layout.local_ar);
+        coordX = (EditText) findViewById(R.id.coordX);
+        coordY = (EditText) findViewById(R.id.coordY);
+        coordZ = (EditText) findViewById(R.id.coordZ);
+
+
+
         if((Build.MANUFACTURER.equals("EPSON") && Build.MODEL.equals("embt2"))){
             Log.d(TAG, "loading optical files");
             mOpticalARToolkit = new OpticalARToolkit(ARToolKit.getInstance());
+
+            coordX.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                    if (keyEvent.getKeyCode() == (KeyEvent.KEYCODE_ENTER)){
+                        mOpticalARToolkit.eyeLmodel[12] = Float.parseFloat(coordX.getText().toString());
+                        return true;
+                    }
+                    return false;
+                }
+            });
+
+        }
+        else{
+            coordX.setVisibility(View.INVISIBLE);
+            coordY.setVisibility(View.INVISIBLE);
+            coordZ.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -86,13 +114,14 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
 
             }
         }
-        if (Build.MANUFACTURER.equals("EPSON") && Build.MODEL.equals("embt2")) {
-            DisplayControl displayControl = new DisplayControl(this);
-            boolean stereo = PreferenceManager.getDefaultSharedPreferences(this).
-                    getBoolean("pref_stereoDisplay", false);
-            displayControl.setMode(DisplayControl.DISPLAY_MODE_3D, stereo);
 
-        }
+//        if (Build.MANUFACTURER.equals("EPSON") && Build.MODEL.equals("embt2")) {
+//            DisplayControl displayControl = new DisplayControl(this);
+//            boolean stereo = PreferenceManager.getDefaultSharedPreferences(this).
+//                    getBoolean("pref_stereoDisplay", false);
+//            displayControl.setMode(DisplayControl.DISPLAY_MODE_3D, stereo);
+//
+//        }
     }
 
     @Override
@@ -123,7 +152,7 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
             this.glView.setEGLContextClientVersion(1);
         }
 
-//        this.glView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
+        this.glView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
         Log.d(TAG, "ready to call setRenderer with " + (this.renderer !=null));
         this.glView.getHolder().setFormat(-3);
         this.glView.setRenderer((PubSubARRenderer) this.renderer);
@@ -189,6 +218,9 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
                         Log.d(TAG, "optical getEyeRproject " + f);
                     }
 
+                    coordX.setText((String) Float.toString(mOpticalARToolkit.eyeLmodel[12]));
+                    coordY.setText((String) Float.toString(mOpticalARToolkit.eyeLmodel[13]));
+                    coordZ.setText((String) Float.toString(mOpticalARToolkit.eyeLmodel[14]));
                 }
                 else {
                     Log.e("ARActivity", "Error initialising optical device. Cannot continue.");

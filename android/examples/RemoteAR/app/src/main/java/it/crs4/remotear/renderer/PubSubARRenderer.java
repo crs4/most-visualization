@@ -24,6 +24,7 @@ import it.crs4.remotear.mesh.Cube;
 import it.crs4.remotear.mesh.Group;
 import it.crs4.remotear.mesh.Mesh;
 import it.crs4.remotear.mesh.MeshFactory;
+import it.crs4.remotear.mesh.Plane;
 import it.crs4.remotear.mesh.Pyramid;
 import it.crs4.zmqlib.pubsub.BaseSubscriber;
 import it.crs4.zmqlib.pubsub.IPublisher;
@@ -136,6 +137,8 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback{
         group.add(cube);
         group.add(pyramid);
         meshes.put(group.getId(), group);
+        Plane plane = new Plane(20, 20, "plane");
+        meshes.put(plane.getId(), plane);
 
         return  true;
     }

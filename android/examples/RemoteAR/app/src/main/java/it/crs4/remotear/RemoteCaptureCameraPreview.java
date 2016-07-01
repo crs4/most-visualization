@@ -77,7 +77,6 @@ public class RemoteCaptureCameraPreview extends SurfaceView implements SurfaceHo
 
     @Override
     public void frameReady(byte[] bytes) {
-        Log.d(TAG, "frameReady");
         if(this.listener != null) {
             this.listener.cameraPreviewFrame(bytes);
         }

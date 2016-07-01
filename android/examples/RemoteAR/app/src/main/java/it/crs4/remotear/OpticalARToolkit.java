@@ -28,11 +28,11 @@ public class OpticalARToolkit {
         return eyeRproject;
     }
 
-    private float [] eyeLmodel = new float [16];
-    private float [] eyeLproject = new float [16];
+    protected float [] eyeLmodel = new float [16];
+    protected float [] eyeLproject = new float [16];
 
-    private float [] eyeRmodel = new float [16];
-    private float [] eyeRproject = new float [16];
+    protected float [] eyeRmodel = new float [16];
+    protected float [] eyeRproject = new float [16];
 
     public OpticalARToolkit(ARToolKit arToolKit) {
         this.arToolKit = arToolKit;

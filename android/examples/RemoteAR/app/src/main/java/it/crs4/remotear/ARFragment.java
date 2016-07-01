@@ -1,6 +1,10 @@
 package it.crs4.remotear;
 
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.Context;
+import android.content.pm.ConfigurationInfo;
+import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,6 +31,12 @@ public class ARFragment extends StreamViewerFragment {
     private SurfaceView surfaceView = null;
     private View streamCover = null;
     private TextView txtHiddenSurface = null;
+
+    public TouchGLSurfaceView getGlView() {
+        return glView;
+    }
+
+    private TouchGLSurfaceView glView;
 
     private boolean playerButtonsVisible = true;
 
@@ -104,22 +114,56 @@ public class ARFragment extends StreamViewerFragment {
         View rootView = inflater.inflate(R.layout.fragment_ar, container, false);
 
         surfaceView = (SurfaceView) rootView.findViewById(R.id.streamSurface);
-//        surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
-//            @Override
-//            public void surfaceCreated(SurfaceHolder surfaceHolder) {
+        surfaceView.getHolder().setFixedSize(704, 576); //FIXME should be dynamically set
+        surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
+            @Override
+            public void surfaceCreated(SurfaceHolder surfaceHolder) {
 //                ARFragment.this.cmdListener.onSurfaceViewCreated(getStreamId(), surfaceView);
-//            }
-//
-//            @Override
-//            public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-//
-//            }
-//
-//            @Override
-//            public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-//
-//            }
-//        });
+            }
+
+            @Override
+            public void surfaceChanged(SurfaceHolder surfaceHolder, int format, int width, int height) {
+                Log.d(TAG, String.format("***SurfaceView surfaceChanged format %s, width %s, height %s", format, width, height));
+            }
+
+            @Override
+            public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+
+            }
+        });
+
+
+
+
+        glView = (TouchGLSurfaceView) rootView.findViewById(R.id.ARSurface);
+        glView.getHolder().setFixedSize(704, 576); //FIXME should be dynamically set
+        glView.getHolder().addCallback(new SurfaceHolder.Callback() {
+            @Override
+            public void surfaceCreated(SurfaceHolder surfaceHolder) {
+
+            }
+
+            @Override
+            public void surfaceChanged(SurfaceHolder surfaceHolder, int format, int width, int height) {
+                Log.d(TAG, String.format("***GLSurfaceView surfaceChanged format %s, width %s, height %s", format, width, height));
+
+            }
+
+            @Override
+            public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+
+            }
+        });
+
+        ActivityManager activityManager = (ActivityManager) getActivity().getSystemService(Context.ACTIVITY_SERVICE);
+        ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
+        glView.setEGLContextClientVersion(1);
+        glView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
+        glView.getHolder().setFormat(-3);
+
+        Log.i(TAG, "onResume(): GLSurfaceView created");
+//        this.mainLayout.addView(this.preview, new ViewGroup.LayoutParams(-1, -1));
+
 //
         streamCover =  rootView.findViewById(R.id.hidecontainer);
         txtHiddenSurface = (TextView) rootView.findViewById(R.id.txtHiddenSurface);

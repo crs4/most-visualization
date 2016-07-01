@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
+import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -96,13 +97,13 @@ public class MainActivity extends Activity implements
 
         File cacheFolder = new File(getCacheDir().getAbsolutePath() + "/Data");
 
-        File[] files = cacheFolder.listFiles();
-
-        for (File file : files) {
-
-            if (!file.delete())
-                throw new RuntimeException("cannot delete cached files");
-        }
+//        File[] files = cacheFolder.listFiles();
+//
+//        for (File file : files) {
+//
+//            if (!file.delete())
+//                throw new RuntimeException("cannot delete cached files");
+//        }
 
         AssetHelper assetHelper = new AssetHelper(getAssets());
         assetHelper.cacheAssetFolder(this, "Data");
@@ -199,7 +200,8 @@ public class MainActivity extends Activity implements
                             IStream stream = MainActivity.this.stream1;
                             //                    int width = stream.getVideoSize().getWidth();
                             //                    int height = stream.getVideoSize().getHeight();
-                            //FIXME
+
+                            //FIXME should be dynamically set
                             int width = 704;
                             int height = 576;
                             Log.d(TAG, "width " + width);
@@ -356,23 +358,12 @@ public class MainActivity extends Activity implements
 
         preview = (RemoteCaptureCameraPreview) findViewById(R.id.streamSurface);
         Log.i(TAG, "RemoteCaptureCameraPreview created");
-        this.preview.setCameraListener(this);
-        this.stream1.addFrameListener(this.preview);
-
-        this.glView = new TouchGLSurfaceView(this);
-
-        ActivityManager activityManager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
-        ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
-        this.glView.setEGLContextClientVersion(1);
-        this.glView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
-        this.glView.getHolder().setFormat(-3);
-        this.glView.setRenderer(this.renderer);
-        this.glView.setRenderMode(0);
-        this.glView.setZOrderMediaOverlay(true);
-        Log.i(TAG, "onResume(): GLSurfaceView created");
-//        this.mainLayout.addView(this.preview, new ViewGroup.LayoutParams(-1, -1));
-        this.mainLayout.addView(this.glView, new ViewGroup.LayoutParams(-1, -1));
-        Log.i(TAG, "onResume(): Views added to main layout.");
+        preview.setCameraListener(this);
+        stream1.addFrameListener(this.preview);
+        glView = stream1Fragment.getGlView();
+        glView.setRenderer(this.renderer);
+        glView.setRenderMode(0);
+        glView.setZOrderMediaOverlay(true);
 
     }
 
@@ -409,7 +400,6 @@ public class MainActivity extends Activity implements
 
 
     public void cameraPreviewFrame(byte[] frame) {
-        Log.d(TAG, "cameraPreviewFrame()!");
         if (this.firstUpdate) {
             if (this.renderer.configureARScene()) {
                 Log.i(TAG, "cameraPreviewFrame(): Scene configured successfully");
@@ -422,9 +412,7 @@ public class MainActivity extends Activity implements
         }
 
         if (ARToolKit.getInstance().convertAndDetect(frame)) {
-            Log.d(TAG, "detected marker in frame!");
             if (this.glView != null) {
-                Log.d(TAG, "request render on glView");
                 this.glView.requestRender();
             }
 
