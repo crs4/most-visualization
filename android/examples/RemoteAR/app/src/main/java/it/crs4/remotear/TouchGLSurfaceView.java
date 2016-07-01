@@ -46,7 +46,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
         Log.d(TAG, "inside setRenderer ");
         this.renderer = renderer;
         super.setRenderer((Renderer) renderer);
-        setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+//        setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
     }
 
     public TouchGLSurfaceView(Context context) {

@@ -152,12 +152,14 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback{
 ////
 ////                 Apply the ARToolKit projection matrix
 
-        gl.glMatrixMode(GL10.GL_PROJECTION);
-        float [] projectMatrix = ARToolKit.getInstance().getProjectionMatrix();
-        gl.glLoadMatrixf(projectMatrix, 0);
+
 
         // If the marker is visible, apply its transformation, and draw a pyramid
         if (ARToolKit.getInstance().queryMarkerVisible(markerID)) {
+            gl.glMatrixMode(GL10.GL_PROJECTION);
+            float [] projectMatrix = ARToolKit.getInstance().getProjectionMatrix();
+            gl.glLoadMatrixf(projectMatrix, 0);
+
             gl.glMatrixMode(GL10.GL_MODELVIEW);
             gl.glLoadMatrixf(ARToolKit.getInstance().queryMarkerTransformation(markerID), 0);
 
@@ -315,6 +317,10 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback{
                 _tempGluUnProjectData[_temp_out+3];
         return GL10.GL_TRUE;
     }
+
+//    public void onDrawFrame(GL10 gl){
+//        draw(gl);
+//    }
 
 
 

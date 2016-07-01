@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.pm.ConfigurationInfo;
 
 
+import android.opengl.GLSurfaceView;
 import android.os.Handler;
 //import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -362,7 +363,8 @@ public class MainActivity extends Activity implements
         stream1.addFrameListener(this.preview);
         glView = stream1Fragment.getGlView();
         glView.setRenderer(this.renderer);
-        glView.setRenderMode(0);
+//        glView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
+        glView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
         glView.setZOrderMediaOverlay(true);
 
     }
