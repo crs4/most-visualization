@@ -13,8 +13,8 @@ import java.util.UUID;
 import javax.microedition.khronos.opengles.GL10;
 
 import it.crs4.most.visualization.StreamViewerFragment;
-import it.crs4.zmqlib.pubsub.IPublisher;
-import it.crs4.zmqlib.pubsub.BaseSubscriber;
+import it.crs4.most.visualization.utils.zmq.IPublisher;
+import it.crs4.most.visualization.utils.zmq.BaseSubscriber;
 
 
 import org.json.JSONException;

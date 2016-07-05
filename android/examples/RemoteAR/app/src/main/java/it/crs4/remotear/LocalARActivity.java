@@ -33,7 +33,7 @@ import org.artoolkit.ar.base.rendering.gles20.ARRendererGLES20;
 
 import it.crs4.remotear.renderer.OpticalRenderer;
 import it.crs4.remotear.renderer.PubSubARRenderer;
-import it.crs4.zmqlib.pubsub.ZMQSubscriber;
+import it.crs4.most.visualization.utils.zmq.ZMQSubscriber;
 import jp.epson.moverio.bt200.DisplayControl;
 // For Epson Moverio BT-200. BT200Ctrl.jar must be in libs/ folder.
 
@@ -284,8 +284,8 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
 
 
     protected ARRenderer supplyRenderer() {
-//        String address = "156.148.33.87:5555";
-        String address = "156.148.33.66:5555";
+        String address = "156.148.33.87:5555";
+//        String address = "156.148.33.66:5555";
         ZMQSubscriber subscriber = new ZMQSubscriber(address);
         Thread subThread = new Thread(subscriber);
         subThread.start();

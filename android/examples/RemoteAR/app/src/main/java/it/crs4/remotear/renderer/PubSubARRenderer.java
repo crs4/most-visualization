@@ -26,8 +26,8 @@ import it.crs4.remotear.mesh.Mesh;
 import it.crs4.remotear.mesh.MeshFactory;
 import it.crs4.remotear.mesh.Plane;
 import it.crs4.remotear.mesh.Pyramid;
-import it.crs4.zmqlib.pubsub.BaseSubscriber;
-import it.crs4.zmqlib.pubsub.IPublisher;
+import it.crs4.most.visualization.utils.zmq.BaseSubscriber;
+import it.crs4.most.visualization.utils.zmq.IPublisher;
 
 import javax.microedition.khronos.opengles.GL10;
 

@@ -41,7 +41,7 @@ import it.crs4.most.visualization.IStreamFragmentCommandListener;
 import it.crs4.most.visualization.StreamInspectorFragment.IStreamProvider;
 import it.crs4.remotear.mesh.Mesh;
 import it.crs4.remotear.renderer.PubSubARRenderer;
-import it.crs4.zmqlib.pubsub.ZMQPublisher;
+import it.crs4.most.visualization.utils.zmq.ZMQPublisher;
 
 import android.view.View;
 import android.widget.FrameLayout;

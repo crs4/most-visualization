@@ -12,8 +12,8 @@ import javax.microedition.khronos.opengles.GL10;
 
 import it.crs4.remotear.OpticalARToolkit;
 import it.crs4.remotear.mesh.Mesh;
-import it.crs4.zmqlib.pubsub.BaseSubscriber;
-import it.crs4.zmqlib.pubsub.IPublisher;
+import it.crs4.most.visualization.utils.zmq.BaseSubscriber;
+import it.crs4.most.visualization.utils.zmq.IPublisher;
 
 public class OpticalRenderer extends PubSubARRenderer{
     private OpticalARToolkit mOpticalARToolkit;

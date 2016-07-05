@@ -66,7 +66,7 @@ dependencies {
 
     compile project(':aRBaseLib')
     compile name: "MOSTStreaming", ext: "aar", group: 'it.crs4.most.streaming', version: '1.0'
-    compile name: "ZMQBackend", ext: "aar", group: 'it.crs4.zmqlib.pubsub', version: '1.0'
+//    compile name: "ZMQBackend", ext: "aar", group: 'it.crs4.zmqlib.pubsub', version: '1.0'
     compile name: "MOSTVisualization", ext: "aar", group: 'it.crs4.most.visualization', version: '1.0'
     compile 'org.zeromq:jeromq:0.3.2@jar' //fixme, should not be here
 
