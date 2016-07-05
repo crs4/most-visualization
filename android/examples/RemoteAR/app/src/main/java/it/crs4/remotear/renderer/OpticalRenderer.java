@@ -17,6 +17,7 @@ import it.crs4.zmqlib.pubsub.IPublisher;
 
 public class OpticalRenderer extends PubSubARRenderer{
     private OpticalARToolkit mOpticalARToolkit;
+    private String TAG = "OpticalRenderer";
 
 
     public OpticalRenderer (Context context, OpticalARToolkit opticalARToolkit){
@@ -61,10 +62,6 @@ public class OpticalRenderer extends PubSubARRenderer{
         float [] projectMatrix = ARToolKit.getInstance().getProjectionMatrix();
 //        gl.glLoadMatrixf(projectMatrix, 0);
         gl.glLoadMatrixf(mOpticalARToolkit.getEyeLproject(), 0);
-        for (float f: mOpticalARToolkit.getEyeLproject()){
-            Log.d(TAG, "" + f);
-        }
-
         gl.glMatrixMode(GL10.GL_MODELVIEW);
         gl.glLoadMatrixf(mOpticalARToolkit.getEyeLmodel(), 0);
         basicDraw(gl);

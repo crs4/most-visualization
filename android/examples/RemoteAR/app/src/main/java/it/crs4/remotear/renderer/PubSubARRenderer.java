@@ -137,8 +137,6 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback{
         group.add(cube);
         group.add(pyramid);
         meshes.put(group.getId(), group);
-        Plane plane = new Plane(20, 20, "plane");
-        meshes.put(plane.getId(), plane);
 
         return  true;
     }
