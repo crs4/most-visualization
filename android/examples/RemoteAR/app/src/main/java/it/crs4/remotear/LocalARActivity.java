@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -75,10 +76,11 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
 
             coordX.setOnEditorActionListener(new TextView.OnEditorActionListener() {
                 @Override
-                public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                    if (keyEvent.getKeyCode() == (KeyEvent.KEYCODE_ENTER)){
+                public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                    Log.d(TAG, "actionId " + actionId);
+                    if (actionId == EditorInfo.IME_ACTION_DONE) {
+                        Log.d(TAG, "Setting coordX to " + coordX.getText().toString());
                         mOpticalARToolkit.eyeLmodel[12] = Float.parseFloat(coordX.getText().toString());
-                        return true;
                     }
                     return false;
                 }
@@ -115,13 +117,12 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
             }
         }
 
-//        if (Build.MANUFACTURER.equals("EPSON") && Build.MODEL.equals("embt2")) {
-//            DisplayControl displayControl = new DisplayControl(this);
-//            boolean stereo = PreferenceManager.getDefaultSharedPreferences(this).
-//                    getBoolean("pref_stereoDisplay", false);
-//            displayControl.setMode(DisplayControl.DISPLAY_MODE_3D, stereo);
-//
-//        }
+        if (Build.MANUFACTURER.equals("EPSON") && Build.MODEL.equals("embt2")) {
+            DisplayControl displayControl = new DisplayControl(this);
+            boolean stereo = PreferenceManager.getDefaultSharedPreferences(this).
+                    getBoolean("pref_stereoDisplay", false);
+            displayControl.setMode(DisplayControl.DISPLAY_MODE_3D, stereo);
+        }
     }
 
     @Override
@@ -152,7 +153,7 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
             this.glView.setEGLContextClientVersion(1);
         }
 
-        this.glView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
+//        this.glView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
         Log.d(TAG, "ready to call setRenderer with " + (this.renderer !=null));
         this.glView.getHolder().setFormat(-3);
         this.glView.setRenderer((PubSubARRenderer) this.renderer);
@@ -283,7 +284,8 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
 
 
     protected ARRenderer supplyRenderer() {
-        String address = "156.148.33.87:5555";
+//        String address = "156.148.33.87:5555";
+        String address = "156.148.33.66:5555";
         ZMQSubscriber subscriber = new ZMQSubscriber(address);
         Thread subThread = new Thread(subscriber);
         subThread.start();
