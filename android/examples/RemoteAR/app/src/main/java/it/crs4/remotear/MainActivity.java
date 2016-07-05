@@ -269,7 +269,7 @@ public class MainActivity extends Activity implements
 
             setupStreamLib();
             prepareRemoteAR();
-            this.stream1.prepare(surfaceView);
+            this.stream1.prepare(surfaceView, true);
             mStreamPrepared = true;
         }
     }
@@ -390,6 +390,7 @@ public class MainActivity extends Activity implements
     public void cameraPreviewStarted(int width, int height, int rate, int cameraIndex, boolean cameraIsFrontFacing) {
         Log.d(TAG, "cameraPreviewStarted!");
         if (ARToolKit.getInstance().initialiseAR(width, height, "Data/camera_para.dat", cameraIndex, cameraIsFrontFacing)) {
+//        if (ARToolKit.getInstance().initialiseAR(width, height, "Data/camera_para_axis.dat", cameraIndex, cameraIsFrontFacing)) {
             Log.i(TAG, "getGLView(): Camera initialised");
         } else {
             Log.e(TAG, "getGLView(): Error initialising camera. Cannot continue.");
