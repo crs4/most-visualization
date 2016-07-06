@@ -1,4 +1,4 @@
-package it.crs4.remotear.renderer;
+package it.crs4.most.visualization.augmentedreality.renderer;
 
 import android.content.Context;
 import android.opengl.Matrix;
@@ -20,12 +20,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import it.crs4.remotear.mesh.Cube;
-import it.crs4.remotear.mesh.Group;
-import it.crs4.remotear.mesh.Mesh;
-import it.crs4.remotear.mesh.MeshFactory;
-import it.crs4.remotear.mesh.Plane;
-import it.crs4.remotear.mesh.Pyramid;
+import it.crs4.most.visualization.augmentedreality.mesh.Cube;
+import it.crs4.most.visualization.augmentedreality.mesh.Group;
+import it.crs4.most.visualization.augmentedreality.mesh.Mesh;
+import it.crs4.most.visualization.augmentedreality.mesh.MeshFactory;
+import it.crs4.most.visualization.augmentedreality.mesh.Pyramid;
 import it.crs4.most.visualization.utils.zmq.BaseSubscriber;
 import it.crs4.most.visualization.utils.zmq.IPublisher;
 

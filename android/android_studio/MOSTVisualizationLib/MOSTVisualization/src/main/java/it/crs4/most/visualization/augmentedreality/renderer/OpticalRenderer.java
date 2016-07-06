@@ -1,4 +1,4 @@
-package it.crs4.remotear.renderer;
+package it.crs4.most.visualization.augmentedreality.renderer;
 
 import android.content.Context;
 import android.util.Log;
@@ -10,8 +10,8 @@ import java.util.Map;
 
 import javax.microedition.khronos.opengles.GL10;
 
-import it.crs4.remotear.OpticalARToolkit;
-import it.crs4.remotear.mesh.Mesh;
+import it.crs4.most.visualization.augmentedreality.OpticalARToolkit;
+import it.crs4.most.visualization.augmentedreality.mesh.Mesh;
 import it.crs4.most.visualization.utils.zmq.BaseSubscriber;
 import it.crs4.most.visualization.utils.zmq.IPublisher;
 

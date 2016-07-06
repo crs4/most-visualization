@@ -31,8 +31,10 @@ import org.artoolkit.ar.base.camera.CaptureCameraPreview;
 import org.artoolkit.ar.base.rendering.ARRenderer;
 import org.artoolkit.ar.base.rendering.gles20.ARRendererGLES20;
 
-import it.crs4.remotear.renderer.OpticalRenderer;
-import it.crs4.remotear.renderer.PubSubARRenderer;
+import it.crs4.most.visualization.augmentedreality.OpticalARToolkit;
+import it.crs4.most.visualization.augmentedreality.TouchGLSurfaceView;
+import it.crs4.most.visualization.augmentedreality.renderer.OpticalRenderer;
+import it.crs4.most.visualization.augmentedreality.renderer.PubSubARRenderer;
 import it.crs4.most.visualization.utils.zmq.ZMQSubscriber;
 import jp.epson.moverio.bt200.DisplayControl;
 // For Epson Moverio BT-200. BT200Ctrl.jar must be in libs/ folder.

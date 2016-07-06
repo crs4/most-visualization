@@ -1,4 +1,4 @@
-package it.crs4.remotear.mesh;
+package it.crs4.most.visualization.augmentedreality.mesh;
 
 public class Cube extends Mesh {
     public float width;

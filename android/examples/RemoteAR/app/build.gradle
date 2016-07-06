@@ -13,16 +13,8 @@ model {
             versionCode = 1
             versionName = "1.0"
 
-//            buildConfigFields.with {
-//
-//                }
-
-
         }
 
-        ndk.with {
-            moduleName = "AROpticalWrapper"
-        }
     }
 
     android.buildTypes {
@@ -32,32 +24,6 @@ model {
         }
     }
 
-    android.productFlavors {
-    }
-
-    android.sources {
-//        main.jni {
-//            source {
-//                srcDirs = ['src/main/nop']
-//            }
-//        }
-        main.jniLibs {
-            source {
-                srcDirs = ['src/main/libs']
-            }
-        }
-    }
-
-
-//    android.packagingOptions {
-//        pickFirst 'lib/armeabi/libARWrapper.so'
-//        pickFirst 'lib/armeabi/libc++_shared.so'
-//    }
-
-//    android.compileOptions {
-//        sourceCompatibility JavaVersion.VERSION_1_7
-//        targetCompatibility JavaVersion.VERSION_1_7
-//    }
 }
 
 dependencies {
@@ -66,9 +32,8 @@ dependencies {
 
     compile project(':aRBaseLib')
     compile name: "MOSTStreaming", ext: "aar", group: 'it.crs4.most.streaming', version: '1.0'
-//    compile name: "ZMQBackend", ext: "aar", group: 'it.crs4.zmqlib.pubsub', version: '1.0'
-    compile name: "MOSTVisualization", ext: "aar", group: 'it.crs4.most.visualization', version: '1.0'
-    compile 'org.zeromq:jeromq:0.3.2@jar' //fixme, should not be here
+//    compile name: "MOSTVisualization", ext: "aar", group: 'it.crs4.most.visualization', version: '1.0', 'transitive': true
+    compile project(':MOSTVisualization')
 
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'com.google.android.gms:play-services-appindexing:8.1.0'

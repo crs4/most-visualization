@@ -1,4 +1,4 @@
-package it.crs4.remotear;
+package it.crs4.most.visualization.augmentedreality;
 
 import android.util.Log;
 
@@ -28,11 +28,11 @@ public class OpticalARToolkit {
         return eyeRproject;
     }
 
-    protected float [] eyeLmodel = new float [16];
-    protected float [] eyeLproject = new float [16];
+    public float [] eyeLmodel = new float [16];
+    public float [] eyeLproject = new float [16];
 
-    protected float [] eyeRmodel = new float [16];
-    protected float [] eyeRproject = new float [16];
+    public float [] eyeRmodel = new float [16];
+    public float [] eyeRproject = new float [16];
 
     public OpticalARToolkit(ARToolKit arToolKit) {
         this.arToolKit = arToolKit;

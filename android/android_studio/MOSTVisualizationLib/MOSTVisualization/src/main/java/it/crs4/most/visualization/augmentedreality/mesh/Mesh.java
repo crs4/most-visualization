@@ -1,8 +1,4 @@
-package it.crs4.remotear.mesh;
-
-import android.os.Handler;
-import android.os.Message;
-import android.util.Log;
+package it.crs4.most.visualization.augmentedreality.mesh;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -11,15 +7,10 @@ import java.nio.ShortBuffer;
 import java.util.UUID;
 
 import javax.microedition.khronos.opengles.GL10;
-
-import it.crs4.most.visualization.StreamViewerFragment;
 import it.crs4.most.visualization.utils.zmq.IPublisher;
-import it.crs4.most.visualization.utils.zmq.BaseSubscriber;
-
-
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.zeromq.ZMQ;
+
 
 public abstract  class Mesh{
 	// Our vertex buffer.

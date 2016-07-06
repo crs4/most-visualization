@@ -1,4 +1,4 @@
-package it.crs4.remotear;
+package it.crs4.most.visualization.augmentedreality;
 
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -19,6 +19,7 @@ import android.widget.TextView;
 //import org.artoolkit.ar.base.rendering.Cube;
 
 import it.crs4.most.visualization.IStreamFragmentCommandListener;
+import it.crs4.most.visualization.R;
 import it.crs4.most.visualization.StreamViewerFragment;
 
 

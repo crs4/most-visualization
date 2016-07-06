@@ -39,8 +39,11 @@ import it.crs4.most.streaming.enums.StreamingEvent;
 import it.crs4.most.streaming.enums.StreamingEventType;
 import it.crs4.most.visualization.IStreamFragmentCommandListener;
 import it.crs4.most.visualization.StreamInspectorFragment.IStreamProvider;
-import it.crs4.remotear.mesh.Mesh;
-import it.crs4.remotear.renderer.PubSubARRenderer;
+import it.crs4.most.visualization.augmentedreality.ARFragment;
+import it.crs4.most.visualization.augmentedreality.RemoteCaptureCameraPreview;
+import it.crs4.most.visualization.augmentedreality.TouchGLSurfaceView;
+import it.crs4.most.visualization.augmentedreality.mesh.Mesh;
+import it.crs4.most.visualization.augmentedreality.renderer.PubSubARRenderer;
 import it.crs4.most.visualization.utils.zmq.ZMQPublisher;
 
 import android.view.View;

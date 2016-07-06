@@ -1,36 +1,50 @@
-apply plugin: 'com.android.library'
+apply plugin: 'com.android.model.library'
 apply plugin: 'maven-publish'
 
-android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.2"
 
-    defaultConfig {
-        minSdkVersion 11
-        targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
+model{
+    android {
+        compileSdkVersion = 21
+        buildToolsVersion = "21.1.2"
+
+        defaultConfig.with {
+            applicationId = "it.crs4.most.visualization"
+            minSdkVersion.apiLevel = 15
+            targetSdkVersion.apiLevel = 21
+            versionCode = 1
+            versionName = "1.0"
+
+        }
+        ndk.with {
+            moduleName = "AROpticalWrapper"
+        }
+
     }
 
-    buildTypes {
+    android.buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            minifyEnabled = false
+            proguardFiles += file('proguard-rules.pro')
         }
     }
 
-//    repositories {
-//        mavenLocal()
-//    }
+    android.sources {
+        main.jniLibs {
+            source {
+                srcDirs = ['src/main/libs']
+            }
+        }
+    }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile group: 'it.crs4.most.streaming', name: 'MOSTStreaming', version: '1.0', ext: 'aar'
     //compile 'com.google.protobuf:protobuf-java:2.4.0a'
-    compile 'com.android.support:support-v4'
-    compile 'com.android.support:appcompat-v7:23.2.1'
-    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:21.0.3'
+    compile 'com.android.support:support-v4:21.0.3'
+//    testCompile 'junit:junit:4.12'
+    compile project(':aRBaseLib')
     compile 'org.zeromq:jeromq:0.3.2@jar'
 }
 

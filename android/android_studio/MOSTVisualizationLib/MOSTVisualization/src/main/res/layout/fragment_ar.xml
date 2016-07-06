@@ -19,7 +19,7 @@
         android:layout_gravity="center"
         android:layout_margin="10dp"/>
 
-        <it.crs4.remotear.RemoteCaptureCameraPreview
+        <it.crs4.most.visualization.augmentedreality.RemoteCaptureCameraPreview
             android:id="@+id/streamSurface"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -27,7 +27,7 @@
             android:layout_margin="10dp"
             />
 
-        <it.crs4.remotear.TouchGLSurfaceView
+        <it.crs4.most.visualization.augmentedreality.TouchGLSurfaceView
             android:id="@+id/ARSurface"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

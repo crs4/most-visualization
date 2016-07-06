@@ -30,7 +30,7 @@ static int setupOptical(const char *optical_param_name, ARdouble m[16], ARdouble
   }
 
 
-JNIEXPORT jint JNICALL Java_it_crs4_remotear_OpticalARToolkit_getOpticalMatrices
+JNIEXPORT jint JNICALL Java_it_crs4_most_visualization_augmentedreality_OpticalARToolkit_getOpticalMatrices
   (JNIEnv *env,
   jobject thiz,
   jstring eyeLfilename,

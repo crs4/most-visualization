@@ -1,4 +1,4 @@
-package it.crs4.remotear;
+package it.crs4.most.visualization.augmentedreality;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
@@ -7,10 +7,10 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 
-import it.crs4.remotear.renderer.PubSubARRenderer;
-import it.crs4.remotear.mesh.Group;
-import it.crs4.remotear.mesh.Mesh;
-import it.crs4.remotear.mesh.Plane;
+import it.crs4.most.visualization.augmentedreality.renderer.PubSubARRenderer;
+import it.crs4.most.visualization.augmentedreality.mesh.Group;
+import it.crs4.most.visualization.augmentedreality.mesh.Mesh;
+import it.crs4.most.visualization.augmentedreality.mesh.Plane;
 
 /**
  * Created by mauro on 24/05/16.

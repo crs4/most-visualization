@@ -1,4 +1,4 @@
-package it.crs4.remotear.mesh;
+package it.crs4.most.visualization.augmentedreality.mesh;
 
 import org.json.JSONException;
 import org.json.JSONObject;

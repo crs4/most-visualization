@@ -1,4 +1,4 @@
-package it.crs4.remotear;
+package it.crs4.most.visualization.augmentedreality;
 
 import android.content.Context;
 import android.hardware.Camera;
