@@ -1,7 +1,6 @@
 apply plugin: 'com.android.model.library'
 apply plugin: 'maven-publish'
 
-
 model{
     android {
         compileSdkVersion = 21
@@ -18,7 +17,9 @@ model{
         ndk.with {
             moduleName = "AROpticalWrapper"
         }
-
+        repositories {
+            mavenLocal()
+        }
     }
 
     android.buildTypes {
@@ -39,10 +40,10 @@ model{
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile group: 'it.crs4.most.streaming', name: 'MOSTStreaming', version: '1.0', ext: 'aar'
+    compile 'it.crs4.most.streaming:MOSTStreaming:1.0'
+    compile 'com.android.support:appcompat-v7:21.0.2'
+    compile 'com.android.support:support-v4:21.0.2'
     //compile 'com.google.protobuf:protobuf-java:2.4.0a'
-    compile 'com.android.support:appcompat-v7:21.0.3'
-    compile 'com.android.support:support-v4:21.0.3'
 //    testCompile 'junit:junit:4.12'
     compile project(':aRBaseLib')
     compile 'org.zeromq:jeromq:0.3.2@jar'
@@ -50,10 +51,8 @@ dependencies {
 
 
 publishing {
-
     repositories {
         maven {
-
             url mavenLocal().url
         }
     }
@@ -62,8 +61,6 @@ publishing {
             groupId 'it.crs4.most.visualization'
             version = '1.0'
             artifactId 'MOSTVisualization'
-
-            // Tell maven to prepare the generated "*.aar" file for publishing
             artifact("build/outputs/aar/MOSTVisualization-debug.aar")
 
         }
