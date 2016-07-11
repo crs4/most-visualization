@@ -1,0 +1,2 @@
+include ':app', ':aRBaseLib', ':MOSTVisualization'
+project(':MOSTVisualization').projectDir = new File(settingsDir, '../../MOSTVisualizationLib/MOSTVisualization')

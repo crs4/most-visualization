@@ -1,2 +1,0 @@
-include ':app', ':aRBaseLib', ':MOSTVisualization'
-project(':MOSTVisualization').projectDir = new File(settingsDir, '../../android_studio/MOSTVisualizationLib/MOSTVisualization')
