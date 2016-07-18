@@ -1,60 +1,18 @@
 package it.crs4.remotear;
 
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.AlertDialog;
-import android.app.FragmentTransaction;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ConfigurationInfo;
-
-
-import android.opengl.GLSurfaceView;
 import android.os.Handler;
-//import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.os.Looper;
-import android.os.Message;
-import android.util.Log;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import it.crs4.most.streaming.IStream;
-import it.crs4.most.streaming.StreamProperties;
-import it.crs4.most.streaming.StreamingEventBundle;
-import it.crs4.most.streaming.StreamingLib;
-import it.crs4.most.streaming.StreamingLibBackend;
-import it.crs4.most.streaming.enums.StreamProperty;
-import it.crs4.most.streaming.enums.StreamState;
-import it.crs4.most.streaming.enums.StreamingEvent;
-import it.crs4.most.streaming.enums.StreamingEventType;
-import it.crs4.most.visualization.IStreamFragmentCommandListener;
-import it.crs4.most.visualization.StreamInspectorFragment.IStreamProvider;
-import it.crs4.most.visualization.augmentedreality.ARFragment;
-import it.crs4.most.visualization.augmentedreality.RemoteCaptureCameraPreview;
 import it.crs4.most.visualization.augmentedreality.TouchGLSurfaceView;
 import it.crs4.most.visualization.augmentedreality.mesh.Mesh;
 import it.crs4.most.visualization.augmentedreality.renderer.PubSubARRenderer;
 import it.crs4.most.visualization.utils.zmq.ZMQPublisher;
-
+import it.crs4.most.visualization.augmentedreality.BaseRemoteARActivity;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.RadioButton;
-import android.widget.Toast;
-
-import org.artoolkit.ar.base.ARToolKit;
-import org.artoolkit.ar.base.assets.AssetHelper;
-import org.artoolkit.ar.base.camera.CameraEventListener;
-
 
 public class MainActivity extends BaseRemoteARActivity {
 

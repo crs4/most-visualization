@@ -1,4 +1,4 @@
-package it.crs4.remotear;
+package it.crs4.most.visualization.augmentedreality;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -34,6 +34,7 @@ import it.crs4.most.streaming.enums.StreamState;
 import it.crs4.most.streaming.enums.StreamingEvent;
 import it.crs4.most.streaming.enums.StreamingEventType;
 import it.crs4.most.visualization.IStreamFragmentCommandListener;
+import it.crs4.most.visualization.R;
 import it.crs4.most.visualization.StreamInspectorFragment;
 import it.crs4.most.visualization.augmentedreality.ARFragment;
 import it.crs4.most.visualization.augmentedreality.RemoteCaptureCameraPreview;
