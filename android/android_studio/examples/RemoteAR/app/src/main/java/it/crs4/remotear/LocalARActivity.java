@@ -73,24 +73,6 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
 //        AndroidUtils.reportDisplayInformation(this);
         setContentView(R.layout.local_ar);
 
-
-        String address = "156.148.33.87:5555";
-//        String address = "156.148.33.66:5555";
-        ZMQSubscriber subscriber = new ZMQSubscriber(address);
-        Thread subThread = new Thread(subscriber);
-        subThread.start();
-        if (mOpticalARToolkit != null){
-            Log.d(TAG, "setting OpticalRenderer");
-            renderer = new OpticalRenderer(this, subscriber, mOpticalARToolkit);
-        }
-        else{
-            renderer = new PubSubARRenderer(this, subscriber);
-        }
-
-        Arrow arrow = new Arrow("arrow");
-        meshes.put(arrow.getId(), arrow);
-        renderer.setMeshes(meshes);
-
         coordX = (EditText) findViewById(R.id.coordX);
         coordY = (EditText) findViewById(R.id.coordY);
         coordZ = (EditText) findViewById(R.id.coordZ);
@@ -119,6 +101,23 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
             coordY.setVisibility(View.INVISIBLE);
             coordZ.setVisibility(View.INVISIBLE);
         }
+
+        String address = "156.148.33.87:5555";
+//        String address = "156.148.33.66:5555";
+        ZMQSubscriber subscriber = new ZMQSubscriber(address);
+        Thread subThread = new Thread(subscriber);
+        subThread.start();
+        if (mOpticalARToolkit != null){
+            Log.d(TAG, "setting OpticalRenderer");
+            renderer = new OpticalRenderer(this, subscriber, mOpticalARToolkit);
+        }
+        else{
+            renderer = new PubSubARRenderer(this, subscriber);
+        }
+
+        Arrow arrow = new Arrow("arrow");
+        meshes.put(arrow.getId(), arrow);
+        renderer.setMeshes(meshes);
     }
 
     protected void onStart() {
