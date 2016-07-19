@@ -34,17 +34,22 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback{
     protected  volatile  float angle = 0 ;
     protected  float previousAngle = 0;
     protected int markerID = -1;
-    protected volatile  Group group = new Group("arrow");
-    protected Pyramid pyramid = new Pyramid(40f, 20f, 40f);
-    protected Cube cube = new Cube(30f, 20f, 30f);
+
     protected Handler handler;
     public IPublisher publisher;
     protected BaseSubscriber subscriber;
     protected String TAG = "PubSubARRenderer";
     protected int height;
     protected int width;
-//    private final ArrayList<Mesh> meshes = new ArrayList<Mesh>();
-    protected final HashMap<String, Mesh> meshes = new HashMap<String, Mesh>();
+    protected HashMap<String, Mesh> meshes;
+
+    public void setMeshes(HashMap<String, Mesh> meshes) {
+        this.meshes = meshes;
+    }
+
+    public HashMap<String, Mesh> getMeshes() {
+        return meshes;
+    }
 
     public PubSubARRenderer(Context context){
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
@@ -68,9 +73,6 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback{
 
     protected void setPublisher(IPublisher publisher){
         this.publisher = publisher;
-        if (publisher != null){
-            group.publisher = publisher;
-        }
     }
 
     protected void setHandler(BaseSubscriber subscriber){
@@ -127,17 +129,7 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback{
     public boolean configureARScene() {
 
         markerID = ARToolKit.getInstance().addMarker("single;Data/hiro.patt;80");
-        if (markerID < 0) return false;
-
-//        cube.setX(-20f);
-        pyramid.setRz(180);
-//        pyramid.setX(-40f);
-        pyramid.setY(-1f*cube.height);
-        group.add(cube);
-        group.add(pyramid);
-        meshes.put(group.getId(), group);
-
-        return  true;
+        return (markerID >= 0);
     }
 
     /**
@@ -160,10 +152,6 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback{
             gl.glMatrixMode(GL10.GL_MODELVIEW);
             gl.glLoadMatrixf(ARToolKit.getInstance().queryMarkerTransformation(markerID), 0);
 
-            if (angle != previousAngle){
-                group.setRy(angle);
-            }
-            previousAngle = angle;
 
             synchronized (meshes){
                 for (Iterator iterator = meshes.entrySet().iterator(); iterator.hasNext();) {

@@ -7,24 +7,32 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 
+import java.util.HashMap;
+
 import it.crs4.most.visualization.augmentedreality.renderer.PubSubARRenderer;
 import it.crs4.most.visualization.augmentedreality.mesh.Group;
 import it.crs4.most.visualization.augmentedreality.mesh.Mesh;
 import it.crs4.most.visualization.augmentedreality.mesh.Plane;
 
-/**
- * Created by mauro on 24/05/16.
- */
 public class TouchGLSurfaceView extends GLSurfaceView {
     private String TAG = "TouchGLSurfaceView";
     protected final float TOUCH_SCALE_FACTOR = 180.0f / 320;
     protected float mPreviousX;
     protected float mPreviousY;
-    protected PubSubARRenderer renderer;
+    protected Renderer renderer;
     private Group meshGroup;
     public enum Mode {Rotate, Edit, Move};
     private boolean mDrawing = false;
     private boolean mMoving = false;
+    protected HashMap<String, Mesh> meshes;
+
+    public void setMeshes(HashMap<String, Mesh> meshes) {
+        this.meshes = meshes;
+    }
+
+    public HashMap<String, Mesh> getMeshes() {
+        return meshes;
+    }
 
     public Mode getMode() {
         return mode;
@@ -38,11 +46,11 @@ public class TouchGLSurfaceView extends GLSurfaceView {
     private ScaleGestureDetector mScaleDetector;
     private boolean mScaling = false;
 
-    public PubSubARRenderer getRenderer() {
+    public Renderer getRenderer() {
         return renderer;
     }
 
-    public void setRenderer(PubSubARRenderer renderer) {
+    public void setRenderer(Renderer renderer) {
         Log.d(TAG, "inside setRenderer ");
         this.renderer = renderer;
         super.setRenderer((Renderer) renderer);
@@ -68,7 +76,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                     TouchGLSurfaceView.this.mScaling = true;
                     float currentScaleFactor = detector.getScaleFactor();
                     Log.d(TAG, "currentScaleFactor " + currentScaleFactor);
-                    Mesh mesh = renderer.getMesh("arrow");
+                    Mesh mesh = meshes.get("arrow");
                     if (currentScaleFactor < 1){
                         mesh.setZ(mesh.getZ() - 5f);
                     }
@@ -110,7 +118,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
 
             float dx = x - mPreviousX;
             float dy = y - mPreviousY;
-            Mesh mesh = renderer.getMesh("arrow");
+            Mesh mesh = meshes.get("arrow");
             switch (e.getAction()) {
                 case MotionEvent.ACTION_MOVE:
                     Log.d(TAG, "ACTION_MOVE");
@@ -135,9 +143,9 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                             mesh.setY(mesh.getY() - dy);
                             break;
 
-                        case Edit:
-                            draw(x, y);
-                            break;
+//                        case Edit:
+//                            draw(x, y);
+//                            break;
                     }
                     break;
                 case MotionEvent.ACTION_UP:
@@ -169,11 +177,11 @@ public class TouchGLSurfaceView extends GLSurfaceView {
         return true;
     }
 
-    private void draw(float x, float y){
-        Plane plane = new Plane(30, 30);
-        plane.publisher = renderer.publisher;
-        renderer.addMesh(plane, x, y);
-        plane.publish();
-
-    }
+//    private void draw(float x, float y){
+//        Plane plane = new Plane(30, 30);
+//        plane.publisher = renderer.publisher;
+//        renderer.addMesh(plane, x, y);
+//        plane.publish();
+//
+//    }
 }

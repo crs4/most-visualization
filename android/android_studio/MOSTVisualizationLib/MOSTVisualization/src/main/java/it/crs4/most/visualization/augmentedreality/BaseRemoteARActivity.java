@@ -75,6 +75,7 @@ public abstract class BaseRemoteARActivity extends Activity implements
 
         AssetHelper assetHelper = new AssetHelper(getAssets());
         assetHelper.cacheAssetFolder(this, "Data");
+        streamARFragment = ARFragment.newInstance(supplyStreamName());
     }
 
     private void setProperties() {
@@ -118,7 +119,6 @@ public abstract class BaseRemoteARActivity extends Activity implements
     public void playRemote() {
         mRemotePlay = true;
         if (!arFragmentAdded) {
-            streamARFragment = ARFragment.newInstance(supplyStreamName());
             // add the first fragment to the first container
             FragmentTransaction fragmentTransaction = getFragmentManager()
                     .beginTransaction();
