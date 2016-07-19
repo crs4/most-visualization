@@ -31,8 +31,12 @@ import org.artoolkit.ar.base.camera.CaptureCameraPreview;
 import org.artoolkit.ar.base.rendering.ARRenderer;
 import org.artoolkit.ar.base.rendering.gles20.ARRendererGLES20;
 
+import java.util.HashMap;
+
 import it.crs4.most.visualization.augmentedreality.OpticalARToolkit;
 import it.crs4.most.visualization.augmentedreality.TouchGLSurfaceView;
+import it.crs4.most.visualization.augmentedreality.mesh.Arrow;
+import it.crs4.most.visualization.augmentedreality.mesh.Mesh;
 import it.crs4.most.visualization.augmentedreality.renderer.OpticalRenderer;
 import it.crs4.most.visualization.augmentedreality.renderer.PubSubARRenderer;
 import it.crs4.most.visualization.utils.zmq.ZMQSubscriber;
@@ -42,7 +46,7 @@ import jp.epson.moverio.bt200.DisplayControl;
 
 public  class LocalARActivity extends Activity implements CameraEventListener {
     protected static final String TAG = "LocalARActivity";
-    protected ARRenderer renderer;
+    protected PubSubARRenderer renderer;
     protected FrameLayout mainLayout;
     private CaptureCameraPreview preview;
     private TouchGLSurfaceView glView;
@@ -50,10 +54,12 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
     private boolean firstUpdate = false;
     private OpticalARToolkit mOpticalARToolkit;
     private EditText coordX, coordY, coordZ;
+    private HashMap<String, Mesh> meshes = new HashMap<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -66,6 +72,25 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
 //        this.setRequestedOrientation(0);
 //        AndroidUtils.reportDisplayInformation(this);
         setContentView(R.layout.local_ar);
+
+
+        String address = "156.148.33.87:5555";
+//        String address = "156.148.33.66:5555";
+        ZMQSubscriber subscriber = new ZMQSubscriber(address);
+        Thread subThread = new Thread(subscriber);
+        subThread.start();
+        if (mOpticalARToolkit != null){
+            Log.d(TAG, "setting OpticalRenderer");
+            renderer = new OpticalRenderer(this, subscriber, mOpticalARToolkit);
+        }
+        else{
+            renderer = new PubSubARRenderer(this, subscriber);
+        }
+
+        Arrow arrow = new Arrow("arrow");
+        meshes.put(arrow.getId(), arrow);
+        renderer.setMeshes(meshes);
+
         coordX = (EditText) findViewById(R.id.coordX);
         coordY = (EditText) findViewById(R.id.coordY);
         coordZ = (EditText) findViewById(R.id.coordZ);
@@ -109,13 +134,6 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
             this.mainLayout = this.supplyFrameLayout();
             if(this.mainLayout == null) {
                 Log.e("ARActivity", "onStart(): Error: supplyFrameLayout did not return a layout.");
-            } else {
-                this.renderer = this.supplyRenderer();
-                if(this.renderer == null) {
-                    Log.e("ARActivity", "onStart(): Error: supplyRenderer did not return a renderer.");
-                    this.renderer = new ARRenderer();
-                }
-
             }
         }
 
@@ -140,7 +158,7 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
         boolean supportsEs2 = configurationInfo.reqGlEsVersion >= 131072;
         if(supportsEs2) {
             Log.i("ARActivity", "onResume(): OpenGL ES 2.x is supported");
-            if(this.renderer instanceof ARRendererGLES20) {
+            if((ARRenderer)renderer instanceof ARRendererGLES20) {
                 this.glView.setEGLContextClientVersion(2);
             } else {
                 Log.w("ARActivity", "onResume(): OpenGL ES 2.x is supported but only a OpenGL 1.x renderer is available. \n Use ARRendererGLES20 for ES 2.x support. \n Continuing with OpenGL 1.x.");
@@ -148,7 +166,7 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
             }
         } else {
             Log.i("ARActivity", "onResume(): Only OpenGL ES 1.x is supported");
-            if(this.renderer instanceof ARRendererGLES20) {
+            if((ARRenderer)renderer instanceof ARRendererGLES20) {
                 throw new RuntimeException("Only OpenGL 1.x available but a OpenGL 2.x renderer was provided.");
             }
 
@@ -156,9 +174,9 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
         }
 
 //        this.glView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
-        Log.d(TAG, "ready to call setRenderer with " + (this.renderer !=null));
+        Log.d(TAG, "ready to call setRenderer with " + (renderer !=null));
         this.glView.getHolder().setFormat(-3);
-        this.glView.setRenderer((PubSubARRenderer) this.renderer);
+        this.glView.setRenderer((PubSubARRenderer) renderer);
         Log.d(TAG, "setRenderer called");
         this.glView.setRenderMode(0);
         this.glView.setZOrderMediaOverlay(true);
@@ -286,18 +304,7 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
 
 
     protected ARRenderer supplyRenderer() {
-        String address = "156.148.33.87:5555";
-//        String address = "156.148.33.66:5555";
-        ZMQSubscriber subscriber = new ZMQSubscriber(address);
-        Thread subThread = new Thread(subscriber);
-        subThread.start();
-        if (mOpticalARToolkit != null){
-            Log.d(TAG, "setting OpticalRenderer");
-            return new OpticalRenderer(this, subscriber, mOpticalARToolkit);
-        }
-        else{
-            return new PubSubARRenderer(this, subscriber);
-        }
+        return renderer;
     }
 
     protected FrameLayout supplyFrameLayout() {

@@ -7,6 +7,7 @@ import android.view.SurfaceHolder;
 import android.widget.Button;
 import android.widget.EditText;
 import it.crs4.most.visualization.augmentedreality.TouchGLSurfaceView;
+import it.crs4.most.visualization.augmentedreality.mesh.Arrow;
 import it.crs4.most.visualization.augmentedreality.mesh.Cube;
 import it.crs4.most.visualization.augmentedreality.mesh.Group;
 import it.crs4.most.visualization.augmentedreality.mesh.Mesh;
@@ -89,19 +90,11 @@ public class MainActivity extends BaseRemoteARActivity implements SurfaceHolder.
         Thread pubThread = new Thread(publisher);
         pubThread.start();
 
-        Group group = new Group("arrow");
-        Pyramid pyramid = new Pyramid(40f, 20f, 40f);
-        Cube cube = new Cube(30f, 20f, 30f);
-        group.publisher = publisher;
-        pyramid.setRz(180);
-//        pyramid.setX(-40f);
-        pyramid.setY(-1f*cube.height);
-        group.add(cube);
-        group.add(pyramid);
-        meshes.put(group.getId(), group);
+        Arrow arrow = new Arrow("arrow");
+        meshes.put(arrow.getId(), arrow);
+        arrow.publisher = publisher;
         renderer =  new PubSubARRenderer(this, publisher);
         renderer.setMeshes(meshes);
-        group.publisher = publisher;
         streamARFragment.setGlSurfaceViewCallback(this);
         streamARFragment.setSurfaceViewCallback(this);
 
