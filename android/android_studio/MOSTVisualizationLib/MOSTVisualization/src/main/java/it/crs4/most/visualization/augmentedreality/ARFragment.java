@@ -213,7 +213,6 @@ public class ARFragment extends StreamViewerFragment implements
             surfaceView.getHolder().addCallback(surfaceViewCallback);
         }
 
-
         glView = (TouchGLSurfaceView) rootView.findViewById(R.id.ARSurface);
         glView.getHolder().setFixedSize(704, 576); //FIXME should be dynamically set
 
@@ -400,8 +399,4 @@ public class ARFragment extends StreamViewerFragment implements
         }
 
     }
-
-
-
-
 }

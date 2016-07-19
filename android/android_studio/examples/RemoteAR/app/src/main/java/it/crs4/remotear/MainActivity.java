@@ -101,6 +101,7 @@ public class MainActivity extends BaseRemoteARActivity implements SurfaceHolder.
         meshes.put(group.getId(), group);
         renderer =  new PubSubARRenderer(this, publisher);
         renderer.setMeshes(meshes);
+        group.publisher = publisher;
         streamARFragment.setGlSurfaceViewCallback(this);
         streamARFragment.setSurfaceViewCallback(this);
 

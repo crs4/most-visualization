@@ -1,11 +1,7 @@
 package it.crs4.most.visualization.augmentedreality;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.FragmentTransaction;
-import android.content.DialogInterface;
-import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -14,7 +10,6 @@ import android.util.Log;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import org.artoolkit.ar.base.ARToolKit;
 import org.artoolkit.ar.base.assets.AssetHelper;
@@ -34,19 +29,14 @@ import it.crs4.most.streaming.enums.StreamState;
 import it.crs4.most.streaming.enums.StreamingEvent;
 import it.crs4.most.streaming.enums.StreamingEventType;
 import it.crs4.most.visualization.IStreamFragmentCommandListener;
-import it.crs4.most.visualization.R;
 import it.crs4.most.visualization.StreamInspectorFragment;
-import it.crs4.most.visualization.augmentedreality.ARFragment;
-import it.crs4.most.visualization.augmentedreality.RemoteCaptureCameraPreview;
-import it.crs4.most.visualization.augmentedreality.TouchGLSurfaceView;
 import it.crs4.most.visualization.augmentedreality.renderer.PubSubARRenderer;
 
 
 public abstract class BaseRemoteARActivity extends Activity implements
         IStreamFragmentCommandListener,
         StreamInspectorFragment.IStreamProvider,
-        ARFragment.OnCompleteListener,
-        CameraEventListener {
+        ARFragment.OnCompleteListener {
 
     String TAG = "BaseRemoteARActivity";
     private IStream streamAR = null;
@@ -155,7 +145,7 @@ public abstract class BaseRemoteARActivity extends Activity implements
                             int height = 576;
                             Log.d(TAG, "width " + width);
                             Log.d(TAG, "height " + height);
-                            BaseRemoteARActivity.this.cameraPreviewStarted(width, height, 25, 0, false);
+                            streamARFragment.cameraPreviewStarted(width, height, 25, 0, false);
                         }
                     }
                 }
@@ -166,46 +156,7 @@ public abstract class BaseRemoteARActivity extends Activity implements
         }
     }
 
-//    @SuppressLint("NewApi")
-    @Override
-    public void cameraPreviewStarted(int width, int height, int rate, int cameraIndex, boolean cameraIsFrontFacing) {
-        Log.d(TAG, "cameraPreviewStarted!");
-        if (ARToolKit.getInstance().initialiseAR(width, height, "Data/camera_para.dat", cameraIndex, cameraIsFrontFacing)) {
-//        if (ARToolKit.getInstance().initialiseAR(width, height, "Data/camera_para_axis.dat", cameraIndex, cameraIsFrontFacing)) {
-            Log.i(TAG, "getGLView(): Camera initialised");
-        } else {
-            Log.e(TAG, "getGLView(): Error initialising camera. Cannot continue.");
-            this.finish();
-        }
 
-        Toast.makeText(this, "Camera settings: " + width + "x" + height + "@" + rate + "fps", Toast.LENGTH_SHORT).show();
-        this.firstUpdate = true;
-    }
-
-    private void prepareAR() {
-        if (!ARToolKit.getInstance().initialiseNative(this.getCacheDir().getAbsolutePath())) {
-            (new AlertDialog.Builder(this)).setMessage("The native library is not loaded. The application cannot continue.").setTitle("Error").setCancelable(true).setNeutralButton(17039360, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    BaseRemoteARActivity.this.finish();
-                }
-            }).show();
-        }else{
-            renderer = supplyRenderer();
-        }
-    }
-
-    private void prepareRemoteAR() {
-        prepareAR();
-        preview = (RemoteCaptureCameraPreview) findViewById(R.id.streamSurface);
-        Log.i(TAG, "RemoteCaptureCameraPreview created");
-        preview.setCameraListener(this);
-        streamAR.addFrameListener(this.preview);
-        glView = streamARFragment.getGlView();
-        glView.setRenderer(this.renderer);
-//        glView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
-        glView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
-        glView.setZOrderMediaOverlay(true);
-    }
     @Override
     public void onSurfaceViewDestroyed(String streamId) {
             this.streamAR.destroy();
@@ -216,25 +167,21 @@ public abstract class BaseRemoteARActivity extends Activity implements
         Log.d(TAG, "onSurfaceViewCreated!!!");
         if (surfaceView != null && !mStreamPrepared) {
             setupStreamLib();
-            prepareRemoteAR();
-            this.streamAR.prepare(surfaceView, true);
+            streamAR.prepare(surfaceView, true);
+            streamARFragment.setStreamAR(streamAR);
+            streamARFragment.setRenderer(supplyRenderer());
+            streamARFragment.prepareRemoteAR();
             mStreamPrepared = true;
         }
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (this.glView != null) {
-            this.glView.onResume();
-        }
-    }
-
-    @Override
-    public void cameraPreviewStopped() {
-        ARToolKit.getInstance().cleanup();
-
-    }
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        if (this.glView != null) {
+//            this.glView.onResume();
+//        }
+//    }
 
     @Override
     public void onFragmentCreate() {
@@ -264,30 +211,6 @@ public abstract class BaseRemoteARActivity extends Activity implements
     @Override
     public  void onSaveInstanceState(Bundle outState){
         outState.putBoolean("mRemotePlay", mRemotePlay);
-    }
-
-    public void cameraPreviewFrame(byte[] frame) {
-        if (this.firstUpdate) {
-            if (this.renderer.configureARScene()) {
-                Log.i(TAG, "cameraPreviewFrame(): Scene configured successfully");
-            } else {
-                Log.e(TAG, "cameraPreviewFrame(): Error configuring scene. Cannot continue.");
-                this.finish();
-            }
-
-            this.firstUpdate = false;
-        }
-
-        if (ARToolKit.getInstance().convertAndDetect(frame)) {
-            if (this.glView != null) {
-                this.glView.requestRender();
-            }
-
-//            this.onFrameProcessed();
-        } else {
-            Log.d(TAG, "no marker found, sorry");
-        }
-
     }
 
     @Override

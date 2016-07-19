@@ -257,7 +257,6 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback{
     }
 
 
-
 //  Code from:  https://groups.google.com/forum/#!topic/android-developers/nSv1Pjp5jLY
     private static final float[] _tempGluUnProjectData = new float[40];
     private static final int     _temp_m   = 0;

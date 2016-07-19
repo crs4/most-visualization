@@ -35,10 +35,10 @@ dependencies {
 //    compile name: "MOSTVisualization", ext: "aar", group: 'it.crs4.most.visualization', version: '1.0', 'transitive': true
     compile project(':MOSTVisualization')
 
-    compile 'com.android.support:appcompat-v7:21.0.3'
-    compile 'com.google.android.gms:play-services-appindexing:8.1.0'
-    compile 'com.android.support:support-v4:21.0.3'
 
     compile files('libs/BT200Ctrl.jar')
 
+    compile 'com.android.support:appcompat-v7:21.0.3'
+    compile 'com.google.android.gms:play-services-appindexing:8.1.0'
+    compile 'com.android.support:support-v4:21.0.3'
 }
