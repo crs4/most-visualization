@@ -206,8 +206,9 @@ public class ARFragment extends StreamViewerFragment implements
         Log.d(TAG,"ON CREATE_VIEW STREAM VIEWER");
         View rootView = inflater.inflate(R.layout.fragment_ar, container, false);
 
-        surfaceView = (SurfaceView) rootView.findViewById(R.id.streamSurface);
+        surfaceView = (SurfaceView) rootView.findViewById(R.id.remoteCameraPreview);
         surfaceView.getHolder().setFixedSize(704, 576); //FIXME should be dynamically set
+
 
         if (surfaceViewCallback != null){
             surfaceView.getHolder().addCallback(surfaceViewCallback);
@@ -215,6 +216,11 @@ public class ARFragment extends StreamViewerFragment implements
 
         glView = (TouchGLSurfaceView) rootView.findViewById(R.id.ARSurface);
         glView.getHolder().setFixedSize(704, 576); //FIXME should be dynamically set
+        glView.setEGLContextClientVersion(1);
+        glView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
+        glView.getHolder().setFormat(-3);
+
+        glView.setRenderer(renderer);
 
         if (glSurfaceViewCallback!= null){
             glView.getHolder().addCallback(glSurfaceViewCallback);
@@ -222,14 +228,7 @@ public class ARFragment extends StreamViewerFragment implements
 
         ActivityManager activityManager = (ActivityManager) getActivity().getSystemService(Context.ACTIVITY_SERVICE);
         ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
-        glView.setEGLContextClientVersion(1);
-        glView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
-        glView.getHolder().setFormat(-3);
 
-        Log.i(TAG, "onResume(): GLSurfaceView created");
-//        this.mainLayout.addView(this.preview, new ViewGroup.LayoutParams(-1, -1));
-
-//
         streamCover =  rootView.findViewById(R.id.hidecontainer);
         txtHiddenSurface = (TextView) rootView.findViewById(R.id.txtHiddenSurface);
 
@@ -251,6 +250,12 @@ public class ARFragment extends StreamViewerFragment implements
         });
 
         mListener.onFragmentCreate();
+
+
+        preview = (RemoteCaptureCameraPreview) rootView.findViewById(R.id.remoteCameraPreview);
+        Log.i(TAG, "RemoteCaptureCameraPreview created");
+        preview.setCameraListener(this);
+
 //        setCmdListenerCallback();
         return rootView;
     }
@@ -360,11 +365,9 @@ public class ARFragment extends StreamViewerFragment implements
 
     public void prepareRemoteAR() {
         prepareAR();
-        preview = (RemoteCaptureCameraPreview) getActivity().findViewById(R.id.streamSurface);
-        Log.i(TAG, "RemoteCaptureCameraPreview created");
-        preview.setCameraListener(this);
+
         streamAR.addFrameListener(preview);
-        glView.setRenderer(renderer);
+//        glView.setRenderer(renderer);
 //        glView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
         glView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
         glView.setZOrderMediaOverlay(true);

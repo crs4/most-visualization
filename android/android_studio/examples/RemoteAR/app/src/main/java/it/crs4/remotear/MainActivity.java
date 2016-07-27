@@ -42,7 +42,8 @@ public class MainActivity extends BaseRemoteARActivity implements SurfaceHolder.
     @Override
     public String supplyStreamURI() {
         // FIXME
-        return "rtsp://specialista:speciali@156.148.133.11/mpeg4/media.amp";
+//        return "rtsp://specialista:speciali@156.148.133.11/mpeg4/media.amp";
+        return "rtsp://root:AOB124!$@172.16.4.3/mpeg4/media.amp";
     }
 
     @Override
@@ -62,6 +63,16 @@ public class MainActivity extends BaseRemoteARActivity implements SurfaceHolder.
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        ZMQPublisher publisher = new ZMQPublisher();
+        Thread pubThread = new Thread(publisher);
+        pubThread.start();
+
+        Arrow arrow = new Arrow("arrow");
+        meshes.put(arrow.getId(), arrow);
+        arrow.publisher = publisher;
+        renderer =  new PubSubARRenderer(this, publisher);
+        renderer.setMeshes(meshes);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -85,19 +96,8 @@ public class MainActivity extends BaseRemoteARActivity implements SurfaceHolder.
 
             }
         });
-
-        ZMQPublisher publisher = new ZMQPublisher();
-        Thread pubThread = new Thread(publisher);
-        pubThread.start();
-
-        Arrow arrow = new Arrow("arrow");
-        meshes.put(arrow.getId(), arrow);
-        arrow.publisher = publisher;
-        renderer =  new PubSubARRenderer(this, publisher);
-        renderer.setMeshes(meshes);
         streamARFragment.setGlSurfaceViewCallback(this);
         streamARFragment.setSurfaceViewCallback(this);
-
 
         if(savedInstanceState != null && savedInstanceState.getBoolean("mRemotePlay", false)){
             playRemote();

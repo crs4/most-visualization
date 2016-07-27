@@ -20,7 +20,7 @@
         android:layout_margin="10dp"/>
 
         <it.crs4.most.visualization.augmentedreality.RemoteCaptureCameraPreview
-            android:id="@+id/streamSurface"
+            android:id="@+id/remoteCameraPreview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
@@ -34,36 +34,26 @@
             android:layout_gravity="center"
             android:layout_margin="10dp"
             />
+        <LinearLayout android:id="@+id/hidecontainer"
+            android:orientation="vertical"
+            android:visibility="invisible"
+            android:background="@android:color/darker_gray"
+            android:gravity="center_horizontal|center_vertical"
+            android:layout_margin="10dp"
 
-        <!--<android.opengl.GLSurfaceView-->
-            <!--android:id="@+id/GLSurfaceView"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:layout_gravity="center"-->
-            <!--android:layout_margin="10dp"-->
-            <!--/>-->
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <!--<LinearLayout android:id="@+id/hidecontainer"-->
-            <!--android:orientation="vertical"-->
-            <!--android:visibility="invisible"-->
-            <!--android:background="@android:color/darker_gray"-->
-            <!--android:gravity="center_horizontal|center_vertical"-->
-            <!--android:layout_margin="10dp"-->
-
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent">-->
-
-            <!--<TextView-->
-                <!--android:id="@+id/txtHiddenSurface"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:text=""-->
-                <!--android:textStyle="bold"-->
-                <!--android:layout_gravity="center_horizontal|center_vertical"-->
-                <!--android:textSize="28sp"-->
-                <!--/>-->
-
-        <!--</LinearLayout>-->
+            <TextView
+                android:id="@+id/txtHiddenSurface"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textStyle="bold"
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:textSize="28sp"
+                />
+        </LinearLayout>
 
     </FrameLayout>
 

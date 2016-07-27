@@ -66,6 +66,7 @@ public abstract class BaseRemoteARActivity extends Activity implements
         AssetHelper assetHelper = new AssetHelper(getAssets());
         assetHelper.cacheAssetFolder(this, "Data");
         streamARFragment = ARFragment.newInstance(supplyStreamName());
+        streamARFragment.setRenderer(supplyRenderer());
     }
 
     private void setProperties() {
@@ -169,7 +170,7 @@ public abstract class BaseRemoteARActivity extends Activity implements
             setupStreamLib();
             streamAR.prepare(surfaceView, true);
             streamARFragment.setStreamAR(streamAR);
-            streamARFragment.setRenderer(supplyRenderer());
+//            streamARFragment.setRenderer(supplyRenderer());
             streamARFragment.prepareRemoteAR();
             mStreamPrepared = true;
         }

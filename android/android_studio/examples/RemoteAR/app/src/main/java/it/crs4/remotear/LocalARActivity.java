@@ -102,7 +102,8 @@ public  class LocalARActivity extends Activity implements CameraEventListener {
             coordZ.setVisibility(View.INVISIBLE);
         }
 
-        String address = "156.148.33.87:5555";
+//        String address = "156.148.33.87:5555";
+        String address = "172.16.4.20:5555";
 //        String address = "156.148.33.66:5555";
         ZMQSubscriber subscriber = new ZMQSubscriber(address);
         Thread subThread = new Thread(subscriber);
