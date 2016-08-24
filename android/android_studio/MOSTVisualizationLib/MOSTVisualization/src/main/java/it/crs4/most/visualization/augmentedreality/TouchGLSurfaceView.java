@@ -24,6 +24,8 @@ public class TouchGLSurfaceView extends GLSurfaceView {
     public enum Mode {Rotate, Edit, Move};
     private boolean mDrawing = false;
     private boolean mMoving = false;
+    private boolean enabled = true;
+
     protected HashMap<String, Mesh> meshes;
 
     public void setMeshes(HashMap<String, Mesh> meshes) {
@@ -57,6 +59,16 @@ public class TouchGLSurfaceView extends GLSurfaceView {
 //        setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
     }
 
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
     public TouchGLSurfaceView(Context context) {
         super(context);
         initScaleDetector(context);
@@ -73,6 +85,9 @@ public class TouchGLSurfaceView extends GLSurfaceView {
             new ScaleGestureDetector.SimpleOnScaleGestureListener(){
                 @Override
                 public boolean onScale(ScaleGestureDetector detector) {
+                    if (!isEnabled()) {
+                        return false;
+                    }
                     TouchGLSurfaceView.this.mScaling = true;
                     float currentScaleFactor = detector.getScaleFactor();
                     Log.d(TAG, "currentScaleFactor " + currentScaleFactor);
@@ -94,6 +109,9 @@ public class TouchGLSurfaceView extends GLSurfaceView {
 
     @Override
     public boolean onTouchEvent(MotionEvent e) {
+        if (!isEnabled()) {
+            return false;
+        }
         // MotionEvent reports input details from the touch screen
         // and other input controls. In this case, you are only
         // interested in events where the touch position changed.

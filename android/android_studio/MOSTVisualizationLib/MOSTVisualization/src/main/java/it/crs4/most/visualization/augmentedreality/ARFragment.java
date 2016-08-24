@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.ConfigurationInfo;
@@ -43,10 +44,10 @@ import it.crs4.most.visualization.augmentedreality.renderer.PubSubARRenderer;
 
 
 public class ARFragment extends StreamViewerFragment implements
-        CameraEventListener {
+    CameraEventListener {
 
     public static final String FRAGMENT_STREAM_ID_KEY = "stream_fragment_stream_id_key";
-    private static final String TAG = "StreamViewerFragment";
+    private static final String TAG = "ARFragment";
 
     private IStreamFragmentCommandListener cmdListener = null;
     private SurfaceView surfaceView;
@@ -94,6 +95,7 @@ public class ARFragment extends StreamViewerFragment implements
     }
 
     protected PubSubARRenderer renderer;
+
     public PubSubARRenderer getRenderer() {
         return renderer;
     }
@@ -112,13 +114,14 @@ public class ARFragment extends StreamViewerFragment implements
 
     public static interface OnCompleteListener {
         public abstract void onFragmentCreate();
+
         public abstract void onFragmentResume();
 
     }
 
     private OnCompleteListener mListener;
 
-    public static  ARFragment newInstance(String streamId) {
+    public static ARFragment newInstance(String streamId) {
         ARFragment sf = new ARFragment();
 
         Bundle args = new Bundle();
@@ -128,50 +131,8 @@ public class ARFragment extends StreamViewerFragment implements
         return sf;
     }
 
-    private String getStreamId()
-    {
+    private String getStreamId() {
         return getArguments().getString(FRAGMENT_STREAM_ID_KEY);
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
-        Log.d(TAG,"ON CREATE STREAM VIEWER");
-
-         handler = new Handler(Looper.getMainLooper()) {
-            @Override
-            public void handleMessage(Message streamingMessage) {
-                StreamingEventBundle event = (StreamingEventBundle) streamingMessage.obj;
-                String infoMsg = "Event Type:" + event.getEventType() + " ->" + event.getEvent() + ":" + event.getInfo();
-                Log.d(TAG, "handleMessage: Current Event:" + infoMsg);
-
-                StreamState streamState = ((IStream) event.getData()).getState();
-                Log.d(TAG, "event.getData().streamState " + streamState);
-                if (event.getEventType() == StreamingEventType.STREAM_EVENT &&
-                        event.getEvent() == StreamingEvent.STREAM_STATE_CHANGED
-
-                        ) {
-                    if (streamState == StreamState.INITIALIZED) {
-                        setProperties();
-                        streamAR.play();
-
-
-                    } else if (streamState == StreamState.PLAYING) {
-
-                        Log.d(TAG, "event.getData().streamState " + streamState);
-                        Log.d(TAG, "ready to call cameraPreviewStarted");
-
-                        //FIXME should be dynamically set
-                        int width = 704;
-                        int height = 576;
-                        Log.d(TAG, "width " + width);
-                        Log.d(TAG, "height " + height);
-                        cameraPreviewStarted(width, height, 25, 0, false);
-                    }
-                }
-            }
-        };
     }
 
     @Override
@@ -180,10 +141,10 @@ public class ARFragment extends StreamViewerFragment implements
      */
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        Log.d(TAG,"ON ATTACH STREAM VIEWER");
+        Log.d(TAG, "ON ATTACH STREAM VIEWER");
         this.cmdListener = (IStreamFragmentCommandListener) activity;
         try {
-            this.mListener = (OnCompleteListener)activity;
+            this.mListener = (OnCompleteListener) activity;
         }
         catch (final ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement OnCompleteListener");
@@ -191,26 +152,24 @@ public class ARFragment extends StreamViewerFragment implements
     }
 
     @Override
-    public void onDetach()
-    {
+    public void onDetach() {
         super.onDetach();
-        Log.d(TAG,"ON DETACH STREAM VIEWER");
+        Log.d(TAG, "ON DETACH STREAM VIEWER");
         this.cmdListener.onSurfaceViewDestroyed(getStreamId());
 
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState)
-    {
-        Log.d(TAG,"ON CREATE_VIEW STREAM VIEWER");
+                             Bundle savedInstanceState) {
+        Log.d(TAG, "ON CREATE_VIEW STREAM VIEWER");
         View rootView = inflater.inflate(R.layout.fragment_ar, container, false);
 
         surfaceView = (SurfaceView) rootView.findViewById(R.id.remoteCameraPreview);
         surfaceView.getHolder().setFixedSize(704, 576); //FIXME should be dynamically set
 
 
-        if (surfaceViewCallback != null){
+        if (surfaceViewCallback != null) {
             surfaceView.getHolder().addCallback(surfaceViewCallback);
         }
 
@@ -222,19 +181,18 @@ public class ARFragment extends StreamViewerFragment implements
 
         glView.setRenderer(renderer);
 
-        if (glSurfaceViewCallback!= null){
+        if (glSurfaceViewCallback != null) {
             glView.getHolder().addCallback(glSurfaceViewCallback);
         }
 
         ActivityManager activityManager = (ActivityManager) getActivity().getSystemService(Context.ACTIVITY_SERVICE);
         ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
 
-        streamCover =  rootView.findViewById(R.id.hidecontainer);
+        streamCover = rootView.findViewById(R.id.hidecontainer);
         txtHiddenSurface = (TextView) rootView.findViewById(R.id.txtHiddenSurface);
 
 
-
-        ImageButton butPlay = (ImageButton)  rootView.findViewById(R.id.button_play);
+        ImageButton butPlay = (ImageButton) rootView.findViewById(R.id.button_play);
         butPlay.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 ARFragment.this.cmdListener.onPlay(getStreamId());
@@ -242,7 +200,7 @@ public class ARFragment extends StreamViewerFragment implements
         });
 
 
-        ImageButton butPause = (ImageButton)  rootView.findViewById(R.id.button_pause);
+        ImageButton butPause = (ImageButton) rootView.findViewById(R.id.button_pause);
         butPause.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 ARFragment.this.cmdListener.onPause(getStreamId());
@@ -264,34 +222,35 @@ public class ARFragment extends StreamViewerFragment implements
     /**
      * Set the stream visible
      */
-    public void setStreamVisible()
-    {
+    public void setStreamVisible() {
         streamCover.setVisibility(View.INVISIBLE);
+        getGlView().setEnabled(true);
     }
 
 
     /**
      * Set the stream invisible
+     *
      * @param message an optional message to show instead of the stream
      */
-    public void setStreamInvisible(String message)
-    {
+    public void setStreamInvisible(String message) {
         this.streamCover.setVisibility(View.VISIBLE);
         this.txtHiddenSurface.setText(message);
+        getGlView().setEnabled(false);
     }
 
     /**
      * Set the player buttons visible or not
+     *
      * @param value <code>true</code> set buttons visible; <code>false</code> invisible.
      */
-    public void setPlayerButtonsVisible(boolean value)
-    {
+    public void setPlayerButtonsVisible(boolean value) {
         this.playerButtonsVisible = value;
-        if (getView()==null) return;
-        ImageButton butPlay = (ImageButton)  getView().findViewById(R.id.button_play);
-        ImageButton butPause = (ImageButton)  getView().findViewById(R.id.button_pause);
+        if (getView() == null) return;
+        ImageButton butPlay = (ImageButton) getView().findViewById(R.id.button_play);
+        ImageButton butPause = (ImageButton) getView().findViewById(R.id.button_pause);
 
-        if (value==true) {
+        if (value) {
             butPlay.setVisibility(View.VISIBLE);
             butPause.setVisibility(View.VISIBLE);
         }
@@ -299,6 +258,10 @@ public class ARFragment extends StreamViewerFragment implements
             butPlay.setVisibility(View.INVISIBLE);
             butPause.setVisibility(View.INVISIBLE);
         }
+    }
+
+    public boolean isARRunning() {
+        return ARToolKit.getInstance().isRunning();
     }
 
     private void setProperties() {
@@ -309,8 +272,9 @@ public class ARFragment extends StreamViewerFragment implements
             throw new RuntimeException("failed setting stream properties");
         }
     }
+
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         //setCmdListenerCallback();
 
@@ -333,34 +297,22 @@ public class ARFragment extends StreamViewerFragment implements
         mListener.onFragmentResume();
     }
 
+    @Override
     public void cameraPreviewStarted(int width, int height, int rate, int cameraIndex, boolean cameraIsFrontFacing) {
         Log.d(TAG, "cameraPreviewStarted!");
-        if (ARToolKit.getInstance().initialiseAR(width, height, "Data/camera_para.dat", cameraIndex, cameraIsFrontFacing)) {
-//        if (ARToolKit.getInstance().initialiseAR(width, height, "Data/camera_para_axis.dat", cameraIndex, cameraIsFrontFacing)) {
-            Log.i(TAG, "getGLView(): Camera initialised");
-        } else {
-            Log.e(TAG, "getGLView(): Error initialising camera. Cannot continue.");
-            getActivity().finish();
+        if (!ARToolKit.getInstance().isRunning()) {
+            if (ARToolKit.getInstance()
+                .initialiseAR(width, height, "Data/camera_para.dat", cameraIndex, cameraIsFrontFacing)) {
+                firstUpdate = true;
+            }
+            else {
+                Log.e(TAG, "getGLView(): Error initialising camera. Cannot continue.");
+            }
         }
-
-        Toast.makeText(getActivity(),
-                "Camera settings: " + width + "x" + height + "@" + rate + "fps", Toast.LENGTH_SHORT)
-                .show();
-        firstUpdate = true;
     }
 
     private void prepareAR() {
-        if (!ARToolKit.getInstance().initialiseNative(getActivity().getCacheDir().getAbsolutePath())) {
-            (new AlertDialog.Builder(getActivity()))
-                    .setMessage("The native library is not loaded. The application cannot continue.")
-                    .setTitle("Error")
-                    .setCancelable(true)
-                    .setNeutralButton(17039360, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    getActivity().finish();
-                }
-            }).show();
-        }
+        ARToolKit.getInstance().initialiseNative(getActivity().getCacheDir().getAbsolutePath());
     }
 
     public void prepareRemoteAR() {
@@ -376,16 +328,16 @@ public class ARFragment extends StreamViewerFragment implements
     @Override
     public void cameraPreviewStopped() {
         ARToolKit.getInstance().cleanup();
-
     }
 
+    @Override
     public void cameraPreviewFrame(byte[] frame) {
         if (this.firstUpdate) {
             if (this.renderer.configureARScene()) {
                 Log.i(TAG, "cameraPreviewFrame(): Scene configured successfully");
-            } else {
+            }
+            else {
                 Log.e(TAG, "cameraPreviewFrame(): Error configuring scene. Cannot continue.");
-                getActivity().finish();
             }
 
             this.firstUpdate = false;
@@ -397,7 +349,8 @@ public class ARFragment extends StreamViewerFragment implements
             }
 
 //            this.onFrameProcessed();
-        } else {
+        }
+        else {
             Log.d(TAG, "no marker found, sorry");
         }
 
