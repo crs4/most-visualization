@@ -8,7 +8,7 @@ public class Arrow extends Group {
         Cube cube = new Cube(30f, 20f, 30f);
         pyramid.setRz(180);
 //        pyramid.setX(-40f);
-        pyramid.setY(-1f*cube.height);
+        pyramid.setY(-1f * cube.height);
         add(cube);
         add(pyramid);
     }

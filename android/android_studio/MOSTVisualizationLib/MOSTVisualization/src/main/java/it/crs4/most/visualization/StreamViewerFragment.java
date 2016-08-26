@@ -10,23 +10,19 @@
 package it.crs4.most.visualization;
 
 
-import it.crs4.most.streaming.IStream;
-
-import android.os.Bundle;
 import android.app.Activity;
 import android.app.Fragment;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
+import it.crs4.most.streaming.IStream;
 
 /**
  * This fragment represents a visual container for an {@link IStream}. It can be attached to any Activity, provided that it implements the {@link IStreamFragmentCommandListener} interface.

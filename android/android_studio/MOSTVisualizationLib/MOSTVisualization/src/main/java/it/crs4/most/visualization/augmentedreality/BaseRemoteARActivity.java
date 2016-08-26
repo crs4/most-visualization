@@ -11,9 +11,7 @@ import android.view.SurfaceView;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
-import org.artoolkit.ar.base.ARToolKit;
 import org.artoolkit.ar.base.assets.AssetHelper;
-import org.artoolkit.ar.base.camera.CameraEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,28 +32,31 @@ import it.crs4.most.visualization.augmentedreality.renderer.PubSubARRenderer;
 
 
 public abstract class BaseRemoteARActivity extends Activity implements
-        IStreamFragmentCommandListener,
-        StreamInspectorFragment.IStreamProvider,
-        ARFragment.OnCompleteListener {
+    IStreamFragmentCommandListener,
+    StreamInspectorFragment.IStreamProvider,
+    ARFragment.OnCompleteListener {
 
+    protected RemoteCaptureCameraPreview preview;
+    protected TouchGLSurfaceView glView;
+    protected FrameLayout mainLayout;
+    protected ARFragment streamARFragment = null;
+    protected PubSubARRenderer renderer;
     String TAG = "BaseRemoteARActivity";
     private IStream streamAR = null;
     private boolean streaming_ready = false;
     private Handler handler;
-    protected RemoteCaptureCameraPreview preview;
-    protected TouchGLSurfaceView glView;
-    protected FrameLayout mainLayout;
     private boolean firstUpdate = false;
     private boolean arFragmentAdded = false;
     private boolean mStreamPrepared = false;
     private boolean mRemotePlay = false;
-    protected ARFragment streamARFragment = null;
     private FrameLayout streamContainer;
-    protected PubSubARRenderer renderer;
 
     public abstract String supplyStreamURI();
+
     public abstract FrameLayout supplyStreamContainer();
+
     public abstract String supplyStreamName();
+
     public abstract PubSubARRenderer supplyRenderer();
 
     @Override
@@ -99,7 +100,8 @@ public abstract class BaseRemoteARActivity extends Activity implements
             Log.d(TAG, "createStream");
 
 
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             streaming_ready = false;
             Log.d(TAG, "ERROR!!!");
             e.printStackTrace();
@@ -112,7 +114,7 @@ public abstract class BaseRemoteARActivity extends Activity implements
         if (!arFragmentAdded) {
             // add the first fragment to the first container
             FragmentTransaction fragmentTransaction = getFragmentManager()
-                    .beginTransaction();
+                .beginTransaction();
             fragmentTransaction.add(supplyStreamContainer().getId(), streamARFragment);
             fragmentTransaction.commit();
             Log.d(TAG, "fragmentTransaction.commit");
@@ -128,15 +130,16 @@ public abstract class BaseRemoteARActivity extends Activity implements
                     StreamState streamState = ((IStream) event.getData()).getState();
                     Log.d(TAG, "event.getData().streamState " + streamState);
                     if (event.getEventType() == StreamingEventType.STREAM_EVENT &&
-                            event.getEvent() == StreamingEvent.STREAM_STATE_CHANGED
+                        event.getEvent() == StreamingEvent.STREAM_STATE_CHANGED
 
-                            ) {
+                        ) {
                         if (streamState == StreamState.INITIALIZED) {
                             setProperties();
                             streamAR.play();
 
 
-                        } else if (streamState == StreamState.PLAYING) {
+                        }
+                        else if (streamState == StreamState.PLAYING) {
 
                             Log.d(TAG, "event.getData().streamState " + streamState);
                             Log.d(TAG, "ready to call cameraPreviewStarted");
@@ -152,7 +155,8 @@ public abstract class BaseRemoteARActivity extends Activity implements
                 }
             };
             Log.d(TAG, "this.handler set");
-        } else {
+        }
+        else {
             streamARFragment.setStreamVisible();
         }
     }
@@ -160,7 +164,7 @@ public abstract class BaseRemoteARActivity extends Activity implements
 
     @Override
     public void onSurfaceViewDestroyed(String streamId) {
-            this.streamAR.destroy();
+        this.streamAR.destroy();
     }
 
     @Override
@@ -210,7 +214,7 @@ public abstract class BaseRemoteARActivity extends Activity implements
     }
 
     @Override
-    public  void onSaveInstanceState(Bundle outState){
+    public void onSaveInstanceState(Bundle outState) {
         outState.putBoolean("mRemotePlay", mRemotePlay);
     }
 

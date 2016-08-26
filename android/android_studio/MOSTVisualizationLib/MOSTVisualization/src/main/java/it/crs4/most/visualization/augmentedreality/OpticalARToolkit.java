@@ -1,7 +1,5 @@
 package it.crs4.most.visualization.augmentedreality;
 
-import android.util.Log;
-
 import org.artoolkit.ar.base.ARToolKit;
 
 public class OpticalARToolkit {
@@ -10,7 +8,16 @@ public class OpticalARToolkit {
         System.loadLibrary("ARWrapper");
         System.loadLibrary("AROpticalWrapper");
     }
+
+    public float[] eyeLmodel = new float[16];
+    public float[] eyeLproject = new float[16];
+    public float[] eyeRmodel = new float[16];
+    public float[] eyeRproject = new float[16];
     private ARToolKit arToolKit;
+
+    public OpticalARToolkit(ARToolKit arToolKit) {
+        this.arToolKit = arToolKit;
+    }
 
     public float[] getEyeLmodel() {
         return eyeLmodel;
@@ -28,28 +35,18 @@ public class OpticalARToolkit {
         return eyeRproject;
     }
 
-    public float [] eyeLmodel = new float [16];
-    public float [] eyeLproject = new float [16];
-
-    public float [] eyeRmodel = new float [16];
-    public float [] eyeRproject = new float [16];
-
-    public OpticalARToolkit(ARToolKit arToolKit) {
-        this.arToolKit = arToolKit;
-    }
-
-    public ARToolKit getInstance(){
+    public ARToolKit getInstance() {
         return arToolKit;
     }
 
-    public int initialiseAR(String eyeLfilename, String eyeRfilename){
+    public int initialiseAR(String eyeLfilename, String eyeRfilename) {
         int ret = getOpticalMatrices(eyeLfilename, eyeRfilename, eyeLmodel, eyeLproject, eyeRmodel, eyeRproject, 1);
 
-        eyeLmodel[12] -=  70;
-        eyeRmodel[12] -=  70;
+        eyeLmodel[12] -= 70;
+        eyeRmodel[12] -= 70;
 
-        eyeLmodel[14] -=  100;
-        eyeRmodel[14] -=  100;
+        eyeLmodel[14] -= 100;
+        eyeRmodel[14] -= 100;
 //        float [] tmp = {
 //                5.715693f,
 //                0.000000f,
@@ -75,13 +72,13 @@ public class OpticalARToolkit {
     }
 
     private native int getOpticalMatrices(
-            String eyeLfilename,
-            String eyeRfilename,
-            float [] eyeLmodel,
-            float [] eyeLproject,
-            float [] eyeRmodel,
-            float [] eyeRproject,
-            float scale
+        String eyeLfilename,
+        String eyeRfilename,
+        float[] eyeLmodel,
+        float[] eyeLproject,
+        float[] eyeRmodel,
+        float[] eyeRproject,
+        float scale
     );
 
 }

@@ -9,31 +9,42 @@ import android.view.ScaleGestureDetector;
 
 import java.util.HashMap;
 
-import it.crs4.most.visualization.augmentedreality.renderer.PubSubARRenderer;
 import it.crs4.most.visualization.augmentedreality.mesh.Group;
 import it.crs4.most.visualization.augmentedreality.mesh.Mesh;
-import it.crs4.most.visualization.augmentedreality.mesh.Plane;
 
 public class TouchGLSurfaceView extends GLSurfaceView {
-    private String TAG = "TouchGLSurfaceView";
     protected final float TOUCH_SCALE_FACTOR = 180.0f / 320;
     protected float mPreviousX;
     protected float mPreviousY;
     protected Renderer renderer;
+    protected HashMap<String, Mesh> meshes;
+    private String TAG = "TouchGLSurfaceView";
     private Group meshGroup;
-    public enum Mode {Rotate, Edit, Move};
+
+    ;
     private boolean mDrawing = false;
     private boolean mMoving = false;
     private boolean enabled = true;
+    private Mode mode = Mode.Move;
+    private ScaleGestureDetector mScaleDetector;
+    private boolean mScaling = false;
 
-    protected HashMap<String, Mesh> meshes;
+    public TouchGLSurfaceView(Context context) {
+        super(context);
+        initScaleDetector(context);
+    }
 
-    public void setMeshes(HashMap<String, Mesh> meshes) {
-        this.meshes = meshes;
+    public TouchGLSurfaceView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        initScaleDetector(context);
     }
 
     public HashMap<String, Mesh> getMeshes() {
         return meshes;
+    }
+
+    public void setMeshes(HashMap<String, Mesh> meshes) {
+        this.meshes = meshes;
     }
 
     public Mode getMode() {
@@ -43,10 +54,6 @@ public class TouchGLSurfaceView extends GLSurfaceView {
     public void setMode(Mode mode) {
         this.mode = mode;
     }
-
-    private Mode mode = Mode.Move;
-    private ScaleGestureDetector mScaleDetector;
-    private boolean mScaling = false;
 
     public Renderer getRenderer() {
         return renderer;
@@ -69,20 +76,9 @@ public class TouchGLSurfaceView extends GLSurfaceView {
         this.enabled = enabled;
     }
 
-    public TouchGLSurfaceView(Context context) {
-        super(context);
-        initScaleDetector(context);
-    }
-
-
-    public TouchGLSurfaceView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        initScaleDetector(context);
-    }
-
-    private void initScaleDetector(Context context){
+    private void initScaleDetector(Context context) {
         mScaleDetector = new ScaleGestureDetector(context,
-            new ScaleGestureDetector.SimpleOnScaleGestureListener(){
+            new ScaleGestureDetector.SimpleOnScaleGestureListener() {
                 @Override
                 public boolean onScale(ScaleGestureDetector detector) {
                     if (!isEnabled()) {
@@ -92,10 +88,10 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                     float currentScaleFactor = detector.getScaleFactor();
                     Log.d(TAG, "currentScaleFactor " + currentScaleFactor);
                     Mesh mesh = meshes.get("arrow");
-                    if (currentScaleFactor < 1){
+                    if (currentScaleFactor < 1) {
                         mesh.setZ(mesh.getZ() - 5f);
                     }
-                    else{
+                    else {
                         mesh.setZ(mesh.getZ() + 5f);
                     }
 
@@ -105,7 +101,6 @@ public class TouchGLSurfaceView extends GLSurfaceView {
             });
 
     }
-
 
     @Override
     public boolean onTouchEvent(MotionEvent e) {
@@ -121,12 +116,12 @@ public class TouchGLSurfaceView extends GLSurfaceView {
             mMoving = false;
 //            mScaling = true;
         }
-        else{
+        else {
 
             float x = e.getX();
             float y = e.getY();
 
-            if (mScaling){
+            if (mScaling) {
                 mScaling = false;
                 mPreviousX = x;
                 mPreviousY = y;
@@ -168,7 +163,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                     break;
                 case MotionEvent.ACTION_UP:
                     Log.d(TAG, "ACTION_UP");
-                    if(mode == Mode.Edit){
+                    if (mode == Mode.Edit) {
                         mDrawing = false;
                     }
                     else
@@ -177,7 +172,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
 
                 case MotionEvent.ACTION_DOWN:
                     Log.d(TAG, "ACTION_DOWN");
-                    if(mode == Mode.Edit){
+                    if (mode == Mode.Edit) {
                         mDrawing = true;
                     }
                     else
@@ -194,6 +189,9 @@ public class TouchGLSurfaceView extends GLSurfaceView {
         }
         return true;
     }
+
+
+    public enum Mode {Rotate, Edit, Move}
 
 //    private void draw(float x, float y){
 //        Plane plane = new Plane(30, 30);

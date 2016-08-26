@@ -1,7 +1,6 @@
 package it.crs4.most.visualization.augmentedreality;
 
 import android.content.Context;
-import android.hardware.Camera;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
@@ -12,22 +11,20 @@ import android.view.SurfaceView;
 import org.artoolkit.ar.base.FPSCounter;
 import org.artoolkit.ar.base.camera.CameraEventListener;
 
-
 import it.crs4.most.streaming.IFrameListener;
 import it.crs4.most.streaming.IStream;
 import it.crs4.most.streaming.StreamingEventBundle;
-import it.crs4.most.streaming.enums.StreamState;
 import it.crs4.most.streaming.enums.StreamingEvent;
 import it.crs4.most.streaming.enums.StreamingEventType;
 
-public class RemoteCaptureCameraPreview extends SurfaceView implements SurfaceHolder.Callback, IFrameListener, Handler.Callback{
+public class RemoteCaptureCameraPreview extends SurfaceView implements SurfaceHolder.Callback, IFrameListener, Handler.Callback {
     private static final String TAG = "RemoteCameraPreview";
-//    private int captureWidth;
+    public IStream stream;
+    //    private int captureWidth;
 //    private int captureHeight;
     private int captureRate;
     private FPSCounter fpsCounter = new FPSCounter();
     private CameraEventListener listener;
-    public IStream stream;
 
     public RemoteCaptureCameraPreview(Context context) {
         super(context);
@@ -40,31 +37,32 @@ public class RemoteCaptureCameraPreview extends SurfaceView implements SurfaceHo
 
     }
 
-    private void init(){
-        SurfaceHolder holder = this.getHolder();
-        holder.addCallback(this);
-
-    }
-    public RemoteCaptureCameraPreview(Context context, AttributeSet aSet){
+    public RemoteCaptureCameraPreview(Context context, AttributeSet aSet) {
         super(context, aSet);
         Log.d(TAG, "RemoteCameraPreview construct 2");
         init();
     }
 
-    public void setCameraListener(CameraEventListener cel){
+    private void init() {
+        SurfaceHolder holder = this.getHolder();
+        holder.addCallback(this);
+
+    }
+
+    public void setCameraListener(CameraEventListener cel) {
         listener = cel;
     }
 
 
     public void surfaceDestroyed(SurfaceHolder holder) {
-        if(this.listener != null) {
+        if (this.listener != null) {
             this.listener.cameraPreviewStopped();
         }
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
         Log.d(TAG, "surfaceChanged");
-        if(this.listener != null) {
+        if (this.listener != null) {
             Log.d(TAG, "cameraPreviewStarted callback");
 //            this.listener.cameraPreviewStarted(stream.getVideoSize().getWidth(),stream.getVideoSize().getHeight(), this.captureRate, 0, false);
         }
@@ -77,7 +75,7 @@ public class RemoteCaptureCameraPreview extends SurfaceView implements SurfaceHo
 
     @Override
     public void frameReady(byte[] bytes) {
-        if(this.listener != null) {
+        if (this.listener != null) {
             this.listener.cameraPreviewFrame(bytes);
         }
 
@@ -92,7 +90,7 @@ public class RemoteCaptureCameraPreview extends SurfaceView implements SurfaceHo
         String infoMsg = "Event Type:" + myEvent.getEventType() + " ->" + myEvent.getEvent() + ":" + myEvent.getInfo();
         Log.d(TAG, "handleMessage: Current Event:" + infoMsg);
         if (myEvent.getEventType() == StreamingEventType.STREAM_EVENT &&
-                myEvent.getEvent() == StreamingEvent.VIDEO_SIZE_CHANGED){
+            myEvent.getEvent() == StreamingEvent.VIDEO_SIZE_CHANGED) {
             Log.d(TAG, "ready to call cameraPreviewStarted");
             int width = stream.getVideoSize().getWidth();
             int height = stream.getVideoSize().getHeight();
@@ -122,7 +120,7 @@ public class RemoteCaptureCameraPreview extends SurfaceView implements SurfaceHo
 //                }
 //            }
 //        return false;
-    return true;
+        return true;
     }
 
 }

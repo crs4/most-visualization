@@ -1,18 +1,12 @@
 package it.crs4.most.visualization.augmentedreality;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.pm.ConfigurationInfo;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
@@ -21,26 +15,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
-
-//import org.artoolkit.ar.base.ARToolKit;
-//import org.artoolkit.ar.base.rendering.Cube;
 
 import org.artoolkit.ar.base.ARToolKit;
 import org.artoolkit.ar.base.camera.CameraEventListener;
-import org.artoolkit.ar.base.rendering.ARRenderer;
 
 import it.crs4.most.streaming.IStream;
 import it.crs4.most.streaming.StreamProperties;
-import it.crs4.most.streaming.StreamingEventBundle;
 import it.crs4.most.streaming.enums.StreamProperty;
-import it.crs4.most.streaming.enums.StreamState;
-import it.crs4.most.streaming.enums.StreamingEvent;
-import it.crs4.most.streaming.enums.StreamingEventType;
 import it.crs4.most.visualization.IStreamFragmentCommandListener;
 import it.crs4.most.visualization.R;
 import it.crs4.most.visualization.StreamViewerFragment;
 import it.crs4.most.visualization.augmentedreality.renderer.PubSubARRenderer;
+
+//import org.artoolkit.ar.base.ARToolKit;
+//import org.artoolkit.ar.base.rendering.Cube;
 
 
 public class ARFragment extends StreamViewerFragment implements
@@ -48,17 +36,31 @@ public class ARFragment extends StreamViewerFragment implements
 
     public static final String FRAGMENT_STREAM_ID_KEY = "stream_fragment_stream_id_key";
     private static final String TAG = "ARFragment";
-
+    protected RemoteCaptureCameraPreview preview;
+    protected IStream streamAR;
+    protected String streamURI;
+    protected PubSubARRenderer renderer;
     private IStreamFragmentCommandListener cmdListener = null;
     private SurfaceView surfaceView;
     private View streamCover;
     private TextView txtHiddenSurface;
     private boolean firstUpdate = false;
-    protected RemoteCaptureCameraPreview preview;
-    protected IStream streamAR;
     private Handler handler;
     private SurfaceHolder.Callback surfaceViewCallback;
     private SurfaceHolder.Callback glSurfaceViewCallback;
+    private TouchGLSurfaceView glView;
+    private boolean playerButtonsVisible = true;
+    private OnCompleteListener mListener;
+
+    public static ARFragment newInstance(String streamId) {
+        ARFragment sf = new ARFragment();
+
+        Bundle args = new Bundle();
+        args.putString(FRAGMENT_STREAM_ID_KEY, streamId);
+        sf.setArguments(args);
+
+        return sf;
+    }
 
     public SurfaceHolder.Callback getSurfaceViewCallback() {
         return surfaceViewCallback;
@@ -84,8 +86,6 @@ public class ARFragment extends StreamViewerFragment implements
         this.streamURI = streamURI;
     }
 
-    protected String streamURI;
-
     public IStream getStreamAR() {
         return streamAR;
     }
@@ -93,8 +93,6 @@ public class ARFragment extends StreamViewerFragment implements
     public void setStreamAR(IStream streamAR) {
         this.streamAR = streamAR;
     }
-
-    protected PubSubARRenderer renderer;
 
     public PubSubARRenderer getRenderer() {
         return renderer;
@@ -106,29 +104,6 @@ public class ARFragment extends StreamViewerFragment implements
 
     public TouchGLSurfaceView getGlView() {
         return glView;
-    }
-
-    private TouchGLSurfaceView glView;
-
-    private boolean playerButtonsVisible = true;
-
-    public static interface OnCompleteListener {
-        public abstract void onFragmentCreate();
-
-        public abstract void onFragmentResume();
-
-    }
-
-    private OnCompleteListener mListener;
-
-    public static ARFragment newInstance(String streamId) {
-        ARFragment sf = new ARFragment();
-
-        Bundle args = new Bundle();
-        args.putString(FRAGMENT_STREAM_ID_KEY, streamId);
-        sf.setArguments(args);
-
-        return sf;
     }
 
     private String getStreamId() {
@@ -218,7 +193,6 @@ public class ARFragment extends StreamViewerFragment implements
         return rootView;
     }
 
-
     /**
      * Set the stream visible
      */
@@ -226,7 +200,6 @@ public class ARFragment extends StreamViewerFragment implements
         streamCover.setVisibility(View.INVISIBLE);
         getGlView().setEnabled(true);
     }
-
 
     /**
      * Set the stream invisible
@@ -353,6 +326,13 @@ public class ARFragment extends StreamViewerFragment implements
         else {
             Log.d(TAG, "no marker found, sorry");
         }
+
+    }
+
+    public static interface OnCompleteListener {
+        public abstract void onFragmentCreate();
+
+        public abstract void onFragmentResume();
 
     }
 }

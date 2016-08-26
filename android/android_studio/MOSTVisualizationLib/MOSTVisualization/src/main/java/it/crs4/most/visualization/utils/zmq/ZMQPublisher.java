@@ -5,28 +5,17 @@ import android.util.Log;
 
 import org.zeromq.ZMQ;
 
-public class ZMQPublisher  implements Runnable, IPublisher {
+public class ZMQPublisher implements Runnable, IPublisher {
 
-    protected class SendMessage extends AsyncTask<String, Void, Void> {
-
-        @Override
-        protected Void doInBackground(String... messages) {
-            for(String msg: messages){
-                Log.d(TAG, "sending msg " + msg);
-                publisher.send(msg);
-            }
-            return null;
-        }
-    }
+    private static String TAG = "public class ZMQPublisher";
+    public int port = 5555;
     private ZMQ.Context context;
     private ZMQ.Socket publisher;
-    private static String TAG = "public class ZMQPublisher";
-    public int port= 5555;
-
-    public ZMQPublisher(){
+    public ZMQPublisher() {
 
     }
-    public ZMQPublisher(int port){
+
+    public ZMQPublisher(int port) {
         this.port = port;
     }
 
@@ -39,13 +28,25 @@ public class ZMQPublisher  implements Runnable, IPublisher {
 
     }
 
-    public void send(String msg){
+    public void send(String msg) {
         new SendMessage().execute(msg);
     }
 
-    public void close(){
+    public void close() {
         publisher.close();
         context.term();
+    }
+
+    protected class SendMessage extends AsyncTask<String, Void, Void> {
+
+        @Override
+        protected Void doInBackground(String... messages) {
+            for (String msg : messages) {
+                Log.d(TAG, "sending msg " + msg);
+                publisher.send(msg);
+            }
+            return null;
+        }
     }
 
 }

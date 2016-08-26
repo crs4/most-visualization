@@ -1,175 +1,172 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-    
-    <LinearLayout
+
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-     android:layout_width="wrap_content"
-     android:layout_height="wrap_content"
-     android:orientation="horizontal"
-     android:background="@android:color/white"
-    >
-    
-<GridLayout 
-    android:id="@+id/pt_buttons_grid"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:columnCount="3"
-    android:rowCount="3"
-    android:layout_margin="10sp"
+    android:background="@android:color/white"
+    android:orientation="horizontal"
     >
-    
-    <ImageButton
-        android:id="@+id/but_move_NW"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_gravity="fill"
-        android:contentDescription="ptz_button_nw"
-        android:src="@drawable/ptz_arrow_nw"
-        />
-    
-     <ImageButton
-        android:id="@+id/but_move_N"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_gravity="fill"
-        android:contentDescription="ptz_button_n"
-        android:src="@drawable/ptz_arrow_n" 
-      />
 
-     <ImageButton
-         android:id="@+id/but_move_NE"
-         android:layout_width="50dp"
-         android:layout_height="50dp"
-         android:layout_gravity="fill"
-         android:src="@drawable/ptz_arrow_ne"
-         android:contentDescription="ptz_button_ne" />
-     
-    
-     	
-     <ImageButton
-        android:id="@+id/but_move_W"
-        android:layout_gravity="fill"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:contentDescription="ptz_button_w"
- 	    android:src="@drawable/ptz_arrow_w" 
-        />
-     
-     <ImageButton
-        android:id="@+id/but_move_home"
-        android:contentDescription="ptz_home"
- 		android:src="@drawable/ptz_house" 
- 		android:layout_width="50dp"
-        android:layout_height="50dp"
- 		android:layout_gravity="fill"
-        />
-     
-     <ImageButton
-        android:id="@+id/but_move_E"
-		android:src="@drawable/ptz_arrow_e" 
-		android:contentDescription="ptz_button_e"
-		 android:layout_width="50dp"
-         android:layout_height="50dp"
-		android:layout_gravity="fill"
-        />
-     
-     
-     
-     <ImageButton
-        android:id="@+id/but_move_SW"
-		android:src="@drawable/ptz_arrow_sw" 
-		android:contentDescription="ptz_button_sw"
-		 android:layout_width="50dp"
-         android:layout_height="50dp"
-		android:layout_gravity="fill"
-        />
-     
-     <ImageButton
-        android:id="@+id/but_move_S"
-		android:src="@drawable/ptz_arrow_s"
-		android:contentDescription="ptz_button_s"
-		 android:layout_width="50dp"
-         android:layout_height="50dp"
-		android:layout_gravity="fill"
-        />
-     
-      <ImageButton
-        android:id="@+id/but_move_SE"
-		android:src="@drawable/ptz_arrow_se" 
-		android:contentDescription="ptz_button_se"
-		 android:layout_width="50dp"
-         android:layout_height="50dp"
-		android:layout_gravity="fill"
-        />
-    
+    <GridLayout
+        android:id="@+id/pt_buttons_grid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10sp"
+        android:columnCount="3"
+        android:rowCount="3"
+        >
 
-</GridLayout>
-
-
-
-<GridLayout 
-    android:id="@+id/zoom_snap_buttons_grid"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:columnCount="1"
-    android:rowCount="3"
-    android:layout_margin="10sp"
-    >
         <ImageButton
-        android:id="@+id/but_zoom_in"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_gravity="fill"
-        android:contentDescription="ptz_button_magnify_plus"
-        android:src="@drawable/ptz_magnify_plus"
-        />
-        
-         <ImageButton
-        android:id="@+id/but_zoom_out"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_gravity="fill"
-        android:contentDescription="ptz_button_magnify_minus"
-        android:src="@drawable/ptz_magnify_minus_75"
-        />
-        
-         <ImageButton
-	        android:id="@+id/but_snapshot"
-	        android:layout_width="50dp"
-	        android:layout_height="50dp"
-	        android:layout_gravity="fill"
-	        android:contentDescription="ptz_snapshot"
-	        android:src="@drawable/ptz_snapshot"
-        />
-      
-      
-       
+            android:id="@+id/but_move_NW"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="fill"
+            android:contentDescription="ptz_button_nw"
+            android:src="@drawable/ptz_arrow_nw"
+            />
+
+        <ImageButton
+            android:id="@+id/but_move_N"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="fill"
+            android:contentDescription="ptz_button_n"
+            android:src="@drawable/ptz_arrow_n"
+            />
+
+        <ImageButton
+            android:id="@+id/but_move_NE"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="fill"
+            android:contentDescription="ptz_button_ne"
+            android:src="@drawable/ptz_arrow_ne"/>
+
+
+        <ImageButton
+            android:id="@+id/but_move_W"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="fill"
+            android:contentDescription="ptz_button_w"
+            android:src="@drawable/ptz_arrow_w"
+            />
+
+        <ImageButton
+            android:id="@+id/but_move_home"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="fill"
+            android:contentDescription="ptz_home"
+            android:src="@drawable/ptz_house"
+            />
+
+        <ImageButton
+            android:id="@+id/but_move_E"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="fill"
+            android:contentDescription="ptz_button_e"
+            android:src="@drawable/ptz_arrow_e"
+            />
+
+
+        <ImageButton
+            android:id="@+id/but_move_SW"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="fill"
+            android:contentDescription="ptz_button_sw"
+            android:src="@drawable/ptz_arrow_sw"
+            />
+
+        <ImageButton
+            android:id="@+id/but_move_S"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="fill"
+            android:contentDescription="ptz_button_s"
+            android:src="@drawable/ptz_arrow_s"
+            />
+
+        <ImageButton
+            android:id="@+id/but_move_SE"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="fill"
+            android:contentDescription="ptz_button_se"
+            android:src="@drawable/ptz_arrow_se"
+            />
+
+
     </GridLayout>
 
-  
-  <!--
-    <SeekBar 
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content" 
-    android:id="@+id/ptz_zoom" 
-    android:max="100" 
-    android:progress="70" 
-    android:thumb="@drawable/seek_thumb"
-    android:progressDrawable="@drawable/progress_vertical"
-    
-    />
-    
-<it.crs4.most.visualization.ui.VerticalSeekBar
-    android:id="@+id/ptz_zoom" 
-    
-    android:layout_width="26dip"
-    android:layout_height="match_parent" 
-    android:progressDrawable="@drawable/progress_vertical"
-    android:thumb="@drawable/seek_thumb"
-    android:max="100" 
-    android:progress="20" 
 
-    />
--->
+    <GridLayout
+        android:id="@+id/zoom_snap_buttons_grid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10sp"
+        android:columnCount="1"
+        android:rowCount="3"
+        >
+
+        <ImageButton
+            android:id="@+id/but_zoom_in"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="fill"
+            android:contentDescription="ptz_button_magnify_plus"
+            android:src="@drawable/ptz_magnify_plus"
+            />
+
+        <ImageButton
+            android:id="@+id/but_zoom_out"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="fill"
+            android:contentDescription="ptz_button_magnify_minus"
+            android:src="@drawable/ptz_magnify_minus_75"
+            />
+
+        <ImageButton
+            android:id="@+id/but_snapshot"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="fill"
+            android:contentDescription="ptz_snapshot"
+            android:src="@drawable/ptz_snapshot"
+            />
+
+
+    </GridLayout>
+
+
+    <!--
+      <SeekBar
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:id="@+id/ptz_zoom"
+      android:max="100"
+      android:progress="70"
+      android:thumb="@drawable/seek_thumb"
+      android:progressDrawable="@drawable/progress_vertical"
+
+      />
+
+  <it.crs4.most.visualization.ui.VerticalSeekBar
+      android:id="@+id/ptz_zoom"
+
+      android:layout_width="26dip"
+      android:layout_height="match_parent"
+      android:progressDrawable="@drawable/progress_vertical"
+      android:thumb="@drawable/seek_thumb"
+      android:max="100"
+      android:progress="20"
+
+      />
+  -->
 
 </LinearLayout>
