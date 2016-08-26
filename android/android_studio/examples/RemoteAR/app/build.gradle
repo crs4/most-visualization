@@ -1,0 +1,44 @@
+apply plugin: 'com.android.model.application'
+
+model {
+
+    android {
+        compileSdkVersion = 21
+        buildToolsVersion = "21.1.2"
+
+        defaultConfig.with {
+            applicationId = "it.crs4.remotear"
+            minSdkVersion.apiLevel = 15
+            targetSdkVersion.apiLevel = 21
+            versionCode = 1
+            versionName = "1.0"
+
+        }
+
+    }
+
+    android.buildTypes {
+        release {
+            minifyEnabled = false
+            proguardFiles += file('proguard-rules.pro')
+        }
+    }
+
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+//    testCompile 'junit:junit:4.12'
+
+    compile project(':aRBaseLib')
+    compile name: "MOSTStreaming", ext: "aar", group: 'it.crs4.most.streaming', version: '1.0'
+//    compile name: "MOSTVisualization", ext: "aar", group: 'it.crs4.most.visualization', version: '1.0', 'transitive': true
+    compile project(':MOSTVisualization')
+
+
+    compile files('libs/BT200Ctrl.jar')
+
+    compile 'com.android.support:appcompat-v7:21.0.3'
+    compile 'com.google.android.gms:play-services-appindexing:8.1.0'
+    compile 'com.android.support:support-v4:21.0.3'
+}

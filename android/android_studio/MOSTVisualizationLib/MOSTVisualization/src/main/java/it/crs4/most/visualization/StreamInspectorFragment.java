@@ -10,12 +10,6 @@
 
 package it.crs4.most.visualization;
 
-import java.util.List;
-
-import it.crs4.most.streaming.IStream;
-import it.crs4.most.streaming.StreamProperties;
-import it.crs4.most.streaming.enums.StreamProperty;
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.Fragment;
@@ -24,15 +18,21 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TextView;
+
+import java.util.List;
+
+import it.crs4.most.streaming.IStream;
+import it.crs4.most.streaming.StreamProperties;
+import it.crs4.most.streaming.enums.StreamProperty;
 
 /**
  * This fragment provides a way for visually getting and/or updating the video properties of a list of {@link IStream} objects.
@@ -41,33 +41,11 @@ import android.widget.TextView;
  */
 public class StreamInspectorFragment extends Fragment {
 
-    /**
-     * This interface is used by the StreamInspector for getting the streams to inspect along with their properties.
-     */
-    public interface IStreamProvider {
-
-        /**
-         * Provides the list of the streams to show in the inspector
-         *
-         * @return the list of the streams to inspect
-         */
-        public List<IStream> getStreams();
-
-        /**
-         * Provide the list of properties to show for each stream (a null value shows all properties)
-         *
-         * @return
-         */
-        public List<StreamProperty> getStreamProperties();
-    }
-
     private static final String TAG = "StreamInspectorFragment";
-
     private IStreamProvider streamProvider = null;
     private List<IStream> streamsArray = null;
     private ArrayAdapter<IStream> streamsArrayAdapter = null;
     private ListView streamsView = null;
-
 
     /**
      * Provides a new istance of this fragment
@@ -92,7 +70,6 @@ public class StreamInspectorFragment extends Fragment {
         this.streamsView = (ListView) rootView.findViewById(R.id.listStreams);
         return rootView;
     }
-
 
     @Override
     public void onActivityCreated(Bundle bundle) {
@@ -119,13 +96,13 @@ public class StreamInspectorFragment extends Fragment {
             Log.d(TAG, "Adding stream to listView!");
             this.streamsArray.add(stream);
 
-        } else {
+        }
+        else {
             Log.d(TAG, "Replacing stream into the listView!");
             this.streamsArray.set(streamPosition, stream);
         }
         this.streamsArrayAdapter.notifyDataSetChanged();
     }
-
 
     /**
      * Force the reloading of the stream data of the underlying adapter
@@ -235,5 +212,25 @@ public class StreamInspectorFragment extends Fragment {
 
         );
 
+    }
+
+    /**
+     * This interface is used by the StreamInspector for getting the streams to inspect along with their properties.
+     */
+    public interface IStreamProvider {
+
+        /**
+         * Provides the list of the streams to show in the inspector
+         *
+         * @return the list of the streams to inspect
+         */
+        public List<IStream> getStreams();
+
+        /**
+         * Provide the list of properties to show for each stream (a null value shows all properties)
+         *
+         * @return
+         */
+        public List<StreamProperty> getStreamProperties();
     }
 }
