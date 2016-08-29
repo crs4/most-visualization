@@ -36,6 +36,7 @@ public abstract class Mesh {
     // Smooth Colors
     private FloatBuffer colorBuffer = null;
     private String TAG = "MESH";
+    private String marker;
 
     public Mesh() {
         setId(null);
@@ -48,6 +49,14 @@ public abstract class Mesh {
 
     public String getId() {
         return id;
+    }
+
+    public String getMarker() {
+        return marker;
+    }
+
+    public void setMarker(String marker) {
+        this.marker = marker;
     }
 
     protected void setId(String id) {

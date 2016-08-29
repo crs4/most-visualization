@@ -16,12 +16,18 @@ import org.artoolkit.ar.base.rendering.ARRenderer;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import it.crs4.most.visualization.augmentedreality.Marker;
 import it.crs4.most.visualization.augmentedreality.mesh.Mesh;
 import it.crs4.most.visualization.augmentedreality.mesh.MeshFactory;
 import it.crs4.most.visualization.utils.zmq.BaseSubscriber;
@@ -39,36 +45,35 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     public IPublisher publisher;
     protected volatile float angle = 0;
     protected float previousAngle = 0;
-    protected int markerID = -1;
     protected Handler handler;
     protected BaseSubscriber subscriber;
     protected String TAG = "PubSubARRenderer";
     protected int height;
     protected int width;
     protected HashMap<String, Mesh> meshes;
+    protected HashMap<Integer, String> markersID = new HashMap<>();
+    protected HashMap<Integer, List<Mesh>> markerToMeshes = new HashMap<>();
 
-    public PubSubARRenderer(Context context) {
+    public PubSubARRenderer(Context context, HashMap<String, Mesh> meshes) {
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
-//        width = size.x;
-//        height = size.y;
-
+        this.meshes = meshes;
     }
 
-    public PubSubARRenderer(Context context, IPublisher publisher) {
-        this(context);
+    public PubSubARRenderer(Context context, IPublisher publisher, HashMap<String, Mesh> meshes) {
+        this(context, meshes);
         setPublisher(publisher);
     }
 
-    public PubSubARRenderer(Context context, BaseSubscriber subscriber) {
-        this(context);
+    public PubSubARRenderer(Context context, BaseSubscriber subscriber, HashMap<String, Mesh> meshes) {
+        this(context, meshes);
         setHandler(subscriber);
     }
 
-    public PubSubARRenderer(Context context, IPublisher publisher, BaseSubscriber subscriber) {
-        this(context);
+    public PubSubARRenderer(Context context, IPublisher publisher, BaseSubscriber subscriber, HashMap<String, Mesh> meshes) {
+        this(context, meshes);
         setPublisher(publisher);
         setHandler(subscriber);
     }
@@ -84,30 +89,30 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
 
    /* Normalize between -1 and 1 */
         _tempGluUnProjectData[_temp_in] = (winx - viewport[offsetV]) *
-            2f / viewport[offsetV + 2] - 1.0f;
+                2f / viewport[offsetV + 2] - 1.0f;
         _tempGluUnProjectData[_temp_in + 1] = (winy - viewport[offsetV + 1]) *
-            2f / viewport[offsetV + 3] - 1.0f;
+                2f / viewport[offsetV + 3] - 1.0f;
         _tempGluUnProjectData[_temp_in + 2] = 2f * winz - 1.0f;
         _tempGluUnProjectData[_temp_in + 3] = 1.0f;
 
    /* Get the inverse */
         android.opengl.Matrix.multiplyMM(_tempGluUnProjectData, _temp_A,
-            proj, offsetP, model, offsetM);
+                proj, offsetP, model, offsetM);
         android.opengl.Matrix.invertM(_tempGluUnProjectData, _temp_m,
-            _tempGluUnProjectData, _temp_A);
+                _tempGluUnProjectData, _temp_A);
 
         android.opengl.Matrix.multiplyMV(_tempGluUnProjectData, _temp_out,
-            _tempGluUnProjectData, _temp_m,
-            _tempGluUnProjectData, _temp_in);
+                _tempGluUnProjectData, _temp_m,
+                _tempGluUnProjectData, _temp_in);
         if (_tempGluUnProjectData[_temp_out + 3] == 0.0)
             return GL10.GL_FALSE;
 
         xyz[offset] = _tempGluUnProjectData[_temp_out] /
-            _tempGluUnProjectData[_temp_out + 3];
+                _tempGluUnProjectData[_temp_out + 3];
         xyz[offset + 1] = _tempGluUnProjectData[_temp_out + 1] /
-            _tempGluUnProjectData[_temp_out + 3];
+                _tempGluUnProjectData[_temp_out + 3];
         xyz[offset + 2] = _tempGluUnProjectData[_temp_out + 2] /
-            _tempGluUnProjectData[_temp_out + 3];
+                _tempGluUnProjectData[_temp_out + 3];
         return GL10.GL_TRUE;
     }
 
@@ -138,29 +143,25 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
                         if (msgType.equals("newObj")) {
                             mesh = MeshFactory.createMesh(json);
                             addMesh(mesh);
-                        }
-                        else {
+                        } else {
 
                             mesh = meshes.get(meshId);
                         }
                         if (mesh != null) {
                             mesh.setCoordinates(
-                                Float.valueOf(json.get("x").toString()),
-                                Float.valueOf(json.get("y").toString()),
-                                Float.valueOf(json.get("z").toString()),
-                                Float.valueOf(json.get("rx").toString()),
-                                Float.valueOf(json.get("ry").toString()),
-                                Float.valueOf(json.get("rz").toString())
+                                    Float.valueOf(json.get("x").toString()),
+                                    Float.valueOf(json.get("y").toString()),
+                                    Float.valueOf(json.get("z").toString()),
+                                    Float.valueOf(json.get("rx").toString()),
+                                    Float.valueOf(json.get("ry").toString()),
+                                    Float.valueOf(json.get("rz").toString())
                             );
-                        }
-                        else {
+                        } else {
                             Log.e(TAG, "mesh with id " + meshId + " not found!");
                         }
-                    }
-                    catch (JSONException e) {
+                    } catch (JSONException e) {
                         e.printStackTrace();
-                    }
-                    catch (MeshFactory.MeshCreationFail meshCreationFail) {
+                    } catch (MeshFactory.MeshCreationFail meshCreationFail) {
                         meshCreationFail.printStackTrace();
                     }
                 }
@@ -171,9 +172,33 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
 
     @Override
     public boolean configureARScene() {
+        HashSet<String> markersAdded = new HashSet<>();
 
-        markerID = ARToolKit.getInstance().addMarker("single;Data/hiro.patt;80");
-        return (markerID >= 0);
+        int markerID;
+        for (Mesh mesh : meshes.values()) {
+            String marker = mesh.getMarker();
+            if (!markersAdded.contains(marker)) {
+                markerID = ARToolKit.getInstance().addMarker(marker);
+                if (markerID < 0){
+                    return false;
+                }
+                markersAdded.add(marker);
+                markersID.put(markerID, marker);
+
+                List<Mesh> meshes;
+                if (!markerToMeshes.containsKey(markerID)) {
+                    meshes = new ArrayList<Mesh>();
+                    markerToMeshes.put(markerID, meshes);
+                } else {
+                    meshes = markerToMeshes.get(markerID);
+                }
+                meshes.add(mesh);
+            }
+        }
+        return true;
+//        markerID = ARToolKit.getInstance().addMarker("single;Data/hiro.patt;80");
+//        return (markerID >= 0);
+
     }
 
     /**
@@ -182,39 +207,45 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     public void draw(GL10 gl) {
 
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
-////
-////                 Apply the ARToolKit projection matrix
+        for (int markerID : markersID.keySet()) {
+            if (ARToolKit.getInstance().queryMarkerVisible(markerID)) {
+                gl.glMatrixMode(GL10.GL_PROJECTION);
+                float[] projectMatrix = ARToolKit.getInstance().getProjectionMatrix();
+                gl.glLoadMatrixf(projectMatrix, 0);
 
+                gl.glMatrixMode(GL10.GL_MODELVIEW);
+                gl.glLoadMatrixf(ARToolKit.getInstance().queryMarkerTransformation(markerID), 0);
 
-        // If the marker is visible, apply its transformation, and draw a pyramid
-        if (ARToolKit.getInstance().queryMarkerVisible(markerID)) {
-            gl.glMatrixMode(GL10.GL_PROJECTION);
-            float[] projectMatrix = ARToolKit.getInstance().getProjectionMatrix();
-            gl.glLoadMatrixf(projectMatrix, 0);
-
-            gl.glMatrixMode(GL10.GL_MODELVIEW);
-            gl.glLoadMatrixf(ARToolKit.getInstance().queryMarkerTransformation(markerID), 0);
-
-
-            synchronized (meshes) {
-                for (Iterator iterator = meshes.entrySet().iterator(); iterator.hasNext(); ) {
-                    Map.Entry pair = (Map.Entry) iterator.next();
-//                    Mesh mesh = iterator.next();
-                    Mesh mesh = (Mesh) pair.getValue();
-                    gl.glPushMatrix();
-                    mesh.draw(gl);
-                    gl.glPopMatrix();
+                synchronized (markerToMeshes) {
+                    for (Mesh mesh : markerToMeshes.get(markerID)) {
+                        gl.glPushMatrix();
+                        mesh.draw(gl);
+                        gl.glPopMatrix();
+                    }
                 }
             }
         }
-    }
 
-    public float getAngle() {
-        return angle;
-    }
-
-    public void setAngle(float angle) {
-        this.angle = angle;
+        // If the marker is visible, apply its transformation, and draw a pyramid
+//        if (ARToolKit.getInstance().queryMarkerVisible(markerID)) {
+//            gl.glMatrixMode(GL10.GL_PROJECTION);
+//            float[] projectMatrix = ARToolKit.getInstance().getProjectionMatrix();
+//            gl.glLoadMatrixf(projectMatrix, 0);
+//
+//            gl.glMatrixMode(GL10.GL_MODELVIEW);
+//            gl.glLoadMatrixf(ARToolKit.getInstance().queryMarkerTransformation(markerID), 0);
+//
+//            synchronized (meshes) {
+//                for (Iterator iterator = meshes.entrySet().iterator(); iterator.hasNext(); ) {
+//                    Map.Entry pair = (Map.Entry) iterator.next();
+////                    Mesh mesh = iterator.next();
+//                    Mesh mesh = (Mesh) pair.getValue();
+//                    gl.glPushMatrix();
+//                    mesh.draw(gl);
+//                    gl.glPopMatrix();
+//                }
+//            }
+//        }
     }
 
     @Override
