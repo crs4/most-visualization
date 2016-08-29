@@ -94,6 +94,7 @@ public class OpticalRenderer extends PubSubARRenderer {
         for (int markerID : markersID.keySet()) {
             if (ARToolKit.getInstance().queryMarkerVisible(markerID)) {
                 float[] trans = ARToolKit.getInstance().queryMarkerTransformation(markerID);
+                gl.glPushMatrix();
                 gl.glMultMatrixf(trans, 0);
 
                 synchronized (markerToMeshes) {
@@ -103,6 +104,7 @@ public class OpticalRenderer extends PubSubARRenderer {
                         gl.glPopMatrix();
                     }
                 }
+                gl.glPopMatrix();
             }
         }
     }
