@@ -96,8 +96,7 @@ public class PTZ_ControllerFragment extends DialogFragment implements OnTouchLis
     }
 
     private void setupButtonListeners(View rootView) {
-
-        ArrayList<View> ptzButtons = new ArrayList<View>();
+        ArrayList<View> ptzButtons = new ArrayList<>();
         rootView.findViewsWithText(ptzButtons, "ptz_button", View.FIND_VIEWS_WITH_CONTENT_DESCRIPTION);
         // Toast.makeText(getActivity(), "Found views:" + String.valueOf(ptzButtons.size()), Toast.LENGTH_LONG).show();
         for (View v : ptzButtons)
@@ -116,7 +115,7 @@ public class PTZ_ControllerFragment extends DialogFragment implements OnTouchLis
         butSnapshot.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                ptzCommandReceiver.onSnaphot();
+                ptzCommandReceiver.onSnapshot();
             }
         });
     }

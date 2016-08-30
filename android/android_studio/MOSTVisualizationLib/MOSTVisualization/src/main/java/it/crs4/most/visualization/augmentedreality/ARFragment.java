@@ -14,6 +14,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.artoolkit.ar.base.ARToolKit;
@@ -51,6 +52,9 @@ public class ARFragment extends StreamViewerFragment implements
     private TouchGLSurfaceView glView;
     private boolean playerButtonsVisible = true;
     private OnCompleteListener mListener;
+    private ImageButton butPlay;
+    private ImageButton butPause;
+    private LinearLayout controlButtonLayout;
 
     public static ARFragment newInstance(String streamId) {
         ARFragment sf = new ARFragment();
@@ -143,7 +147,6 @@ public class ARFragment extends StreamViewerFragment implements
         surfaceView = (SurfaceView) rootView.findViewById(R.id.remoteCameraPreview);
         surfaceView.getHolder().setFixedSize(704, 576); //FIXME should be dynamically set
 
-
         if (surfaceViewCallback != null) {
             surfaceView.getHolder().addCallback(surfaceViewCallback);
         }
@@ -163,31 +166,40 @@ public class ARFragment extends StreamViewerFragment implements
         ActivityManager activityManager = (ActivityManager) getActivity().getSystemService(Context.ACTIVITY_SERVICE);
         ConfigurationInfo configurationInfo = activityManager.getDeviceConfigurationInfo();
 
-        streamCover = rootView.findViewById(R.id.hidecontainer);
-        txtHiddenSurface = (TextView) rootView.findViewById(R.id.txtHiddenSurface);
+        streamCover = rootView.findViewById(R.id.hide_container);
+        txtHiddenSurface = (TextView) rootView.findViewById(R.id.txt_hidden_surface);
 
-
-        ImageButton butPlay = (ImageButton) rootView.findViewById(R.id.button_play);
+        butPlay = (ImageButton) rootView.findViewById(R.id.button_play);
         butPlay.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 ARFragment.this.cmdListener.onPlay(getStreamId());
             }
         });
+        butPlay.setVisibility(playerButtonsVisible ? View.VISIBLE : View.INVISIBLE);
 
-
-        ImageButton butPause = (ImageButton) rootView.findViewById(R.id.button_pause);
+        butPause = (ImageButton) rootView.findViewById(R.id.button_pause);
         butPause.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 ARFragment.this.cmdListener.onPause(getStreamId());
             }
         });
-
+        butPause.setVisibility(playerButtonsVisible ? View.VISIBLE : View.INVISIBLE);
         mListener.onFragmentCreate();
-
 
         preview = (RemoteCaptureCameraPreview) rootView.findViewById(R.id.remoteCameraPreview);
         Log.i(TAG, "RemoteCaptureCameraPreview created");
         preview.setCameraListener(this);
+
+        this.controlButtonLayout = (LinearLayout) rootView.findViewById(R.id.control_button_layout);
+        this.controlButtonLayout.setVisibility(playerButtonsVisible ? View.VISIBLE : View.INVISIBLE);
+        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) this.controlButtonLayout.getLayoutParams();
+        if (playerButtonsVisible) {
+            layoutParams.height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        }
+        else {
+            layoutParams.height = 0;
+        }
+        this.controlButtonLayout.setLayoutParams(layoutParams);
 
 //        setCmdListenerCallback();
         return rootView;
@@ -219,17 +231,16 @@ public class ARFragment extends StreamViewerFragment implements
      */
     public void setPlayerButtonsVisible(boolean value) {
         this.playerButtonsVisible = value;
-        if (getView() == null) return;
-        ImageButton butPlay = (ImageButton) getView().findViewById(R.id.button_play);
-        ImageButton butPause = (ImageButton) getView().findViewById(R.id.button_pause);
-
-        if (value) {
-            butPlay.setVisibility(View.VISIBLE);
-            butPause.setVisibility(View.VISIBLE);
-        }
-        else {
-            butPlay.setVisibility(View.INVISIBLE);
-            butPause.setVisibility(View.INVISIBLE);
+        if (getView() != null) {
+            LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) this.controlButtonLayout.getLayoutParams();
+            if (value) {
+                this.controlButtonLayout.setVisibility(View.VISIBLE);
+                layoutParams.height = LinearLayout.LayoutParams.WRAP_CONTENT;
+            }
+            else {
+                this.controlButtonLayout.setVisibility(View.INVISIBLE);
+                layoutParams.height = 0;
+            }
         }
     }
 

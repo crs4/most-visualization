@@ -153,7 +153,7 @@ public class PTZ_ControllerPopupWindowFactory implements OnTouchListener {
         butSnapshot.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                ptzCommandReceiver.onSnaphot();
+                ptzCommandReceiver.onSnapshot();
             }
         });
     }

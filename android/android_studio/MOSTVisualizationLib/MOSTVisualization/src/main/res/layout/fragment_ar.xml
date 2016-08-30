@@ -11,55 +11,47 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
-
         <FrameLayout
             android:id="@+id/RemoteARFrameLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:layout_margin="10dp"/>
+            android:layout_gravity="center"/>
 
         <it.crs4.most.visualization.augmentedreality.RemoteCaptureCameraPreview
             android:id="@+id/remoteCameraPreview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:layout_margin="10dp"
-            />
+            android:layout_gravity="center"/>
 
         <it.crs4.most.visualization.augmentedreality.TouchGLSurfaceView
             android:id="@+id/ARSurface"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:layout_margin="10dp"
-            />
+            android:layout_gravity="center"/>
 
         <LinearLayout
-            android:id="@+id/hidecontainer"
+            android:id="@+id/hide_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="10dp"
             android:background="@android:color/darker_gray"
             android:gravity="center_horizontal|center_vertical"
-
             android:orientation="vertical"
             android:visibility="invisible">
 
             <TextView
-                android:id="@+id/txtHiddenSurface"
+                android:id="@+id/txt_hidden_surface"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal|center_vertical"
                 android:text=""
                 android:textSize="28sp"
-                android:textStyle="bold"
-                />
+                android:textStyle="bold"/>
         </LinearLayout>
 
     </FrameLayout>
 
     <LinearLayout
+        android:id="@+id/control_button_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#000000"

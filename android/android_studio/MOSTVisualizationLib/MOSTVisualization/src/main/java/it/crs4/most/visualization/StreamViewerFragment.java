@@ -13,13 +13,14 @@ package it.crs4.most.visualization;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import it.crs4.most.streaming.IStream;
@@ -37,8 +38,10 @@ public class StreamViewerFragment extends Fragment {
     private SurfaceView surfaceView = null;
     private View streamCover = null;
     private TextView txtHiddenSurface = null;
-
     private boolean playerButtonsVisible = true;
+    private ImageButton butPlay;
+    private ImageButton butPause;
+    private LinearLayout controlButtonLayout;
 
     /**
      * Intances a new StreamViewerFragment
@@ -56,24 +59,17 @@ public class StreamViewerFragment extends Fragment {
         return sf;
     }
 
-    private String getStreamId() {
-        return getArguments().getString(FRAGMENT_STREAM_ID_KEY);
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "ON CREATE STREAM VIEWER");
     }
 
     @Override
     public void onActivityCreated(Bundle bundle) {
         super.onActivityCreated(bundle);
-        Log.d(TAG, "ON ACTIVITY_CREATED STREAM VIEWER");
         setPlayerButtonsVisible(this.playerButtonsVisible);
         StreamViewerFragment.this.cmdListener.onSurfaceViewCreated(getStreamId(), this.surfaceView);
     }
-
 
     @Override
     /**
@@ -81,49 +77,54 @@ public class StreamViewerFragment extends Fragment {
      */
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        Log.d(TAG, "ON ATTACH STREAM VIEWER");
         this.cmdListener = (IStreamFragmentCommandListener) activity;
-
-
     }
-
 
     @Override
     public void onDetach() {
         super.onDetach();
-        Log.d(TAG, "ON DETACH STREAM VIEWER");
         this.cmdListener.onSurfaceViewDestroyed(getStreamId());
-
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        Log.d(TAG, "ON CREATE_VIEW STREAM VIEWER");
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.stream_layout, container, false);
 
-        this.surfaceView = (SurfaceView) rootView.findViewById(R.id.streamSurface);
-        this.streamCover = rootView.findViewById(R.id.hidecontainer);
-        this.txtHiddenSurface = (TextView) rootView.findViewById(R.id.txtHiddenSurface);
+        this.surfaceView = (SurfaceView) rootView.findViewById(R.id.stream_surface);
+        this.streamCover = rootView.findViewById(R.id.hide_container);
+        this.txtHiddenSurface = (TextView) rootView.findViewById(R.id.txt_hidden_surface);
 
-        ImageButton butPlay = (ImageButton) rootView.findViewById(R.id.button_play);
-        butPlay.setOnClickListener(new OnClickListener() {
+        this.butPlay = (ImageButton) rootView.findViewById(R.id.button_play);
+        this.butPlay.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 StreamViewerFragment.this.cmdListener.onPlay(getStreamId());
             }
         });
 
-
-        ImageButton butPause = (ImageButton) rootView.findViewById(R.id.button_pause);
-        butPause.setOnClickListener(new OnClickListener() {
+        this.butPause = (ImageButton) rootView.findViewById(R.id.button_pause);
+        this.butPause.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 StreamViewerFragment.this.cmdListener.onPause(getStreamId());
             }
         });
 
+        this.controlButtonLayout = (LinearLayout) rootView.findViewById(R.id.control_button_layout);
+        this.controlButtonLayout.setVisibility(playerButtonsVisible ? View.VISIBLE : View.INVISIBLE);
+        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) this.controlButtonLayout.getLayoutParams();
+        if (playerButtonsVisible) {
+            layoutParams.height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        }
+        else {
+            layoutParams.height = 0;
+        }
+        this.controlButtonLayout.setLayoutParams(layoutParams);
+
         return rootView;
     }
 
+    private String getStreamId() {
+        return getArguments().getString(FRAGMENT_STREAM_ID_KEY);
+    }
 
     /**
      * Set the stream visible
@@ -131,7 +132,6 @@ public class StreamViewerFragment extends Fragment {
     public void setStreamVisible() {
         this.streamCover.setVisibility(View.INVISIBLE);
     }
-
 
     /**
      * Set the stream invisible
@@ -150,20 +150,16 @@ public class StreamViewerFragment extends Fragment {
      */
     public void setPlayerButtonsVisible(boolean value) {
         this.playerButtonsVisible = value;
-
-        if (getView() == null) return;
-
-        ImageButton butPlay = (ImageButton) getView().findViewById(R.id.button_play);
-        ImageButton butPause = (ImageButton) getView().findViewById(R.id.button_pause);
-
-        if (value) {
-            butPlay.setVisibility(View.VISIBLE);
-            butPause.setVisibility(View.VISIBLE);
-
-        }
-        else {
-            butPlay.setVisibility(View.INVISIBLE);
-            butPause.setVisibility(View.INVISIBLE);
+        if (getView() != null) {
+            LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) this.controlButtonLayout.getLayoutParams();
+            if (value) {
+                this.controlButtonLayout.setVisibility(View.VISIBLE);
+                layoutParams.height = LinearLayout.LayoutParams.WRAP_CONTENT;
+            }
+            else {
+                this.controlButtonLayout.setVisibility(View.INVISIBLE);
+                layoutParams.height = 0;
+            }
         }
     }
 }

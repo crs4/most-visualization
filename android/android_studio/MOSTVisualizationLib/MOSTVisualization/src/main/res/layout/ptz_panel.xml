@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@android:color/white"
-    android:orientation="horizontal"
-    >
+    android:orientation="horizontal">
 
     <GridLayout
         android:id="@+id/pt_buttons_grid"
@@ -15,8 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="10sp"
         android:columnCount="3"
-        android:rowCount="3"
-        >
+        android:rowCount="3">
 
         <ImageButton
             android:id="@+id/but_move_NW"
@@ -24,8 +20,7 @@
             android:layout_height="50dp"
             android:layout_gravity="fill"
             android:contentDescription="ptz_button_nw"
-            android:src="@drawable/ptz_arrow_nw"
-            />
+            android:src="@drawable/ptz_arrow_nw"/>
 
         <ImageButton
             android:id="@+id/but_move_N"
@@ -33,8 +28,7 @@
             android:layout_height="50dp"
             android:layout_gravity="fill"
             android:contentDescription="ptz_button_n"
-            android:src="@drawable/ptz_arrow_n"
-            />
+            android:src="@drawable/ptz_arrow_n"/>
 
         <ImageButton
             android:id="@+id/but_move_NE"
@@ -51,8 +45,7 @@
             android:layout_height="50dp"
             android:layout_gravity="fill"
             android:contentDescription="ptz_button_w"
-            android:src="@drawable/ptz_arrow_w"
-            />
+            android:src="@drawable/ptz_arrow_w"/>
 
         <ImageButton
             android:id="@+id/but_move_home"
@@ -60,8 +53,7 @@
             android:layout_height="50dp"
             android:layout_gravity="fill"
             android:contentDescription="ptz_home"
-            android:src="@drawable/ptz_house"
-            />
+            android:src="@drawable/ptz_house"/>
 
         <ImageButton
             android:id="@+id/but_move_E"
@@ -69,8 +61,7 @@
             android:layout_height="50dp"
             android:layout_gravity="fill"
             android:contentDescription="ptz_button_e"
-            android:src="@drawable/ptz_arrow_e"
-            />
+            android:src="@drawable/ptz_arrow_e"/>
 
 
         <ImageButton
@@ -79,8 +70,7 @@
             android:layout_height="50dp"
             android:layout_gravity="fill"
             android:contentDescription="ptz_button_sw"
-            android:src="@drawable/ptz_arrow_sw"
-            />
+            android:src="@drawable/ptz_arrow_sw"/>
 
         <ImageButton
             android:id="@+id/but_move_S"
@@ -88,8 +78,7 @@
             android:layout_height="50dp"
             android:layout_gravity="fill"
             android:contentDescription="ptz_button_s"
-            android:src="@drawable/ptz_arrow_s"
-            />
+            android:src="@drawable/ptz_arrow_s"/>
 
         <ImageButton
             android:id="@+id/but_move_SE"
@@ -97,12 +86,8 @@
             android:layout_height="50dp"
             android:layout_gravity="fill"
             android:contentDescription="ptz_button_se"
-            android:src="@drawable/ptz_arrow_se"
-            />
-
-
+            android:src="@drawable/ptz_arrow_se"/>
     </GridLayout>
-
 
     <GridLayout
         android:id="@+id/zoom_snap_buttons_grid"
@@ -110,8 +95,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="10sp"
         android:columnCount="1"
-        android:rowCount="3"
-        >
+        android:rowCount="3">
 
         <ImageButton
             android:id="@+id/but_zoom_in"
@@ -119,8 +103,7 @@
             android:layout_height="50dp"
             android:layout_gravity="fill"
             android:contentDescription="ptz_button_magnify_plus"
-            android:src="@drawable/ptz_magnify_plus"
-            />
+            android:src="@drawable/ptz_magnify_plus"/>
 
         <ImageButton
             android:id="@+id/but_zoom_out"
@@ -128,8 +111,7 @@
             android:layout_height="50dp"
             android:layout_gravity="fill"
             android:contentDescription="ptz_button_magnify_minus"
-            android:src="@drawable/ptz_magnify_minus_75"
-            />
+            android:src="@drawable/ptz_magnify_minus_75"/>
 
         <ImageButton
             android:id="@+id/but_snapshot"
@@ -137,12 +119,8 @@
             android:layout_height="50dp"
             android:layout_gravity="fill"
             android:contentDescription="ptz_snapshot"
-            android:src="@drawable/ptz_snapshot"
-            />
-
-
+            android:src="@drawable/ptz_snapshot"/>
     </GridLayout>
-
 
     <!--
       <SeekBar
@@ -168,5 +146,4 @@
 
       />
   -->
-
 </LinearLayout>

@@ -53,6 +53,6 @@ public interface IPtzCommandReceiver {
     /**
      * Called when the user clicks on the snapshot button
      */
-    public void onSnaphot();
+    public void onSnapshot();
 
 }
