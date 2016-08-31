@@ -52,8 +52,6 @@ public class ARFragment extends StreamViewerFragment implements
     private TouchGLSurfaceView glView;
     private boolean playerButtonsVisible = true;
     private OnCompleteListener mListener;
-    private ImageButton butPlay;
-    private ImageButton butPause;
     private LinearLayout controlButtonLayout;
 
     public static ARFragment newInstance(String streamId) {
@@ -156,7 +154,6 @@ public class ARFragment extends StreamViewerFragment implements
         glView.setEGLContextClientVersion(1);
         glView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
         glView.getHolder().setFormat(-3);
-
         glView.setRenderer(renderer);
 
         if (glSurfaceViewCallback != null) {
@@ -169,21 +166,19 @@ public class ARFragment extends StreamViewerFragment implements
         streamCover = rootView.findViewById(R.id.hide_container);
         txtHiddenSurface = (TextView) rootView.findViewById(R.id.txt_hidden_surface);
 
-        butPlay = (ImageButton) rootView.findViewById(R.id.button_play);
+        ImageButton butPlay = (ImageButton) rootView.findViewById(R.id.button_play);
         butPlay.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 ARFragment.this.cmdListener.onPlay(getStreamId());
             }
         });
-        butPlay.setVisibility(playerButtonsVisible ? View.VISIBLE : View.INVISIBLE);
 
-        butPause = (ImageButton) rootView.findViewById(R.id.button_pause);
+        ImageButton butPause = (ImageButton) rootView.findViewById(R.id.button_pause);
         butPause.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 ARFragment.this.cmdListener.onPause(getStreamId());
             }
         });
-        butPause.setVisibility(playerButtonsVisible ? View.VISIBLE : View.INVISIBLE);
         mListener.onFragmentCreate();
 
         preview = (RemoteCaptureCameraPreview) rootView.findViewById(R.id.remoteCameraPreview);
@@ -311,7 +306,9 @@ public class ARFragment extends StreamViewerFragment implements
 
     @Override
     public void cameraPreviewStopped() {
-        ARToolKit.getInstance().cleanup();
+        if (isARRunning()) {
+            ARToolKit.getInstance().cleanup();
+        }
     }
 
     @Override
