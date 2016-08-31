@@ -29,6 +29,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
     private boolean mScaling = false;
     private MeshManager meshManager;
     private Mesh mesh;
+    private float moveNormFactor = 1;
 
     public TouchGLSurfaceView(Context context) {
         super(context);
@@ -64,6 +65,15 @@ public class TouchGLSurfaceView extends GLSurfaceView {
         this.renderer = renderer;
         super.setRenderer(renderer);
     }
+
+    public float getMoveNormFactor() {
+        return moveNormFactor;
+    }
+
+    public void setMoveNormFactor(float moveNormFactor) {
+        this.moveNormFactor = moveNormFactor;
+    }
+
 
     @Override
     public boolean isEnabled() {
@@ -115,6 +125,9 @@ public class TouchGLSurfaceView extends GLSurfaceView {
         float x = e.getX();
         float y = e.getY();
         mesh = meshManager.getSelectedMesh(x, y);
+        if (mesh == null){
+            return false;
+        }
 
         if (mode == Mode.Move && e.getPointerCount() > 1) {
             mScaleDetector.onTouchEvent(e);
@@ -129,8 +142,8 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                 return true;
 
             }
-            float dx = x - mPreviousX;
-            float dy = y - mPreviousY;
+            float dx = (x - mPreviousX)/moveNormFactor;
+            float dy = (y - mPreviousY)/moveNormFactor;
             switch (e.getAction()) {
                 case MotionEvent.ACTION_MOVE:
                     Log.d(TAG, "ACTION_MOVE");
@@ -151,8 +164,13 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                             break;
                         case Move:
                             Log.d(TAG, "Move");
-                            mesh.setX(mesh.getX() + dx);
-                            mesh.setY(mesh.getY() - dy);
+                            float finalDx = mesh.getX() + dx;
+                            float finalDy = mesh.getY() - dy;
+
+//                            mesh.setX(finalDx < 1? (finalDx > -1? finalDx: -1): 1);
+//                            mesh.setY(finalDy < 1? (finalDy > -1? finalDy: -1): 1);
+                            mesh.setX(finalDx);
+                            mesh.setY(finalDy);
                             break;
 
 //                        case Edit:

@@ -1,5 +1,7 @@
 package it.crs4.most.visualization.augmentedreality.mesh;
 
+import android.opengl.Matrix;
+
 import org.artoolkit.ar.base.ARToolKit;
 
 import java.util.ArrayList;
@@ -14,20 +16,27 @@ public class MeshManager {
     private HashMap<String, Mesh> meshes = new HashMap<>();
     private HashMap<Integer, String> markersID = new HashMap<>();
     private HashMap<Integer, List<Mesh>> markerToMeshes = new HashMap<>();
+    private static int MARKERLESS_ID = -1;
+
 
     public void addMesh(Mesh mesh){
         meshes.put(mesh.getId(), mesh);
     }
 
-    public boolean addMarkersToScene(){
+    public boolean configureScene(){
         HashSet<String> markersAdded = new HashSet<>();
         int markerID;
         for (Mesh mesh : meshes.values()) {
             String marker = mesh.getMarker();
             if (!markersAdded.contains(marker)) {
-                markerID = ARToolKit.getInstance().addMarker(marker);
-                if (markerID < 0){
-                    return false;
+                if(marker != null){
+                    markerID = ARToolKit.getInstance().addMarker(marker);
+                    if (markerID < 0){
+                        return false;
+                    }
+                }
+                else{
+                    markerID = MARKERLESS_ID;
                 }
                 markersAdded.add(marker);
                 markersID.put(markerID, marker);
@@ -46,14 +55,24 @@ public class MeshManager {
     }
 
     public HashMap<float [], List<Mesh>> getVisibleMeshes(){
-
+        float [] modelView;
         HashMap<float [], List<Mesh>> result = new HashMap<>();
+
         for (int markerID : markersID.keySet()) {
-            if (ARToolKit.getInstance().queryMarkerVisible(markerID)) {
-                float [] modelView = ARToolKit.getInstance().queryMarkerTransformation(markerID);
-                result.put(modelView, markerToMeshes.get(markerID));
-                }
+            if (markerID == MARKERLESS_ID){
+                modelView = new float[16];
+                Matrix.setIdentityM(modelView, 0);
+
             }
+            else if (ARToolKit.getInstance().queryMarkerVisible(markerID)) {
+                modelView = ARToolKit.getInstance().queryMarkerTransformation(markerID);
+
+                }
+            else{
+                continue;
+            }
+            result.put(modelView, markerToMeshes.get(markerID));
+        }
         return result;
     }
     public Mesh getSelectedMesh(float winX, float winY){
@@ -68,5 +87,9 @@ public class MeshManager {
 
     public Mesh getMeshByID(String id){
         return meshes.get(id);
+    }
+
+    public List<Mesh> getMeshes(){
+        return new ArrayList<>(meshes.values());
     }
 }

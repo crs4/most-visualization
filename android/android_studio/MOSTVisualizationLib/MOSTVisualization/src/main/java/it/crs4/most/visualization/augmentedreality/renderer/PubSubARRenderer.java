@@ -16,21 +16,15 @@ import org.artoolkit.ar.base.rendering.ARRenderer;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.microedition.khronos.opengles.GL10;
 
-import it.crs4.most.visualization.augmentedreality.Marker;
 import it.crs4.most.visualization.augmentedreality.mesh.Mesh;
 import it.crs4.most.visualization.augmentedreality.mesh.MeshFactory;
 import it.crs4.most.visualization.augmentedreality.mesh.MeshManager;
+import it.crs4.most.visualization.augmentedreality.mesh.Plane;
 import it.crs4.most.visualization.utils.zmq.BaseSubscriber;
 import it.crs4.most.visualization.utils.zmq.IPublisher;
 
@@ -171,10 +165,7 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
 
     @Override
     public boolean configureARScene() {
-        return meshManager.addMarkersToScene();
-        //        markerID = ARToolKit.getInstance().addMarker("single;Data/hiro.patt;80");
-//        return (markerID >= 0);
-
+        return meshManager.configureScene();
     }
 
     /**
@@ -183,22 +174,49 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     public void draw(GL10 gl) {
 
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
-        gl.glMatrixMode(GL10.GL_PROJECTION);
-        float[] projectMatrix = ARToolKit.getInstance().getProjectionMatrix();
-        gl.glLoadMatrixf(projectMatrix, 0);
 
-        gl.glMatrixMode(GL10.GL_MODELVIEW);
+
+
+//        Log.d(TAG,"draw mesh size" + meshManager.getMeshes().size());
+//        float [] identity = new float[16];
+//        Matrix.setIdentityM(identity, 0);
+//        gl.glLoadMatrixf(identity, 0);
+//
+//        gl.glMatrixMode(GL10.GL_MODELVIEW);
+//        gl.glLoadMatrixf(identity, 0);
+//        Plane p = new Plane(0.1f, 0.1f);
+//        p.draw(gl);
+//        gl.glMatrixMode(GL10.GL_PROJECTION);
+
+
+
+        float [] identityM = new float[16];
+        Matrix.setIdentityM(identityM, 0);
+
         for(Map.Entry<float [], List<Mesh>> entry: meshManager.getVisibleMeshes().entrySet()){
-            gl.glLoadMatrixf(entry.getKey(), 0);
+
             synchronized (meshManager) {
                 for (Mesh mesh : entry.getValue()) {
+
+                    gl.glMatrixMode(GL10.GL_PROJECTION);
+                    if (mesh.getMarker() != null){
+                        gl.glLoadMatrixf(ARToolKit.getInstance().getProjectionMatrix(), 0);
+                    }
+                    else{
+                        gl.glLoadMatrixf(identityM, 0);
+                    }
+
+                    gl.glMatrixMode(GL10.GL_MODELVIEW);
+                    gl.glLoadMatrixf(entry.getKey(), 0);
                     gl.glPushMatrix();
                     mesh.draw(gl);
                     gl.glPopMatrix();
                 }
             }
         }
+
     }
+
 
     @Override
     public boolean handleMessage(Message message) {
@@ -209,10 +227,6 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
         synchronized (meshManager) {
             meshManager.addMesh(mesh);
         }
-    }
-
-    public Mesh getMesh(String id) {
-        return meshManager.getMeshByID(id);
     }
 
     public void addMesh(Mesh mesh, float winX, float winY) {
@@ -274,5 +288,10 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         this.width = width;
         this.height = height;
+    }
+
+    @Override
+    public void onDrawFrame(GL10 gl) {
+            this.draw(gl);
     }
 }
