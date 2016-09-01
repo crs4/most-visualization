@@ -37,6 +37,7 @@ public abstract class Mesh {
     private FloatBuffer colorBuffer = null;
     private String TAG = "MESH";
     private String marker;
+    private CoordsConverter coordsConverter;
 
     public Mesh() {
         setId(null);
@@ -71,13 +72,22 @@ public abstract class Mesh {
         setX(x, true);
     }
 
-    protected JSONObject getBaseJsonObj() throws JSONException {
-        JSONObject obj = new JSONObject();
 
+    protected JSONObject getBaseJsonObj() throws JSONException {
+        float [] coords;
+        CoordsConverter converter;
+        if (coordsConverter == null){
+            coords = new float [] {x, y, z};
+        }
+        else{
+            coords = coordsConverter.convert(x, y, z);
+        }
+
+        JSONObject obj = new JSONObject();
         obj.put("id", id);
-        obj.put("x", x);
-        obj.put("y", y);
-        obj.put("z", z);
+        obj.put("x", coords[0]);
+        obj.put("y", coords[1]);
+        obj.put("z", coords[2]);
         obj.put("rx", rx);
         obj.put("ry", ry);
         obj.put("rz", rz);
@@ -287,4 +297,13 @@ public abstract class Mesh {
             }
         }
     }
+
+    public CoordsConverter getCoordsConverter() {
+        return coordsConverter;
+    }
+
+    public void setCoordsConverter(CoordsConverter coordsConverter) {
+        this.coordsConverter = coordsConverter;
+    }
+
 }
