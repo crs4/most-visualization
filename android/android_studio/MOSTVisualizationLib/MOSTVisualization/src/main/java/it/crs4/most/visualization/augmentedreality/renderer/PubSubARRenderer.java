@@ -288,6 +288,7 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         this.width = width;
         this.height = height;
+        gl.glViewport(0, 0, width, height);
     }
 
     @Override
