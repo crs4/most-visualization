@@ -52,6 +52,7 @@ public class ARFragment extends StreamViewerFragment implements
     private TouchGLSurfaceView glView;
     private boolean playerButtonsVisible = true;
     private OnCompleteListener mListener;
+    private int [] fixedSize;
     private LinearLayout controlButtonLayout;
 
     public static ARFragment newInstance(String streamId) {
@@ -143,18 +144,23 @@ public class ARFragment extends StreamViewerFragment implements
         View rootView = inflater.inflate(R.layout.fragment_ar, container, false);
 
         surfaceView = (SurfaceView) rootView.findViewById(R.id.remoteCameraPreview);
-        surfaceView.getHolder().setFixedSize(704, 576); //FIXME should be dynamically set
 
         if (surfaceViewCallback != null) {
             surfaceView.getHolder().addCallback(surfaceViewCallback);
         }
 
         glView = (TouchGLSurfaceView) rootView.findViewById(R.id.ARSurface);
-        glView.getHolder().setFixedSize(704, 576); //FIXME should be dynamically set
         glView.setEGLContextClientVersion(1);
         glView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
         glView.getHolder().setFormat(-3);
         glView.setRenderer(renderer);
+
+        if (fixedSize != null){
+            surfaceView.getHolder().setFixedSize(fixedSize[0], fixedSize[1]);
+            glView.getHolder().setFixedSize(fixedSize[0], fixedSize[1]);
+
+
+        }
 
         if (glSurfaceViewCallback != null) {
             glView.getHolder().addCallback(glSurfaceViewCallback);
@@ -343,4 +349,14 @@ public class ARFragment extends StreamViewerFragment implements
         public abstract void onFragmentResume();
 
     }
+
+    public int[] getFixedSize() {
+        return fixedSize;
+    }
+
+    public void setFixedSize(int[] fixedSize) {
+        this.fixedSize = fixedSize;
+    }
+
+
 }
