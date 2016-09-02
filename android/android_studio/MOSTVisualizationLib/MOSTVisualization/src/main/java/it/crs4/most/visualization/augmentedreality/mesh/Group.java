@@ -94,30 +94,33 @@ public class Group extends Mesh {
 
     @Override
     public void setX(float x, boolean publish) {
+        float oldX = getX();
+        super.setX(x, false);
         for (Mesh child : children) {
-            child.x = x - this.x + child.x;
+            child.setX(getX() - oldX + child.getX(), false);
         }
-        this.x = x;
         if (publish)
             publishCoordinate();
     }
 
     @Override
     public void setY(float y, boolean publish) {
+        float oldY = getY();
+        super.setY(y, false);
         for (Mesh child : children) {
-            child.y = y - this.y + child.y;
+            child.setY(getY() - oldY + child.getY(), false);
         }
-        this.y = y;
         if (publish)
             publishCoordinate();
     }
 
     @Override
     public void setZ(float z, boolean publish) {
+        float oldZ = getZ();
+        super.setZ(z, false);
         for (Mesh child : children) {
-            child.z = z - this.z + child.z;
+            child.setZ(getZ() - oldZ + child.getZ(), false);
         }
-        this.z = z;
         if (publish)
             publishCoordinate();
     }

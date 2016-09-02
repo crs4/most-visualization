@@ -38,6 +38,9 @@ public abstract class Mesh {
     private String TAG = "MESH";
     private String marker;
     private CoordsConverter coordsConverter;
+    private float [] xLimits;
+    private float [] yLimits;
+    private float [] zLimits;
 
     public Mesh() {
         setId(null);
@@ -107,8 +110,18 @@ public abstract class Mesh {
         }
     }
 
+    private float getCoord(float coord, float [] coordLimits){
+        if (coordLimits == null || (coord >= coordLimits[0] && coord <= coordLimits[1])){
+            return coord;
+        }
+        if (coord < coordLimits[0]){
+            return coordLimits[0];
+        }
+        return coordLimits[1];
+    }
+
     public void setX(float x, boolean publish) {
-        this.x = x;
+        this.x = getCoord(x, xLimits);
         if (publish)
             publishCoordinate();
     }
@@ -123,7 +136,7 @@ public abstract class Mesh {
     }
 
     public void setY(float y, boolean publish) {
-        this.y = y;
+        this.y = getCoord(y, yLimits);
         if (publish)
             publishCoordinate();
     }
@@ -137,7 +150,7 @@ public abstract class Mesh {
     }
 
     public void setZ(float z, boolean publish) {
-        this.z = z;
+        this.z = getCoord(z, zLimits);
         if (publish)
             publishCoordinate();
     }
@@ -185,9 +198,9 @@ public abstract class Mesh {
     }
 
     public void setCoordinates(float x, float y, float z, float rx, float ry, float rz, boolean publish) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        setX(x, false);
+        setY(y, false);
+        setZ(z, false);
         this.rx = rx;
         this.ry = ry;
         this.rz = rz;
@@ -304,6 +317,31 @@ public abstract class Mesh {
 
     public void setCoordsConverter(CoordsConverter coordsConverter) {
         this.coordsConverter = coordsConverter;
+    }
+
+
+    public float[] getzLimits() {
+        return zLimits;
+    }
+
+    public void setzLimits(float lowerLimit, float upperLimit) {
+        this.zLimits = new float []{lowerLimit, upperLimit};
+    }
+
+    public float[] getyLimits() {
+        return yLimits;
+    }
+
+    public void setyLimits(float lowerLimit, float upperLimit) {
+        this.yLimits = new float []{lowerLimit, upperLimit};
+    }
+
+    public float[] getxLimits() {
+        return xLimits;
+    }
+
+    public void setxLimits(float lowerLimit, float upperLimit) {
+        this.xLimits = new float []{lowerLimit, upperLimit};
     }
 
 }
