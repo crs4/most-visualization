@@ -169,4 +169,10 @@ public class Group extends Mesh {
             publishCoordinate();
     }
 
+    @Override
+    public void scale(float xFactor, float yFactor, float zFactor){
+        for (Mesh child : children) {
+            child.scale(xFactor,yFactor, zFactor);
+        }
+    }
 }

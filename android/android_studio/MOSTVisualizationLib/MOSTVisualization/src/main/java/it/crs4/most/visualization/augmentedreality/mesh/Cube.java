@@ -10,7 +10,7 @@ public class Cube extends Mesh {
         this.height = height / 2;
         this.depth = depth / 2;
 
-        float vertices[] = {-this.width, -this.height, -this.depth, // 0
+        vertices = new float []{-this.width, -this.height, -this.depth, // 0
             this.width, -this.height, -this.depth, // 1
             this.width, this.height, -this.depth, // 2
             -this.width, this.height, -this.depth, // 3

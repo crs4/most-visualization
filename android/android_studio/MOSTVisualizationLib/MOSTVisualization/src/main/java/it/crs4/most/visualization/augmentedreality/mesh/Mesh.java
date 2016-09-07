@@ -42,6 +42,12 @@ public abstract class Mesh {
     private float [] yLimits;
     private float [] zLimits;
 
+    public float[] getVertices() {
+        return vertices;
+    }
+
+    protected float [] vertices;
+
     public Mesh() {
         setId(null);
     }
@@ -342,6 +348,15 @@ public abstract class Mesh {
 
     public void setxLimits(float lowerLimit, float upperLimit) {
         this.xLimits = new float []{lowerLimit, upperLimit};
+    }
+
+    public void scale(float xFactor, float yFactor, float zFactor){
+        float [] factors = new float[] {xFactor, yFactor, zFactor};
+        for (int i=0; i < vertices.length; i++){
+            vertices[i] *= factors[i%3];
+        }
+
+        setVertices(vertices);
     }
 
 }

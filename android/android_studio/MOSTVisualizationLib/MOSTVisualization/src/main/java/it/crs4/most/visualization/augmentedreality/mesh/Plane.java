@@ -33,7 +33,7 @@ public class Plane extends Mesh {
         this.width = width;
         this.height = height;
 
-        float[] vertices = new float[(widthSegments + 1) * (heightSegments + 1)
+        vertices = new float[(widthSegments + 1) * (heightSegments + 1)
             * 3];
         short[] indices = new short[(widthSegments + 1) * (heightSegments + 1)
             * 6];

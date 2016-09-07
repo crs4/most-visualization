@@ -7,7 +7,7 @@ public class Pyramid extends Mesh {
         depth /= 2;
 //        height /= 2;
 
-        float vertices[] = {
+         vertices = new float []{
             -width, 0, -depth, // 0
             width, 0, -depth, // 1
             width, 0, depth, // 2
