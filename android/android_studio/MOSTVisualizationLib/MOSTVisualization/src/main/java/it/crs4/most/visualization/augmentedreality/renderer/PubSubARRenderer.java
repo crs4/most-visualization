@@ -46,6 +46,7 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     protected int height;
     protected int width;
     protected MeshManager meshManager;
+    private boolean enabled = true;
 
     public PubSubARRenderer(Context context, MeshManager meshManager) {
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
@@ -293,6 +294,17 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
 
     @Override
     public void onDrawFrame(GL10 gl) {
+        if (isEnabled()){
             this.draw(gl);
+        }
     }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
 }
