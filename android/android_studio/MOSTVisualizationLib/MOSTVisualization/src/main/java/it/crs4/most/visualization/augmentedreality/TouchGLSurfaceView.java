@@ -64,6 +64,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
     public void setRenderer(Renderer renderer) {
         this.renderer = renderer;
         super.setRenderer(renderer);
+        setRenderMode(RENDERMODE_WHEN_DIRTY);
     }
 
     public float getMoveNormFactor() {
@@ -105,6 +106,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                             mesh.setZ(mesh.getZ() + 5f);
                         }
 
+                        requestRender();
                         return true;
                     }
                     return false;
@@ -171,6 +173,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
 //                            mesh.setY(finalDy < 1? (finalDy > -1? finalDy: -1): 1);
                             mesh.setX(finalDx, false);
                             mesh.setY(finalDy, false);
+                            requestRender();
                             mesh.publishCoordinate();
                             break;
 
