@@ -17,7 +17,7 @@ public class Group extends Mesh {
 
     @Override
     public void draw(GL10 gl) {
-        Log.d("GROUPMESH", "drawing group elements: x " + x + " y " + y + " z " + z);
+//        Log.d("GROUPMESH", "drawing group elements: x " + x + " y " + y + " z " + z);
         int size = children.size();
         for (int i = 0; i < size; i++) {
             gl.glPushMatrix();

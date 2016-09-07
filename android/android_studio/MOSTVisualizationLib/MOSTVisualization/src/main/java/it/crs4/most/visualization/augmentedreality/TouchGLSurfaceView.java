@@ -169,8 +169,9 @@ public class TouchGLSurfaceView extends GLSurfaceView {
 
 //                            mesh.setX(finalDx < 1? (finalDx > -1? finalDx: -1): 1);
 //                            mesh.setY(finalDy < 1? (finalDy > -1? finalDy: -1): 1);
-                            mesh.setX(finalDx);
-                            mesh.setY(finalDy);
+                            mesh.setX(finalDx, false);
+                            mesh.setY(finalDy, false);
+                            mesh.publishCoordinate();
                             break;
 
 //                        case Edit:

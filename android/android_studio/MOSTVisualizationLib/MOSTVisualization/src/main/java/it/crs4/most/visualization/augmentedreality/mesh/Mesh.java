@@ -103,7 +103,7 @@ public abstract class Mesh {
         return obj;
     }
 
-    protected void publishCoordinate() {
+    public void publishCoordinate() {
         if (publisher != null) {
             try {
                 JSONObject base = getBaseJsonObj();
