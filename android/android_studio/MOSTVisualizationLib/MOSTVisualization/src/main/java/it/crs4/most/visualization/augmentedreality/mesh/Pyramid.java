@@ -2,8 +2,17 @@ package it.crs4.most.visualization.augmentedreality.mesh;
 
 
 public class Pyramid extends Mesh {
+        private float height;
+    private float width;
+    private float depth;
+
     public Pyramid(float width, float height, float depth) {
+        this.height = height;
+        this.width = width;
+        this.depth = depth;
+
         width /= 2;
+
         depth /= 2;
 //        height /= 2;
 
@@ -40,5 +49,17 @@ public class Pyramid extends Mesh {
             0, 0, 1, 0.5f
         };
         setColors(colors);
+    }
+
+    public float getHeight() {
+        return height;
+    }
+
+    public float getWidth() {
+        return width;
+    }
+
+    public float getDepth() {
+        return depth;
     }
 }

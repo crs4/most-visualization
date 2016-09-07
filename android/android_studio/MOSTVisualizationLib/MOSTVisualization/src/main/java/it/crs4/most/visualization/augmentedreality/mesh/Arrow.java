@@ -12,7 +12,8 @@ public class Arrow extends Group {
         Cube cube = new Cube(30f*scale, 20f*scale, 30f*scale);
         pyramid.setRz(180);
 //        pyramid.setX(-40f);
-        pyramid.setY(-1f * cube.height);
+        pyramid.setY(pyramid.getHeight());
+        cube.setY(pyramid.getHeight() + cube.getHeight()/2);
         add(cube);
         add(pyramid);
     }

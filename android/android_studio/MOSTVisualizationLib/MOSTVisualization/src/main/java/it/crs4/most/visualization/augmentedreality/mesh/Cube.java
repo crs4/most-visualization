@@ -1,9 +1,10 @@
 package it.crs4.most.visualization.augmentedreality.mesh;
 
 public class Cube extends Mesh {
-    public float width;
-    public float height;
-    public float depth;
+
+    private float width;
+    private float height;
+    private float depth;
 
     public Cube(float width, float height, float depth) {
         this.width = width / 2;
@@ -48,4 +49,17 @@ public class Cube extends Mesh {
         };
         setColors(colors);
     }
+
+    public float getWidth() {
+        return width;
+    }
+
+    public float getHeight() {
+        return height;
+    }
+
+    public float getDepth() {
+        return depth;
+    }
+
 }
