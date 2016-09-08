@@ -30,6 +30,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
     private MeshManager meshManager;
     private Mesh mesh;
     private float moveNormFactor = 1;
+    private int touchSamplingCounter = 0;
 
     public TouchGLSurfaceView(Context context) {
         super(context);
@@ -165,6 +166,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                             mesh.setRy(mesh.getRy() + (dx + dy) * TOUCH_SCALE_FACTOR);
                             break;
                         case Move:
+                            touchSamplingCounter += 1;
                             Log.d(TAG, "Move");
                             float finalDx = mesh.getX() + dx;
                             float finalDy = mesh.getY() - dy;
@@ -174,7 +176,10 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                             mesh.setX(finalDx, false);
                             mesh.setY(finalDy, false);
                             requestRender();
-                            mesh.publishCoordinate();
+                            if (touchSamplingCounter % 3 == 0) {
+                                mesh.publishCoordinate();
+                            }
+
                             break;
 
 //                        case Edit:
@@ -189,6 +194,9 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                     }
                     else
                         mMoving = false;
+
+                    touchSamplingCounter = 0;
+                    mesh.publishCoordinate();
                     break;
 
                 case MotionEvent.ACTION_DOWN:
