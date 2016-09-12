@@ -24,7 +24,6 @@ import javax.microedition.khronos.opengles.GL10;
 import it.crs4.most.visualization.augmentedreality.mesh.Mesh;
 import it.crs4.most.visualization.augmentedreality.mesh.MeshFactory;
 import it.crs4.most.visualization.augmentedreality.mesh.MeshManager;
-import it.crs4.most.visualization.augmentedreality.mesh.Plane;
 import it.crs4.most.visualization.utils.zmq.BaseSubscriber;
 import it.crs4.most.visualization.utils.zmq.IPublisher;
 
@@ -47,6 +46,9 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     protected int width;
     protected MeshManager meshManager;
     private boolean enabled = true;
+
+    private float viewportAspectRatio = 16f/9f;
+    private boolean newViewport = true;
 
     public PubSubARRenderer(Context context, MeshManager meshManager) {
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
@@ -173,7 +175,7 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
      * Should be overridden in subclasses and used to perform rendering.
      */
     public void draw(GL10 gl) {
-
+        updateViewport(gl);
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
 
@@ -289,8 +291,24 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         this.width = width;
         this.height = height;
-        gl.glViewport(0, 0, width, height);
+        newViewport = true;
+        updateViewport(gl);
     }
+
+    private void updateViewport(GL10 gl){
+        if (newViewport && width != 0 && height != 0) {
+            int heightVideo = (int) (width/viewportAspectRatio);
+            if(viewportAspectRatio > 0) {
+                gl.glViewport(0, (height - heightVideo)/2, width, heightVideo);
+            }
+            else {
+                gl.glViewport(0, 0, width, height);
+            }
+            newViewport = false;
+        }
+    }
+
+
 
     @Override
     public void onDrawFrame(GL10 gl) {
@@ -305,6 +323,17 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public float getViewportAspectRatio() {
+        return viewportAspectRatio;
+    }
+
+    public void setViewportAspectRatio(float viewportAspectRatio) {
+        Log.d(TAG, "setViewportAspectRatio with " + viewportAspectRatio);
+        this.viewportAspectRatio = viewportAspectRatio;
+        newViewport = true;
+
     }
 
 }
