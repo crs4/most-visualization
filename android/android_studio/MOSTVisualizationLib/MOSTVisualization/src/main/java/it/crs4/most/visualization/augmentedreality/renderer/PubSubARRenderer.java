@@ -16,14 +16,14 @@ import org.artoolkit.ar.base.rendering.ARRenderer;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.microedition.khronos.opengles.GL10;
 
 import it.crs4.most.visualization.augmentedreality.mesh.Mesh;
 import it.crs4.most.visualization.augmentedreality.mesh.MeshFactory;
+import it.crs4.most.visualization.augmentedreality.mesh.MeshManager;
 import it.crs4.most.visualization.utils.zmq.BaseSubscriber;
 import it.crs4.most.visualization.utils.zmq.IPublisher;
 
@@ -39,38 +39,47 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     public IPublisher publisher;
     protected volatile float angle = 0;
     protected float previousAngle = 0;
-    protected int markerID = -1;
     protected Handler handler;
     protected BaseSubscriber subscriber;
     protected String TAG = "PubSubARRenderer";
     protected int height;
     protected int width;
-    protected HashMap<String, Mesh> meshes;
+    protected MeshManager meshManager;
+    private boolean enabled = true;
 
-    public PubSubARRenderer(Context context) {
+    private float viewportAspectRatio = 16f/9f;
+    private boolean newViewport = true;
+
+    public PubSubARRenderer(Context context, MeshManager meshManager) {
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
-//        width = size.x;
-//        height = size.y;
-
+        this.meshManager = meshManager;
     }
 
-    public PubSubARRenderer(Context context, IPublisher publisher) {
-        this(context);
+    public PubSubARRenderer(Context context, IPublisher publisher, MeshManager meshManager) {
+        this(context, meshManager);
         setPublisher(publisher);
     }
 
-    public PubSubARRenderer(Context context, BaseSubscriber subscriber) {
-        this(context);
+    public PubSubARRenderer(Context context, BaseSubscriber subscriber, MeshManager meshManager) {
+        this(context, meshManager);
         setHandler(subscriber);
     }
 
-    public PubSubARRenderer(Context context, IPublisher publisher, BaseSubscriber subscriber) {
-        this(context);
+    public PubSubARRenderer(Context context, IPublisher publisher, BaseSubscriber subscriber, MeshManager meshManager) {
+        this(context, meshManager);
         setPublisher(publisher);
         setHandler(subscriber);
+    }
+
+    public MeshManager getMeshManager() {
+        return meshManager;
+    }
+
+    public void setMeshManager(MeshManager meshManager) {
+        this.meshManager = meshManager;
     }
 
     public static int gluUnProject(float winx, float winy, float winz,
@@ -84,39 +93,31 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
 
    /* Normalize between -1 and 1 */
         _tempGluUnProjectData[_temp_in] = (winx - viewport[offsetV]) *
-            2f / viewport[offsetV + 2] - 1.0f;
+                2f / viewport[offsetV + 2] - 1.0f;
         _tempGluUnProjectData[_temp_in + 1] = (winy - viewport[offsetV + 1]) *
-            2f / viewport[offsetV + 3] - 1.0f;
+                2f / viewport[offsetV + 3] - 1.0f;
         _tempGluUnProjectData[_temp_in + 2] = 2f * winz - 1.0f;
         _tempGluUnProjectData[_temp_in + 3] = 1.0f;
 
    /* Get the inverse */
         android.opengl.Matrix.multiplyMM(_tempGluUnProjectData, _temp_A,
-            proj, offsetP, model, offsetM);
+                proj, offsetP, model, offsetM);
         android.opengl.Matrix.invertM(_tempGluUnProjectData, _temp_m,
-            _tempGluUnProjectData, _temp_A);
+                _tempGluUnProjectData, _temp_A);
 
         android.opengl.Matrix.multiplyMV(_tempGluUnProjectData, _temp_out,
-            _tempGluUnProjectData, _temp_m,
-            _tempGluUnProjectData, _temp_in);
+                _tempGluUnProjectData, _temp_m,
+                _tempGluUnProjectData, _temp_in);
         if (_tempGluUnProjectData[_temp_out + 3] == 0.0)
             return GL10.GL_FALSE;
 
         xyz[offset] = _tempGluUnProjectData[_temp_out] /
-            _tempGluUnProjectData[_temp_out + 3];
+                _tempGluUnProjectData[_temp_out + 3];
         xyz[offset + 1] = _tempGluUnProjectData[_temp_out + 1] /
-            _tempGluUnProjectData[_temp_out + 3];
+                _tempGluUnProjectData[_temp_out + 3];
         xyz[offset + 2] = _tempGluUnProjectData[_temp_out + 2] /
-            _tempGluUnProjectData[_temp_out + 3];
+                _tempGluUnProjectData[_temp_out + 3];
         return GL10.GL_TRUE;
-    }
-
-    public HashMap<String, Mesh> getMeshes() {
-        return meshes;
-    }
-
-    public void setMeshes(HashMap<String, Mesh> meshes) {
-        this.meshes = meshes;
     }
 
     protected void setPublisher(IPublisher publisher) {
@@ -138,29 +139,25 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
                         if (msgType.equals("newObj")) {
                             mesh = MeshFactory.createMesh(json);
                             addMesh(mesh);
-                        }
-                        else {
+                        } else {
 
-                            mesh = meshes.get(meshId);
+                            mesh = meshManager.getMeshByID(meshId);
                         }
                         if (mesh != null) {
                             mesh.setCoordinates(
-                                Float.valueOf(json.get("x").toString()),
-                                Float.valueOf(json.get("y").toString()),
-                                Float.valueOf(json.get("z").toString()),
-                                Float.valueOf(json.get("rx").toString()),
-                                Float.valueOf(json.get("ry").toString()),
-                                Float.valueOf(json.get("rz").toString())
+                                    Float.valueOf(json.get("x").toString()),
+                                    Float.valueOf(json.get("y").toString()),
+                                    Float.valueOf(json.get("z").toString()),
+                                    Float.valueOf(json.get("rx").toString()),
+                                    Float.valueOf(json.get("ry").toString()),
+                                    Float.valueOf(json.get("rz").toString())
                             );
-                        }
-                        else {
+                        } else {
                             Log.e(TAG, "mesh with id " + meshId + " not found!");
                         }
-                    }
-                    catch (JSONException e) {
+                    } catch (JSONException e) {
                         e.printStackTrace();
-                    }
-                    catch (MeshFactory.MeshCreationFail meshCreationFail) {
+                    } catch (MeshFactory.MeshCreationFail meshCreationFail) {
                         meshCreationFail.printStackTrace();
                     }
                 }
@@ -171,51 +168,58 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
 
     @Override
     public boolean configureARScene() {
-
-        markerID = ARToolKit.getInstance().addMarker("single;Data/hiro.patt;80");
-        return (markerID >= 0);
+        return meshManager.configureScene();
     }
 
     /**
      * Should be overridden in subclasses and used to perform rendering.
      */
     public void draw(GL10 gl) {
-
+        updateViewport(gl);
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
-////
-////                 Apply the ARToolKit projection matrix
 
 
-        // If the marker is visible, apply its transformation, and draw a pyramid
-        if (ARToolKit.getInstance().queryMarkerVisible(markerID)) {
-            gl.glMatrixMode(GL10.GL_PROJECTION);
-            float[] projectMatrix = ARToolKit.getInstance().getProjectionMatrix();
-            gl.glLoadMatrixf(projectMatrix, 0);
 
-            gl.glMatrixMode(GL10.GL_MODELVIEW);
-            gl.glLoadMatrixf(ARToolKit.getInstance().queryMarkerTransformation(markerID), 0);
+//        Log.d(TAG,"draw mesh size" + meshManager.getMeshes().size());
+//        float [] identity = new float[16];
+//        Matrix.setIdentityM(identity, 0);
+//        gl.glLoadMatrixf(identity, 0);
+//
+//        gl.glMatrixMode(GL10.GL_MODELVIEW);
+//        gl.glLoadMatrixf(identity, 0);
+//        Plane p = new Plane(0.1f, 0.1f);
+//        p.draw(gl);
+//        gl.glMatrixMode(GL10.GL_PROJECTION);
 
 
-            synchronized (meshes) {
-                for (Iterator iterator = meshes.entrySet().iterator(); iterator.hasNext(); ) {
-                    Map.Entry pair = (Map.Entry) iterator.next();
-//                    Mesh mesh = iterator.next();
-                    Mesh mesh = (Mesh) pair.getValue();
+
+        float [] identityM = new float[16];
+        Matrix.setIdentityM(identityM, 0);
+
+        for(Map.Entry<float [], List<Mesh>> entry: meshManager.getVisibleMeshes().entrySet()){
+
+            synchronized (meshManager) {
+                for (Mesh mesh : entry.getValue()) {
+
+                    gl.glMatrixMode(GL10.GL_PROJECTION);
+                    if (mesh.getMarker() != null){
+                        gl.glLoadMatrixf(ARToolKit.getInstance().getProjectionMatrix(), 0);
+                    }
+                    else{
+                        gl.glLoadMatrixf(identityM, 0);
+                    }
+
+                    gl.glMatrixMode(GL10.GL_MODELVIEW);
+                    gl.glLoadMatrixf(entry.getKey(), 0);
                     gl.glPushMatrix();
                     mesh.draw(gl);
                     gl.glPopMatrix();
                 }
             }
         }
+
     }
 
-    public float getAngle() {
-        return angle;
-    }
-
-    public void setAngle(float angle) {
-        this.angle = angle;
-    }
 
     @Override
     public boolean handleMessage(Message message) {
@@ -223,13 +227,9 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     }
 
     public void addMesh(Mesh mesh) {
-        synchronized (meshes) {
-            meshes.put(mesh.getId(), mesh);
+        synchronized (meshManager) {
+            meshManager.addMesh(mesh);
         }
-    }
-
-    public Mesh getMesh(String id) {
-        return meshes.get(id);
     }
 
     public void addMesh(Mesh mesh, float winX, float winY) {
@@ -280,25 +280,60 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
 //        mesh.setZ(0);
 
         Log.d(TAG, "adding mesh in x " + x + " y " + y + " z " + z);
-        synchronized (meshes) {
-            addMesh(mesh);
-        }
-
+        addMesh(mesh);
     }
 
-    public Mesh removeMesh(Mesh mesh) {
-        return meshes.remove(mesh.getId());
-    }
+//    public Mesh removeMesh(Mesh mesh) {
+//        return meshes.remove(mesh.getId());
+//    }
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         this.width = width;
         this.height = height;
+        newViewport = true;
+        updateViewport(gl);
     }
 
-//    public void onDrawFrame(GL10 gl){
-//        draw(gl);
-//    }
+    private void updateViewport(GL10 gl){
+        if (newViewport && width != 0 && height != 0) {
+            int heightVideo = (int) (width/viewportAspectRatio);
+            if(viewportAspectRatio > 0) {
+                gl.glViewport(0, (height - heightVideo)/2, width, heightVideo);
+            }
+            else {
+                gl.glViewport(0, 0, width, height);
+            }
+            newViewport = false;
+        }
+    }
 
+
+
+    @Override
+    public void onDrawFrame(GL10 gl) {
+        if (isEnabled()){
+            this.draw(gl);
+        }
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public float getViewportAspectRatio() {
+        return viewportAspectRatio;
+    }
+
+    public void setViewportAspectRatio(float viewportAspectRatio) {
+        Log.d(TAG, "setViewportAspectRatio with " + viewportAspectRatio);
+        this.viewportAspectRatio = viewportAspectRatio;
+        newViewport = true;
+
+    }
 
 }

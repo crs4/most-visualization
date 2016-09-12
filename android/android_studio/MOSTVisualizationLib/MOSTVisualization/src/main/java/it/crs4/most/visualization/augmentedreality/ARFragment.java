@@ -52,6 +52,8 @@ public class ARFragment extends StreamViewerFragment implements
     private TouchGLSurfaceView glView;
     private boolean playerButtonsVisible = true;
     private OnCompleteListener mListener;
+    private int [] fixedSize;
+    private boolean enabled = true;
     private LinearLayout controlButtonLayout;
 
     public static ARFragment newInstance(String streamId) {
@@ -102,6 +104,7 @@ public class ARFragment extends StreamViewerFragment implements
 
     public void setRenderer(PubSubARRenderer renderer) {
         this.renderer = renderer;
+        renderer.setEnabled(isEnabled());
     }
 
     public TouchGLSurfaceView getGlView() {
@@ -143,18 +146,24 @@ public class ARFragment extends StreamViewerFragment implements
         View rootView = inflater.inflate(R.layout.fragment_ar, container, false);
 
         surfaceView = (SurfaceView) rootView.findViewById(R.id.remoteCameraPreview);
-        surfaceView.getHolder().setFixedSize(704, 576); //FIXME should be dynamically set
 
         if (surfaceViewCallback != null) {
             surfaceView.getHolder().addCallback(surfaceViewCallback);
         }
 
         glView = (TouchGLSurfaceView) rootView.findViewById(R.id.ARSurface);
-        glView.getHolder().setFixedSize(704, 576); //FIXME should be dynamically set
         glView.setEGLContextClientVersion(1);
         glView.setEGLConfigChooser(8, 8, 8, 8, 16, 0);
         glView.getHolder().setFormat(-3);
         glView.setRenderer(renderer);
+        glView.setEnabled(isEnabled());
+
+        if (fixedSize != null){
+            surfaceView.getHolder().setFixedSize(fixedSize[0], fixedSize[1]);
+            glView.getHolder().setFixedSize(fixedSize[0], fixedSize[1]);
+
+
+        }
 
         if (glSurfaceViewCallback != null) {
             glView.getHolder().addCallback(glSurfaceViewCallback);
@@ -313,6 +322,10 @@ public class ARFragment extends StreamViewerFragment implements
 
     @Override
     public void cameraPreviewFrame(byte[] frame) {
+        if (!isEnabled()) {
+            return;
+        }
+
         if (this.firstUpdate) {
             if (this.renderer.configureARScene()) {
                 Log.i(TAG, "cameraPreviewFrame(): Scene configured successfully");
@@ -343,4 +356,29 @@ public class ARFragment extends StreamViewerFragment implements
         public abstract void onFragmentResume();
 
     }
+
+    public int[] getFixedSize() {
+        return fixedSize;
+    }
+
+    public void setFixedSize(int[] fixedSize) {
+        this.fixedSize = fixedSize;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+        if (glView != null){ glView.setEnabled(enabled); }
+        if(renderer != null){
+            renderer.setEnabled(enabled);
+            if(enabled) {
+                glView.requestRender();
+            }
+        }
+    }
+
+
 }

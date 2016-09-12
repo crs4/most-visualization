@@ -36,6 +36,17 @@ public abstract class Mesh {
     // Smooth Colors
     private FloatBuffer colorBuffer = null;
     private String TAG = "MESH";
+    private String marker;
+    private CoordsConverter coordsConverter;
+    private float [] xLimits;
+    private float [] yLimits;
+    private float [] zLimits;
+
+    public float[] getVertices() {
+        return vertices;
+    }
+
+    protected float [] vertices;
 
     public Mesh() {
         setId(null);
@@ -50,6 +61,14 @@ public abstract class Mesh {
         return id;
     }
 
+    public String getMarker() {
+        return marker;
+    }
+
+    public void setMarker(String marker) {
+        this.marker = marker;
+    }
+
     protected void setId(String id) {
         this.id = id != null ? id : UUID.randomUUID().toString();
     }
@@ -62,20 +81,29 @@ public abstract class Mesh {
         setX(x, true);
     }
 
-    protected JSONObject getBaseJsonObj() throws JSONException {
-        JSONObject obj = new JSONObject();
 
+    protected JSONObject getBaseJsonObj() throws JSONException {
+        float [] coords;
+        CoordsConverter converter;
+        if (coordsConverter == null){
+            coords = new float [] {x, y, z};
+        }
+        else{
+            coords = coordsConverter.convert(x, y, z);
+        }
+
+        JSONObject obj = new JSONObject();
         obj.put("id", id);
-        obj.put("x", x);
-        obj.put("y", y);
-        obj.put("z", z);
+        obj.put("x", coords[0]);
+        obj.put("y", coords[1]);
+        obj.put("z", coords[2]);
         obj.put("rx", rx);
         obj.put("ry", ry);
         obj.put("rz", rz);
         return obj;
     }
 
-    protected void publishCoordinate() {
+    public void publishCoordinate() {
         if (publisher != null) {
             try {
                 JSONObject base = getBaseJsonObj();
@@ -88,8 +116,18 @@ public abstract class Mesh {
         }
     }
 
+    private float getCoord(float coord, float [] coordLimits){
+        if (coordLimits == null || (coord >= coordLimits[0] && coord <= coordLimits[1])){
+            return coord;
+        }
+        if (coord < coordLimits[0]){
+            return coordLimits[0];
+        }
+        return coordLimits[1];
+    }
+
     public void setX(float x, boolean publish) {
-        this.x = x;
+        this.x = getCoord(x, xLimits);
         if (publish)
             publishCoordinate();
     }
@@ -104,7 +142,7 @@ public abstract class Mesh {
     }
 
     public void setY(float y, boolean publish) {
-        this.y = y;
+        this.y = getCoord(y, yLimits);
         if (publish)
             publishCoordinate();
     }
@@ -118,7 +156,7 @@ public abstract class Mesh {
     }
 
     public void setZ(float z, boolean publish) {
-        this.z = z;
+        this.z = getCoord(z, zLimits);
         if (publish)
             publishCoordinate();
     }
@@ -166,9 +204,9 @@ public abstract class Mesh {
     }
 
     public void setCoordinates(float x, float y, float z, float rx, float ry, float rz, boolean publish) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        setX(x, false);
+        setY(y, false);
+        setZ(z, false);
         this.rx = rx;
         this.ry = ry;
         this.rz = rz;
@@ -278,4 +316,47 @@ public abstract class Mesh {
             }
         }
     }
+
+    public CoordsConverter getCoordsConverter() {
+        return coordsConverter;
+    }
+
+    public void setCoordsConverter(CoordsConverter coordsConverter) {
+        this.coordsConverter = coordsConverter;
+    }
+
+
+    public float[] getzLimits() {
+        return zLimits;
+    }
+
+    public void setzLimits(float lowerLimit, float upperLimit) {
+        this.zLimits = new float []{lowerLimit, upperLimit};
+    }
+
+    public float[] getyLimits() {
+        return yLimits;
+    }
+
+    public void setyLimits(float lowerLimit, float upperLimit) {
+        this.yLimits = new float []{lowerLimit, upperLimit};
+    }
+
+    public float[] getxLimits() {
+        return xLimits;
+    }
+
+    public void setxLimits(float lowerLimit, float upperLimit) {
+        this.xLimits = new float []{lowerLimit, upperLimit};
+    }
+
+    public void scale(float xFactor, float yFactor, float zFactor){
+        float [] factors = new float[] {xFactor, yFactor, zFactor};
+        for (int i=0; i < vertices.length; i++){
+            vertices[i] *= factors[i%3];
+        }
+
+        setVertices(vertices);
+    }
+
 }

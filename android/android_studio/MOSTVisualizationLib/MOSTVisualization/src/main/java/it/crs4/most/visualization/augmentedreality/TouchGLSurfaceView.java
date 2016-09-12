@@ -8,26 +8,29 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 
 import java.util.HashMap;
+import java.util.List;
 
 import it.crs4.most.visualization.augmentedreality.mesh.Group;
 import it.crs4.most.visualization.augmentedreality.mesh.Mesh;
+import it.crs4.most.visualization.augmentedreality.mesh.MeshManager;
 
 public class TouchGLSurfaceView extends GLSurfaceView {
     protected final float TOUCH_SCALE_FACTOR = 180.0f / 320;
     protected float mPreviousX;
     protected float mPreviousY;
     protected Renderer renderer;
-    protected HashMap<String, Mesh> meshes;
     private String TAG = "TouchGLSurfaceView";
     private Group meshGroup;
-
-    ;
     private boolean mDrawing = false;
     private boolean mMoving = false;
     private boolean enabled = true;
     private Mode mode = Mode.Move;
     private ScaleGestureDetector mScaleDetector;
     private boolean mScaling = false;
+    private MeshManager meshManager;
+    private Mesh mesh;
+    private float moveNormFactor = 1;
+    private int touchSamplingCounter = 0;
 
     public TouchGLSurfaceView(Context context) {
         super(context);
@@ -39,12 +42,12 @@ public class TouchGLSurfaceView extends GLSurfaceView {
         initScaleDetector(context);
     }
 
-    public HashMap<String, Mesh> getMeshes() {
-        return meshes;
+    public MeshManager getMeshManager() {
+        return meshManager;
     }
 
-    public void setMeshes(HashMap<String, Mesh> meshes) {
-        this.meshes = meshes;
+    public void setMeshManager(MeshManager meshManager) {
+        this.meshManager = meshManager;
     }
 
     public Mode getMode() {
@@ -60,11 +63,19 @@ public class TouchGLSurfaceView extends GLSurfaceView {
     }
 
     public void setRenderer(Renderer renderer) {
-        Log.d(TAG, "inside setRenderer ");
         this.renderer = renderer;
-        super.setRenderer((Renderer) renderer);
-//        setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+        super.setRenderer(renderer);
+        setRenderMode(RENDERMODE_WHEN_DIRTY);
     }
+
+    public float getMoveNormFactor() {
+        return moveNormFactor;
+    }
+
+    public void setMoveNormFactor(float moveNormFactor) {
+        this.moveNormFactor = moveNormFactor;
+    }
+
 
     @Override
     public boolean isEnabled() {
@@ -87,19 +98,22 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                     TouchGLSurfaceView.this.mScaling = true;
                     float currentScaleFactor = detector.getScaleFactor();
                     Log.d(TAG, "currentScaleFactor " + currentScaleFactor);
-                    Mesh mesh = meshes.get("arrow");
-                    if (currentScaleFactor < 1) {
-                        mesh.setZ(mesh.getZ() - 5f);
-                    }
-                    else {
-                        mesh.setZ(mesh.getZ() + 5f);
-                    }
 
-                    return true;
+                    if (mesh != null){
+                        if (currentScaleFactor < 1) {
+                            mesh.setZ(mesh.getZ() - 5f);
+                        }
+                        else {
+                            mesh.setZ(mesh.getZ() + 5f);
+                        }
+
+                        requestRender();
+                        return true;
+                    }
+                    return false;
                 }
 
             });
-
     }
 
     @Override
@@ -111,16 +125,19 @@ public class TouchGLSurfaceView extends GLSurfaceView {
         // and other input controls. In this case, you are only
         // interested in events where the touch position changed.
 
+        float x = e.getX();
+        float y = e.getY();
+        mesh = meshManager.getSelectedMesh(x, y);
+        if (mesh == null){
+            return false;
+        }
+
         if (mode == Mode.Move && e.getPointerCount() > 1) {
             mScaleDetector.onTouchEvent(e);
             mMoving = false;
 //            mScaling = true;
         }
         else {
-
-            float x = e.getX();
-            float y = e.getY();
-
             if (mScaling) {
                 mScaling = false;
                 mPreviousX = x;
@@ -128,10 +145,8 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                 return true;
 
             }
-
-            float dx = x - mPreviousX;
-            float dy = y - mPreviousY;
-            Mesh mesh = meshes.get("arrow");
+            float dx = (x - mPreviousX)/moveNormFactor;
+            float dy = (y - mPreviousY)/moveNormFactor;
             switch (e.getAction()) {
                 case MotionEvent.ACTION_MOVE:
                     Log.d(TAG, "ACTION_MOVE");
@@ -151,9 +166,20 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                             mesh.setRy(mesh.getRy() + (dx + dy) * TOUCH_SCALE_FACTOR);
                             break;
                         case Move:
+                            touchSamplingCounter += 1;
                             Log.d(TAG, "Move");
-                            mesh.setX(mesh.getX() + dx);
-                            mesh.setY(mesh.getY() - dy);
+                            float finalDx = mesh.getX() + dx;
+                            float finalDy = mesh.getY() - dy;
+
+//                            mesh.setX(finalDx < 1? (finalDx > -1? finalDx: -1): 1);
+//                            mesh.setY(finalDy < 1? (finalDy > -1? finalDy: -1): 1);
+                            mesh.setX(finalDx, false);
+                            mesh.setY(finalDy, false);
+                            requestRender();
+                            if (touchSamplingCounter % 3 == 0) {
+                                mesh.publishCoordinate();
+                            }
+
                             break;
 
 //                        case Edit:
@@ -168,6 +194,9 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                     }
                     else
                         mMoving = false;
+
+                    touchSamplingCounter = 0;
+                    mesh.publishCoordinate();
                     break;
 
                 case MotionEvent.ACTION_DOWN:

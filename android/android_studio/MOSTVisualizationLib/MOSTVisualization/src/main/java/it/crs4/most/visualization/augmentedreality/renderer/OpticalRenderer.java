@@ -4,13 +4,16 @@ import android.content.Context;
 
 import org.artoolkit.ar.base.ARToolKit;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.microedition.khronos.opengles.GL10;
 
 import it.crs4.most.visualization.augmentedreality.OpticalARToolkit;
 import it.crs4.most.visualization.augmentedreality.mesh.Mesh;
+import it.crs4.most.visualization.augmentedreality.mesh.MeshManager;
 import it.crs4.most.visualization.utils.zmq.BaseSubscriber;
 import it.crs4.most.visualization.utils.zmq.IPublisher;
 
@@ -19,31 +22,41 @@ public class OpticalRenderer extends PubSubARRenderer {
     private String TAG = "OpticalRenderer";
 
 
-    public OpticalRenderer(Context context, OpticalARToolkit opticalARToolkit) {
-        super(context);
-        mOpticalARToolkit = opticalARToolkit;
-    }
-
-    public OpticalRenderer(Context context, IPublisher publisher, OpticalARToolkit opticalARToolkit) {
-        super(context, publisher);
+    public OpticalRenderer(
+            Context context,
+            OpticalARToolkit opticalARToolkit,
+            MeshManager meshManager) {
+        super(context, meshManager);
         mOpticalARToolkit = opticalARToolkit;
     }
 
     public OpticalRenderer(
-        Context context,
-        BaseSubscriber subscriber,
-        OpticalARToolkit opticalARToolkit) {
-        super(context, subscriber);
+            Context context,
+            IPublisher publisher,
+            OpticalARToolkit opticalARToolkit,
+            MeshManager meshManager) {
+        super(context, publisher, meshManager);
         mOpticalARToolkit = opticalARToolkit;
     }
 
     public OpticalRenderer(
-        Context context,
-        IPublisher publisher,
-        BaseSubscriber subscriber,
-        OpticalARToolkit opticalARToolkit) {
+            Context context,
+            BaseSubscriber subscriber,
+            OpticalARToolkit opticalARToolkit,
+            MeshManager meshManager) {
 
-        super(context, publisher, subscriber);
+        super(context, subscriber, meshManager);
+        mOpticalARToolkit = opticalARToolkit;
+    }
+
+    public OpticalRenderer(
+            Context context,
+            IPublisher publisher,
+            BaseSubscriber subscriber,
+            OpticalARToolkit opticalARToolkit,
+            MeshManager meshManager) {
+
+        super(context, publisher, subscriber, meshManager);
         mOpticalARToolkit = opticalARToolkit;
     }
 
@@ -80,26 +93,18 @@ public class OpticalRenderer extends PubSubARRenderer {
     }
 
     protected void basicDraw(GL10 gl) {
+        for(Map.Entry<float [], List<Mesh>> entry: meshManager.getVisibleMeshes().entrySet()){
+            gl.glPushMatrix();
+            gl.glMultMatrixf(entry.getKey(), 0);
 
-
-        if (ARToolKit.getInstance().queryMarkerVisible(markerID)) {
-            float[] trans = ARToolKit.getInstance().queryMarkerTransformation(markerID);
-            gl.glMultMatrixf(trans, 0);
-//            gl.glLoadMatrixf(trans, 0);
-
-            synchronized (meshes) {
-                for (Iterator iterator = meshes.entrySet().iterator(); iterator.hasNext(); ) {
-                    Map.Entry pair = (Map.Entry) iterator.next();
-//                    Mesh mesh = iterator.next();
-                    Mesh mesh = (Mesh) pair.getValue();
+            synchronized (meshManager) {
+                for (Mesh mesh : entry.getValue()) {
                     gl.glPushMatrix();
                     mesh.draw(gl);
                     gl.glPopMatrix();
                 }
             }
+            gl.glPopMatrix();
         }
-
     }
-
-
 }

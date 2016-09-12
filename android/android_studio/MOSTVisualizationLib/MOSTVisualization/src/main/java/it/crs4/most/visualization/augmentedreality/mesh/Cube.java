@@ -1,16 +1,17 @@
 package it.crs4.most.visualization.augmentedreality.mesh;
 
 public class Cube extends Mesh {
-    public float width;
-    public float height;
-    public float depth;
+
+    private float width;
+    private float height;
+    private float depth;
 
     public Cube(float width, float height, float depth) {
         this.width = width / 2;
         this.height = height / 2;
         this.depth = depth / 2;
 
-        float vertices[] = {-this.width, -this.height, -this.depth, // 0
+        vertices = new float []{-this.width, -this.height, -this.depth, // 0
             this.width, -this.height, -this.depth, // 1
             this.width, this.height, -this.depth, // 2
             -this.width, this.height, -this.depth, // 3
@@ -37,15 +38,28 @@ public class Cube extends Mesh {
         setVertices(vertices);
         setColor(1f, 1f, 1f, 1f);
         float colors[] = {
-            0, 0, 0, 0.5f,
-            1, 0, 0, 0.5f,
-            0, 1, 0, 0.5f,
-            0, 0, 1, 0.5f,
-            0, 0, 0, 0.5f,
-            1, 0, 0, 0.5f,
-            0, 1, 0, 0.5f,
-            0, 0, 1, 0.5f
+            0, 0, 0, 1f,
+            1, 0, 0, 1f,
+            0, 1, 0, 1f,
+            0, 0, 1, 1f,
+            0, 0, 0, 1f,
+            1, 0, 0, 1f,
+            0, 1, 0, 1f,
+            0, 0, 1, 1f
         };
         setColors(colors);
     }
+
+    public float getWidth() {
+        return width;
+    }
+
+    public float getHeight() {
+        return height;
+    }
+
+    public float getDepth() {
+        return depth;
+    }
+
 }
