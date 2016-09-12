@@ -39,14 +39,14 @@ public class Pyramid extends Mesh {
         setVertices(vertices);
         setColor(1f, 1f, 1f, 1f);
         float colors[] = {
-            0, 0, 0, 0.5f,
-            1, 0, 0, 0.5f,
-            0, 1, 0, 0.5f,
-            0, 0, 1, 0.5f,
-            0, 0, 0, 0.5f,
-            1, 0, 0, 0.5f,
-            0, 1, 0, 0.5f,
-            0, 0, 1, 0.5f
+            0, 0, 0, 1f,
+            1, 0, 0, 1f,
+            0, 1, 0, 1f,
+            0, 0, 1, 1f,
+            0, 0, 0, 1f,
+            1, 0, 0, 1f,
+            0, 1, 0, 1f,
+            0, 0, 1, 1f
         };
         setColors(colors);
     }
