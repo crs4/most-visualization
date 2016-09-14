@@ -30,36 +30,6 @@ public class OpticalRenderer extends PubSubARRenderer {
         mOpticalARToolkit = opticalARToolkit;
     }
 
-    public OpticalRenderer(
-            Context context,
-            IPublisher publisher,
-            OpticalARToolkit opticalARToolkit,
-            MeshManager meshManager) {
-        super(context, publisher, meshManager);
-        mOpticalARToolkit = opticalARToolkit;
-    }
-
-    public OpticalRenderer(
-            Context context,
-            BaseSubscriber subscriber,
-            OpticalARToolkit opticalARToolkit,
-            MeshManager meshManager) {
-
-        super(context, subscriber, meshManager);
-        mOpticalARToolkit = opticalARToolkit;
-    }
-
-    public OpticalRenderer(
-            Context context,
-            IPublisher publisher,
-            BaseSubscriber subscriber,
-            OpticalARToolkit opticalARToolkit,
-            MeshManager meshManager) {
-
-        super(context, publisher, subscriber, meshManager);
-        mOpticalARToolkit = opticalARToolkit;
-    }
-
     public void draw(GL10 gl) {
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
         drawLeft(gl);

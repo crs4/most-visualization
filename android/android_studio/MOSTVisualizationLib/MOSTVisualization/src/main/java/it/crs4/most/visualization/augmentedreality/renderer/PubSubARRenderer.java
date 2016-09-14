@@ -25,7 +25,7 @@ import it.crs4.most.visualization.augmentedreality.mesh.Mesh;
 import it.crs4.most.visualization.augmentedreality.mesh.MeshFactory;
 import it.crs4.most.visualization.augmentedreality.mesh.MeshManager;
 import it.crs4.most.visualization.utils.zmq.BaseSubscriber;
-import it.crs4.most.visualization.utils.zmq.IPublisher;
+
 
 //import org.artoolkit.ar.base.rendering.Cube;
 
@@ -36,7 +36,6 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     private static final int _temp_A = 16;
     private static final int _temp_in = 32;
     private static final int _temp_out = 36;
-    public IPublisher publisher;
     protected volatile float angle = 0;
     protected float previousAngle = 0;
     protected Handler handler;
@@ -56,22 +55,6 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
         Point size = new Point();
         display.getSize(size);
         this.meshManager = meshManager;
-    }
-
-    public PubSubARRenderer(Context context, IPublisher publisher, MeshManager meshManager) {
-        this(context, meshManager);
-        setPublisher(publisher);
-    }
-
-    public PubSubARRenderer(Context context, BaseSubscriber subscriber, MeshManager meshManager) {
-        this(context, meshManager);
-        setHandler(subscriber);
-    }
-
-    public PubSubARRenderer(Context context, IPublisher publisher, BaseSubscriber subscriber, MeshManager meshManager) {
-        this(context, meshManager);
-        setPublisher(publisher);
-        setHandler(subscriber);
     }
 
     public MeshManager getMeshManager() {
@@ -120,52 +103,6 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
         return GL10.GL_TRUE;
     }
 
-    protected void setPublisher(IPublisher publisher) {
-        this.publisher = publisher;
-    }
-
-    protected void setHandler(BaseSubscriber subscriber) {
-        this.subscriber = subscriber;
-        if (subscriber != null) {
-            handler = new Handler(Looper.getMainLooper()) {
-                @Override
-                public void handleMessage(Message inputMessage) {
-                    JSONObject json = (JSONObject) inputMessage.obj;
-
-                    try {
-                        String meshId = json.getString("id");
-                        String msgType = (String) json.get("msgType");
-                        Mesh mesh;
-                        if (msgType.equals("newObj")) {
-                            mesh = MeshFactory.createMesh(json);
-                            addMesh(mesh);
-                        } else {
-
-                            mesh = meshManager.getMeshByID(meshId);
-                        }
-                        if (mesh != null) {
-                            mesh.setCoordinates(
-                                    Float.valueOf(json.get("x").toString()),
-                                    Float.valueOf(json.get("y").toString()),
-                                    Float.valueOf(json.get("z").toString()),
-                                    Float.valueOf(json.get("rx").toString()),
-                                    Float.valueOf(json.get("ry").toString()),
-                                    Float.valueOf(json.get("rz").toString())
-                            );
-                        } else {
-                            Log.e(TAG, "mesh with id " + meshId + " not found!");
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    } catch (MeshFactory.MeshCreationFail meshCreationFail) {
-                        meshCreationFail.printStackTrace();
-                    }
-                }
-            };
-            subscriber.handler = handler;
-        }
-    }
-
     @Override
     public boolean configureARScene() {
         return meshManager.configureScene();
@@ -177,43 +114,29 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     public void draw(GL10 gl) {
         updateViewport(gl);
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
+        if (isEnabled()){
+            float [] identityM = new float[16];
+            Matrix.setIdentityM(identityM, 0);
 
+            for(Map.Entry<float [], List<Mesh>> entry: meshManager.getVisibleMeshes().entrySet()){
 
+                synchronized (meshManager) {
+                    for (Mesh mesh : entry.getValue()) {
 
-//        Log.d(TAG,"draw mesh size" + meshManager.getMeshes().size());
-//        float [] identity = new float[16];
-//        Matrix.setIdentityM(identity, 0);
-//        gl.glLoadMatrixf(identity, 0);
-//
-//        gl.glMatrixMode(GL10.GL_MODELVIEW);
-//        gl.glLoadMatrixf(identity, 0);
-//        Plane p = new Plane(0.1f, 0.1f);
-//        p.draw(gl);
-//        gl.glMatrixMode(GL10.GL_PROJECTION);
+                        gl.glMatrixMode(GL10.GL_PROJECTION);
+                        if (mesh.getMarker() != null){
+                            gl.glLoadMatrixf(ARToolKit.getInstance().getProjectionMatrix(), 0);
+                        }
+                        else{
+                            gl.glLoadMatrixf(identityM, 0);
+                        }
 
-
-
-        float [] identityM = new float[16];
-        Matrix.setIdentityM(identityM, 0);
-
-        for(Map.Entry<float [], List<Mesh>> entry: meshManager.getVisibleMeshes().entrySet()){
-
-            synchronized (meshManager) {
-                for (Mesh mesh : entry.getValue()) {
-
-                    gl.glMatrixMode(GL10.GL_PROJECTION);
-                    if (mesh.getMarker() != null){
-                        gl.glLoadMatrixf(ARToolKit.getInstance().getProjectionMatrix(), 0);
+                        gl.glMatrixMode(GL10.GL_MODELVIEW);
+                        gl.glLoadMatrixf(entry.getKey(), 0);
+                        gl.glPushMatrix();
+                        mesh.draw(gl);
+                        gl.glPopMatrix();
                     }
-                    else{
-                        gl.glLoadMatrixf(identityM, 0);
-                    }
-
-                    gl.glMatrixMode(GL10.GL_MODELVIEW);
-                    gl.glLoadMatrixf(entry.getKey(), 0);
-                    gl.glPushMatrix();
-                    mesh.draw(gl);
-                    gl.glPopMatrix();
                 }
             }
         }
@@ -312,9 +235,7 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
 
     @Override
     public void onDrawFrame(GL10 gl) {
-        if (isEnabled()){
-            this.draw(gl);
-        }
+        this.draw(gl);
     }
 
     public boolean isEnabled() {

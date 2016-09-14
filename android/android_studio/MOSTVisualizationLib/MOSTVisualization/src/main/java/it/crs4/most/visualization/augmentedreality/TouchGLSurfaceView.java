@@ -2,17 +2,27 @@ package it.crs4.most.visualization.augmentedreality;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.List;
 
 import it.crs4.most.visualization.augmentedreality.mesh.Group;
 import it.crs4.most.visualization.augmentedreality.mesh.Mesh;
+import it.crs4.most.visualization.augmentedreality.mesh.MeshFactory;
 import it.crs4.most.visualization.augmentedreality.mesh.MeshManager;
+import it.crs4.most.visualization.augmentedreality.renderer.PubSubARRenderer;
+import it.crs4.most.visualization.utils.zmq.BaseSubscriber;
+import it.crs4.most.visualization.utils.zmq.IPublisher;
 
 public class TouchGLSurfaceView extends GLSurfaceView {
     protected final float TOUCH_SCALE_FACTOR = 180.0f / 320;
@@ -31,6 +41,10 @@ public class TouchGLSurfaceView extends GLSurfaceView {
     private Mesh mesh;
     private float moveNormFactor = 1;
     private int touchSamplingCounter = 0;
+    private BaseSubscriber subscriber;
+    private IPublisher publisher;
+    private Handler handler;
+
 
     public TouchGLSurfaceView(Context context) {
         super(context);
@@ -85,6 +99,18 @@ public class TouchGLSurfaceView extends GLSurfaceView {
     @Override
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+        requestRender();
+        if (publisher != null) {
+            JSONObject obj = new JSONObject();
+
+            try {
+                obj.put("msgType", "visibility");
+                obj.put("value", enabled);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            publisher.send(obj.toString());
+        }
     }
 
     private void initScaleDetector(Context context) {
@@ -222,11 +248,63 @@ public class TouchGLSurfaceView extends GLSurfaceView {
 
     public enum Mode {Rotate, Edit, Move}
 
-//    private void draw(float x, float y){
-//        Plane plane = new Plane(30, 30);
-//        plane.publisher = renderer.publisher;
-//        renderer.addMesh(plane, x, y);
-//        plane.publish();
-//
-//    }
+    public BaseSubscriber getSubscriber() {
+        return subscriber;
+    }
+
+    public void setSubscriber(BaseSubscriber subscriber) {
+        this.subscriber = subscriber;
+        if (subscriber != null) {
+            handler = new Handler(Looper.getMainLooper()) {
+                @Override
+                public void handleMessage(Message inputMessage) {
+                    JSONObject json = (JSONObject) inputMessage.obj;
+                    Mesh mesh = null;
+                    try {
+                        String msgType = (String) json.get("msgType");
+                        switch (msgType){
+                            case "visibility":
+                                boolean enabled = json.getBoolean("value");
+                                setEnabled(enabled);
+                                if(renderer != null){
+                                    ((PubSubARRenderer) renderer).setEnabled(enabled);
+                                    requestRender();
+                                }
+
+                                break;
+
+//                            case "newObj":
+//                                mesh = MeshFactory.createMesh(json);
+//                                addMesh(mesh);
+//                                break;
+                            case "coord":
+                                String meshId = json.getString("id");
+                                mesh = meshManager.getMeshByID(meshId);
+                        }
+                        if (mesh != null) {
+                            mesh.setCoordinates(
+                                    Float.valueOf(json.get("x").toString()),
+                                    Float.valueOf(json.get("y").toString()),
+                                    Float.valueOf(json.get("z").toString()),
+                                    Float.valueOf(json.get("rx").toString()),
+                                    Float.valueOf(json.get("ry").toString()),
+                                    Float.valueOf(json.get("rz").toString())
+                            );
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            subscriber.handler = handler;
+        }
+    }
+
+    public IPublisher getPublisher() {
+        return publisher;
+    }
+
+    public void setPublisher(IPublisher publisher) {
+        this.publisher = publisher;
+    }
 }
