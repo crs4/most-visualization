@@ -99,7 +99,10 @@ public class TouchGLSurfaceView extends GLSurfaceView {
     @Override
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
-        requestRender();
+        if (this.renderer != null){
+            requestRender();
+        }
+
         if (publisher != null) {
             JSONObject obj = new JSONObject();
 
