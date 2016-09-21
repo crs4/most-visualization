@@ -13,7 +13,7 @@ public class Arrow extends Group {
         super(id);
         pyramid = new Pyramid(40f*scale, 20f*scale, 40f*scale);
         cube = new Cube(30f*scale, 20f*scale, 30f*scale);
-        pyramid.setRz(180);
+//        pyramid.setRz(180);
 //        pyramid.setX(-40f);
         pyramid.setY(pyramid.getHeight());
         cube.setY(pyramid.getHeight() + cube.getHeight()/2);

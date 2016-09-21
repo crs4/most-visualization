@@ -6,6 +6,20 @@ public class Cube extends Mesh {
     private float height;
     private float depth;
 
+
+    public Cube(){
+        this(1f);
+    }
+
+    public Cube(float size){
+        this(size, size, size);
+    }
+
+    public Cube(float size, String id){
+        this(size, size, size);
+        setId(id);
+    }
+
     public Cube(float width, float height, float depth) {
         this.width = width / 2;
         this.height = height / 2;
@@ -40,14 +54,16 @@ public class Cube extends Mesh {
         float colors[] = {
             0, 0, 0, 1f,
             1, 0, 0, 1f,
-            0, 1, 0, 1f,
-            0, 0, 1, 1f,
-            0, 0, 0, 1f,
             1, 0, 0, 1f,
             0, 1, 0, 1f,
             0, 0, 1, 1f
         };
         setColors(colors);
+    }
+
+    public Cube(float width, float height, float depth, String id) {
+        this(width, height, depth);
+        setId(id);
     }
 
     public float getWidth() {

@@ -290,7 +290,7 @@ public abstract class Mesh {
         rgba[3] = alpha;
     }
 
-    protected void setColors(float[] colors) {
+    public void setColors(float[] colors) {
         // float has 4 bytes.
         ByteBuffer cbb = ByteBuffer.allocateDirect(colors.length * 4);
         cbb.order(ByteOrder.nativeOrder());

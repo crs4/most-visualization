@@ -6,6 +6,21 @@ public class Pyramid extends Mesh {
     private float width;
     private float depth;
 
+
+    public Pyramid(float size){
+        this(size, size, size);
+    }
+
+    public Pyramid(float size, String id){
+        this(size);
+        setId(id);
+    }
+
+    public Pyramid(float width, float height, float depth, String id) {
+        this(width, height, depth);
+        setId(id);
+    }
+
     public Pyramid(float width, float height, float depth) {
         this.height = height;
         this.width = width;
@@ -21,7 +36,7 @@ public class Pyramid extends Mesh {
             width, 0, -depth, // 1
             width, 0, depth, // 2
             -width, 0, depth, // 3
-            0, height, 0, // 4
+            0, -height, 0, // 4
 
         };
 
@@ -41,9 +56,6 @@ public class Pyramid extends Mesh {
         float colors[] = {
             0, 0, 0, 1f,
             1, 0, 0, 1f,
-            0, 1, 0, 1f,
-            0, 0, 1, 1f,
-            0, 0, 0, 1f,
             1, 0, 0, 1f,
             0, 1, 0, 1f,
             0, 0, 1, 1f
