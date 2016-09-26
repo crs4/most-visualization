@@ -17,14 +17,14 @@ public class MeshManager {
     private HashMap<Integer, String> markersID = new HashMap<>();
     private HashMap<Integer, List<Mesh>> markerToMeshes = new HashMap<>();
     private static int MARKERLESS_ID = -1;
-
+    private HashSet<String> markersAdded = new HashSet<>();
 
     public void addMesh(Mesh mesh){
         meshes.put(mesh.getId(), mesh);
     }
 
     public boolean configureScene(){
-        HashSet<String> markersAdded = new HashSet<>();
+
         int markerID;
         for (Mesh mesh : meshes.values()) {
             String marker = mesh.getMarker();
