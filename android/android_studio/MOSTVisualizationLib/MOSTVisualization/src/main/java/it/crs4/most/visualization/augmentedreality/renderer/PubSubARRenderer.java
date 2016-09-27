@@ -124,11 +124,15 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
                     for (Mesh mesh : entry.getValue()) {
 
                         gl.glMatrixMode(GL10.GL_PROJECTION);
+
+                        float [] modelMatrix = new float [16];
                         if (mesh.getMarker() != null){
                             gl.glLoadMatrixf(ARToolKit.getInstance().getProjectionMatrix(), 0);
+                            modelMatrix = mesh.getMarker().getModelMatrix();
                         }
                         else{
                             gl.glLoadMatrixf(identityM, 0);
+                            Matrix.setIdentityM(modelMatrix, 0);
                         }
 
                         gl.glMatrixMode(GL10.GL_MODELVIEW);
@@ -136,7 +140,8 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
 //                        gl.glLoadMatrixf(mesh.getMarker().getModelMatrix(), 0);
 //                        gl.glMultMatrixf(entry.getKey(), 0);
                         gl.glLoadMatrixf(entry.getKey(), 0);
-                        gl.glMultMatrixf(mesh.getMarker().getModelMatrix(), 0);
+
+                        gl.glMultMatrixf(modelMatrix, 0);
 
                         gl.glPushMatrix();
                         mesh.draw(gl);
