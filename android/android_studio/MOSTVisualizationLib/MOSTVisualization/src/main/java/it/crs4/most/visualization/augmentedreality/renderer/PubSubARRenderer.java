@@ -132,7 +132,12 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
                         }
 
                         gl.glMatrixMode(GL10.GL_MODELVIEW);
+
+//                        gl.glLoadMatrixf(mesh.getMarker().getModelMatrix(), 0);
+//                        gl.glMultMatrixf(entry.getKey(), 0);
                         gl.glLoadMatrixf(entry.getKey(), 0);
+                        gl.glMultMatrixf(mesh.getMarker().getModelMatrix(), 0);
+
                         gl.glPushMatrix();
                         mesh.draw(gl);
                         gl.glPopMatrix();
