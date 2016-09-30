@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import it.crs4.most.visualization.augmentedreality.MarkerFactory.Marker;
 import it.crs4.most.visualization.utils.zmq.IPublisher;
 
 
@@ -36,7 +37,7 @@ public abstract class Mesh {
     // Smooth Colors
     private FloatBuffer colorBuffer = null;
     private String TAG = "MESH";
-    private String marker;
+    private Marker marker;
     private CoordsConverter coordsConverter;
     private float [] xLimits;
     private float [] yLimits;
@@ -61,11 +62,11 @@ public abstract class Mesh {
         return id;
     }
 
-    public String getMarker() {
+    public Marker getMarker() {
         return marker;
     }
 
-    public void setMarker(String marker) {
+    public void setMarker(Marker marker) {
         this.marker = marker;
     }
 

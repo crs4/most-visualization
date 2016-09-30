@@ -70,6 +70,7 @@ public class OpticalRenderer extends PubSubARRenderer {
             synchronized (meshManager) {
                 for (Mesh mesh : entry.getValue()) {
                     gl.glPushMatrix();
+                    gl.glMultMatrixf(mesh.getMarker().getModelMatrix(), 0);
                     mesh.draw(gl);
                     gl.glPopMatrix();
                 }

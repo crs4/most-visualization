@@ -11,13 +11,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import it.crs4.most.visualization.augmentedreality.MarkerFactory.Marker;
+
 
 public class MeshManager {
     private HashMap<String, Mesh> meshes = new HashMap<>();
-    private HashMap<Integer, String> markersID = new HashMap<>();
+    private HashMap<Integer, Marker> markersID = new HashMap<>();
     private HashMap<Integer, List<Mesh>> markerToMeshes = new HashMap<>();
     private static int MARKERLESS_ID = -1;
-    private HashSet<String> markersAdded = new HashSet<>();
+    private HashSet<Marker> markersAdded = new HashSet<>();
 
     public void addMesh(Mesh mesh){
         meshes.put(mesh.getId(), mesh);
@@ -27,10 +29,10 @@ public class MeshManager {
 
         int markerID;
         for (Mesh mesh : meshes.values()) {
-            String marker = mesh.getMarker();
+            Marker marker = mesh.getMarker();
             if (!markersAdded.contains(marker)) {
                 if(marker != null){
-                    markerID = ARToolKit.getInstance().addMarker(marker);
+                    markerID = ARToolKit.getInstance().addMarker(marker.toString());
                     if (markerID < 0){
                         return false;
                     }

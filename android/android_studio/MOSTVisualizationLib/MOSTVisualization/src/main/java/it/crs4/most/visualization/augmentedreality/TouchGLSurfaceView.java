@@ -293,6 +293,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                                     Float.valueOf(json.get("ry").toString()),
                                     Float.valueOf(json.get("rz").toString())
                             );
+                            requestRender();
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
