@@ -15,6 +15,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import it.crs4.most.visualization.augmentedreality.mesh.Group;
 import it.crs4.most.visualization.augmentedreality.mesh.Mesh;
@@ -283,6 +284,21 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                             case "coord":
                                 String meshId = json.getString("id");
                                 mesh = meshManager.getMeshByID(meshId);
+                                break;
+                            case "trans":
+                                Log.d(TAG, "received trans");
+                                float [] trans;
+                                for(Map.Entry<float [], List<Mesh>> entry: meshManager.getVisibleMeshes().entrySet()){
+                                    MarkerFactory.Marker marker = MarkerFactory.
+                                            getMarker(json.getString("marker"));
+                                    trans = marker.getModelMatrix();
+                                    trans[12] = json.getLong("transX");
+                                    trans[13] = json.getLong("transY");
+                                    marker.setModelMatrix(trans);
+
+
+                                }
+
                         }
                         if (mesh != null) {
                             mesh.setCoordinates(

@@ -5,7 +5,9 @@ import android.util.Log;
 
 import org.zeromq.ZMQ;
 
-public class ZMQPublisher implements Runnable, IPublisher {
+import java.io.Serializable;
+
+public class ZMQPublisher implements Runnable, IPublisher, Serializable {
 
     private static String TAG = "public class ZMQPublisher";
     public int port = 5555;
