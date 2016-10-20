@@ -18,40 +18,79 @@ public class MeshManager {
     private HashMap<String, Mesh> meshes = new HashMap<>();
     private HashMap<Integer, Marker> markersID = new HashMap<>();
     private HashMap<Integer, List<Mesh>> markerToMeshes = new HashMap<>();
-    private static int MARKERLESS_ID = -1;
+    private static int MARKERLESS_ID = -1000;
     private HashSet<Marker> markersAdded = new HashSet<>();
 
     public void addMesh(Mesh mesh){
         meshes.put(mesh.getId(), mesh);
     }
 
+    private boolean addMarker(Mesh mesh, Marker marker){
+        int markerID;
+        if (!markersAdded.contains(marker)) {
+            if (marker != null) {
+                markerID = ARToolKit.getInstance().addMarker(marker.toString());
+                if (markerID < 0){
+                    return false;
+                }
+                marker.setArtoolkitID(markerID);
+            }
+            else {
+                markerID = MARKERLESS_ID;
+            }
+
+            markersAdded.add(marker);
+            markersID.put(markerID, marker);
+        }
+        else {
+            markerID = marker != null? marker.getArtoolkitID() : MARKERLESS_ID;
+        }
+        List<Mesh> meshes;
+        if (!markerToMeshes.containsKey(markerID)) {
+            meshes = new ArrayList<Mesh>();
+            markerToMeshes.put(markerID, meshes);
+        } else {
+            meshes = markerToMeshes.get(markerID);
+        }
+        meshes.add(mesh);
+        return true;
+    }
+
     public boolean configureScene(){
 
         int markerID;
         for (Mesh mesh : meshes.values()) {
-            Marker marker = mesh.getMarker();
-            if (!markersAdded.contains(marker)) {
-                if(marker != null){
+            List<Marker> markers = mesh.getMarkers();
+            if (markers.size() == 0){
+                addMarker(mesh, null);
+                continue;
+            }
+
+            for (Marker marker: markers){
+                if (!markersAdded.contains(marker)) {
+                    if(marker == null){
+                        continue;
+                    }
+
                     markerID = ARToolKit.getInstance().addMarker(marker.toString());
                     if (markerID < 0){
                         return false;
                     }
-                }
-                else{
-                    markerID = MARKERLESS_ID;
-                }
-                markersAdded.add(marker);
-                markersID.put(markerID, marker);
+                    marker.setArtoolkitID(markerID);
+                    markersAdded.add(marker);
+                    markersID.put(markerID, marker);
 
-                List<Mesh> meshes;
-                if (!markerToMeshes.containsKey(markerID)) {
-                    meshes = new ArrayList<Mesh>();
-                    markerToMeshes.put(markerID, meshes);
-                } else {
-                    meshes = markerToMeshes.get(markerID);
+                    List<Mesh> meshes;
+                    if (!markerToMeshes.containsKey(markerID)) {
+                        meshes = new ArrayList<Mesh>();
+                        markerToMeshes.put(markerID, meshes);
+                    } else {
+                        meshes = markerToMeshes.get(markerID);
+                    }
+                    meshes.add(mesh);
                 }
-                meshes.add(mesh);
             }
+
         }
         return true;
     }

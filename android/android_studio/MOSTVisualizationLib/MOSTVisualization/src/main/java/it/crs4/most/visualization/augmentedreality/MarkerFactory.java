@@ -9,6 +9,7 @@ public class MarkerFactory {
 
     public static class Marker{
         private String cfg;
+        private int artoolkitID = -1;
         private float [] modelMatrix = new float[] {
             1, 0, 0, 0,
             0, 1, 0, 0,
@@ -30,6 +31,14 @@ public class MarkerFactory {
 
         public void setModelMatrix(float[] modelMatrix) {
             this.modelMatrix = modelMatrix;
+        }
+
+        public int getArtoolkitID() {
+            return artoolkitID;
+        }
+
+        public void setArtoolkitID(int artoolkitID) {
+            this.artoolkitID = artoolkitID;
         }
     }
 

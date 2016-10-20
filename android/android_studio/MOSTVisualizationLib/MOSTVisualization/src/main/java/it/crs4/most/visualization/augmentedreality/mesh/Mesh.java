@@ -7,6 +7,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import javax.microedition.khronos.opengles.GL10;
@@ -37,7 +39,7 @@ public abstract class Mesh {
     // Smooth Colors
     private FloatBuffer colorBuffer = null;
     private String TAG = "MESH";
-    private Marker marker;
+    private List<Marker> markers = new ArrayList<>();
     private CoordsConverter coordsConverter;
     private float [] xLimits;
     private float [] yLimits;
@@ -62,12 +64,12 @@ public abstract class Mesh {
         return id;
     }
 
-    public Marker getMarker() {
-        return marker;
+    public List<Marker> getMarkers() {
+        return markers;
     }
 
-    public void setMarker(Marker marker) {
-        this.marker = marker;
+    public void addMarker(Marker marker) {
+        markers.add(marker);
     }
 
     protected void setId(String id) {

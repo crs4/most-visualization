@@ -34,48 +34,15 @@ public class OpticalRenderer extends PubSubARRenderer {
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
         drawLeft(gl);
         drawRight(gl);
-//        super.draw(gl);
-
     }
 
-    protected void drawLeft(GL10 gl) {
+    private void drawLeft(GL10 gl) {
         gl.glViewport(0, 0, 960 / 2, 436);
-        gl.glMatrixMode(GL10.GL_PROJECTION);
-        float[] projectMatrix = ARToolKit.getInstance().getProjectionMatrix();
-//        gl.glLoadMatrixf(projectMatrix, 0);
-        gl.glLoadMatrixf(mOpticalARToolkit.getEyeLproject(), 0);
-        gl.glMatrixMode(GL10.GL_MODELVIEW);
-        gl.glLoadMatrixf(mOpticalARToolkit.getEyeLmodel(), 0);
-        basicDraw(gl);
-
+        basicDraw(gl, mOpticalARToolkit.getEyeLproject(), mOpticalARToolkit.getEyeLmodel());
     }
 
-    protected void drawRight(GL10 gl) {
+    private void drawRight(GL10 gl) {
         gl.glViewport(960 / 2, 0, 960 / 2, 436);
-        gl.glMatrixMode(GL10.GL_PROJECTION);
-        float[] projectMatrix = ARToolKit.getInstance().getProjectionMatrix();
-//        gl.glLoadMatrixf(projectMatrix, 0);
-        gl.glLoadMatrixf(mOpticalARToolkit.getEyeRproject(), 0);
-        gl.glMatrixMode(GL10.GL_MODELVIEW);
-        gl.glLoadMatrixf(mOpticalARToolkit.getEyeRmodel(), 0);
-        basicDraw(gl);
-
-    }
-
-    protected void basicDraw(GL10 gl) {
-        for(Map.Entry<float [], List<Mesh>> entry: meshManager.getVisibleMeshes().entrySet()){
-            gl.glPushMatrix();
-            gl.glMultMatrixf(entry.getKey(), 0);
-
-            synchronized (meshManager) {
-                for (Mesh mesh : entry.getValue()) {
-                    gl.glPushMatrix();
-                    gl.glMultMatrixf(mesh.getMarker().getModelMatrix(), 0);
-                    mesh.draw(gl);
-                    gl.glPopMatrix();
-                }
-            }
-            gl.glPopMatrix();
-        }
+        basicDraw(gl, mOpticalARToolkit.getEyeRproject(), mOpticalARToolkit.getEyeRmodel());
     }
 }
