@@ -16,11 +16,14 @@ import org.artoolkit.ar.base.rendering.ARRenderer;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import it.crs4.most.visualization.augmentedreality.MarkerFactory.Marker;
 import it.crs4.most.visualization.augmentedreality.mesh.Mesh;
 import it.crs4.most.visualization.augmentedreality.mesh.MeshFactory;
 import it.crs4.most.visualization.augmentedreality.mesh.MeshManager;
@@ -48,6 +51,12 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
 
     private float viewportAspectRatio = 16f/9f;
     private boolean newViewport = true;
+    private HashMap<Mesh, Integer> lastVisibleMarkers = new HashMap<>();
+    private static float [] identityM = new float[16];
+
+    static {
+        Matrix.setIdentityM(identityM, 0);
+    }
 
     public PubSubARRenderer(Context context, MeshManager meshManager) {
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
@@ -112,47 +121,76 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
      * Should be overridden in subclasses and used to perform rendering.
      */
     public void draw(GL10 gl) {
+        float [] projMatrix = ARToolKit.getInstance().getProjectionMatrix();
         updateViewport(gl);
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
         if (isEnabled()){
-            float [] identityM = new float[16];
-            Matrix.setIdentityM(identityM, 0);
+            basicDraw(gl, projMatrix);
+        }
+    }
 
-            for(Map.Entry<float [], List<Mesh>> entry: meshManager.getVisibleMeshes().entrySet()){
 
-                synchronized (meshManager) {
-                    for (Mesh mesh : entry.getValue()) {
+    protected void basicDraw(GL10 gl, float [] projMatrix){
+        basicDraw(gl, projMatrix, identityM);
+    }
 
-                        gl.glMatrixMode(GL10.GL_PROJECTION);
+    protected void basicDraw(GL10 gl, float [] projMatrix, float [] modelMatrix){
 
-                        float [] modelMatrix = new float [16];
-                        if (mesh.getMarker() != null){
-                            gl.glLoadMatrixf(ARToolKit.getInstance().getProjectionMatrix(), 0);
-                            modelMatrix = mesh.getMarker().getModelMatrix();
+        gl.glMatrixMode(GL10.GL_PROJECTION);
+        synchronized (meshManager) {
+            for (Mesh mesh : meshManager.getMeshes()) {
+
+                List<Marker> markers = mesh.getMarkers();
+                if(markers.size() == 0) { //MARKLESS
+                    gl.glLoadMatrixf(identityM, 0);
+                    mesh.draw(gl);
+                }
+                else if(projMatrix != null){
+                    gl.glLoadMatrixf(projMatrix, 0);
+                    gl.glMatrixMode(GL10.GL_MODELVIEW);
+
+                    int visibleMarkerIndex;
+                    if (lastVisibleMarkers.containsKey(mesh)){
+                        visibleMarkerIndex = lastVisibleMarkers.get(mesh);
+                    }
+                    else{
+                        visibleMarkerIndex = 0;
+                        lastVisibleMarkers.put(mesh, visibleMarkerIndex);
+                    }
+
+                    if (!ARToolKit.getInstance().
+                            queryMarkerVisible(markers.get(visibleMarkerIndex).getArtoolkitID())) {
+
+                        visibleMarkerIndex = -1;
+                        for(int i = 0; i < markers.size(); i++){
+                            if (i != lastVisibleMarkers.get(mesh) &&
+                                    ARToolKit.getInstance().
+                                            queryMarkerVisible(markers.get(i).getArtoolkitID())){
+                                visibleMarkerIndex = i;
+                                break;
+                            }
                         }
-                        else{
-                            gl.glLoadMatrixf(identityM, 0);
-                            Matrix.setIdentityM(modelMatrix, 0);
-                        }
+                    }
+                    if(visibleMarkerIndex >= 0){
+                        Marker marker = markers.get(visibleMarkerIndex);
 
-                        gl.glMatrixMode(GL10.GL_MODELVIEW);
+                        gl.glLoadMatrixf(modelMatrix, 0);
+                        gl.glMultMatrixf(ARToolKit.getInstance().
+                                queryMarkerTransformation(marker.getArtoolkitID()), 0);
 
-//                        gl.glLoadMatrixf(mesh.getMarker().getModelMatrix(), 0);
-//                        gl.glMultMatrixf(entry.getKey(), 0);
-                        gl.glLoadMatrixf(entry.getKey(), 0);
-
+                        modelMatrix = marker.getModelMatrix();
                         gl.glMultMatrixf(modelMatrix, 0);
 
                         gl.glPushMatrix();
                         mesh.draw(gl);
                         gl.glPopMatrix();
                     }
+
                 }
             }
         }
 
     }
-
 
     @Override
     public boolean handleMessage(Message message) {

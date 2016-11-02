@@ -295,10 +295,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                                     trans[12] = json.getLong("transX");
                                     trans[13] = json.getLong("transY");
                                     marker.setModelMatrix(trans);
-
-
                                 }
-
                         }
                         if (mesh != null) {
                             mesh.setCoordinates(
