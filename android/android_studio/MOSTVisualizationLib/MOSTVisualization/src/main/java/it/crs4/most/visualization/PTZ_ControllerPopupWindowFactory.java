@@ -12,7 +12,7 @@ package it.crs4.most.visualization;
 
 import android.app.ActionBar.LayoutParams;
 import android.content.Context;
-import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -92,12 +92,10 @@ public class PTZ_ControllerPopupWindowFactory implements OnTouchListener {
         this.popupWindow = new PopupWindow(rootView,
             LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, true);
 
-        this.popupWindow.setBackgroundDrawable(new BitmapDrawable());
+//        this.popupWindow.setBackgroundDrawable(new ColorDrawable(android.R.color.transparent));
         this.popupWindow.setTouchable(true);
-        this.popupWindow.setFocusable(true);
+        this.popupWindow.setFocusable(false);
         this.popupWindow.setTouchInterceptor(new OnTouchListener() {
-
-
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 int action = event.getAction();
@@ -125,20 +123,35 @@ public class PTZ_ControllerPopupWindowFactory implements OnTouchListener {
     }
 
     /**
-     * Show the popupWindow at the current location
+     * Show the PopupWindow at the current location
      */
     public void show() {
-        this.popupWindow.showAtLocation(this.popupWindow.getContentView(), Gravity.NO_GRAVITY, mCurrentX, mCurrentY);
+        this.getPopupWindow().showAtLocation(this.popupWindow.getContentView(), Gravity.NO_GRAVITY,
+            mCurrentX, mCurrentY);
     }
 
+    /**
+     * Dismiss the PopupWindow
+     */
+    public void dismiss() {
+        this.getPopupWindow().dismiss();
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isShowing() {
+        return this.getPopupWindow().isShowing();
+    }
 
     private void setupButtonListeners(View rootView) {
-
-        ArrayList<View> ptzButtons = new ArrayList<View>();
+        ArrayList<View> ptzButtons = new ArrayList<>();
         rootView.findViewsWithText(ptzButtons, "ptz_button", View.FIND_VIEWS_WITH_CONTENT_DESCRIPTION);
         // Toast.makeText(getActivity(), "Found views:" + String.valueOf(ptzButtons.size()), Toast.LENGTH_LONG).show();
-        for (View v : ptzButtons)
+        for (View v : ptzButtons) {
             v.setOnTouchListener(this);
+        }
 
         ImageButton butHome = (ImageButton) rootView.findViewById(R.id.but_move_home);
         butHome.setOnClickListener(new OnClickListener() {
@@ -161,10 +174,12 @@ public class PTZ_ControllerPopupWindowFactory implements OnTouchListener {
 
     private void setPanTiltPanelVisible(View rootView, boolean visibile) {
         GridLayout ptPanel = (GridLayout) rootView.findViewById(R.id.pt_buttons_grid);
-        if (visibile)
+        if (visibile) {
             ptPanel.setVisibility(View.VISIBLE);
-        else
+        }
+        else {
             ptPanel.setVisibility(View.GONE);
+        }
     }
 
     private void setZoomPanelVisible(View rootView, boolean visibile) {
@@ -182,37 +197,61 @@ public class PTZ_ControllerPopupWindowFactory implements OnTouchListener {
 
     private void setSnaphotVisible(View rootView, boolean visibile) {
         ImageButton butSnap = (ImageButton) rootView.findViewById(R.id.but_snapshot);
-        if (visibile)
+        if (visibile) {
             butSnap.setVisibility(View.VISIBLE);
-        else
+        }
+        else {
             butSnap.setVisibility(View.GONE);
+        }
     }
 
     private PTZ_Direction getPTZDirectionByContentDescription(String desc) {
-        if (desc.endsWith("_nw")) return PTZ_Direction.UP_LEFT;
-        if (desc.endsWith("_n")) return PTZ_Direction.UP;
-        if (desc.endsWith("_ne")) return PTZ_Direction.UP_RIGHT;
-
-        if (desc.endsWith("_w")) return PTZ_Direction.LEFT;
-        if (desc.endsWith("_e")) return PTZ_Direction.RIGHT;
-
-        if (desc.endsWith("_sw")) return PTZ_Direction.DOWN_LEFT;
-        if (desc.endsWith("_s")) return PTZ_Direction.DOWN;
-        if (desc.endsWith("_se")) return PTZ_Direction.DOWN_RIGHT;
-
-        else return null;
+        if (desc.endsWith("_nw")) {
+            return PTZ_Direction.UP_LEFT;
+        }
+        if (desc.endsWith("_n")) {
+            return PTZ_Direction.UP;
+        }
+        if (desc.endsWith("_ne")) {
+            return PTZ_Direction.UP_RIGHT;
+        }
+        if (desc.endsWith("_w")) {
+            return PTZ_Direction.LEFT;
+        }
+        if (desc.endsWith("_e")) {
+            return PTZ_Direction.RIGHT;
+        }
+        if (desc.endsWith("_sw")) {
+            return PTZ_Direction.DOWN_LEFT;
+        }
+        if (desc.endsWith("_s")) {
+            return PTZ_Direction.DOWN;
+        }
+        if (desc.endsWith("_se")) {
+            return PTZ_Direction.DOWN_RIGHT;
+        }
+        else {
+            return null;
+        }
     }
 
     private PTZ_Zoom getPTZZoomByContentDescription(String desc) {
-        if (desc.endsWith("_plus")) return PTZ_Zoom.IN;
-        else if (desc.endsWith("_minus")) return PTZ_Zoom.OUT;
-        else return null;
+        if (desc.endsWith("_plus")) {
+            return PTZ_Zoom.IN;
+        }
+        else if (desc.endsWith("_minus")) {
+            return PTZ_Zoom.OUT;
+        }
+        else {
+            return null;
+        }
     }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        if (v == null || v.getContentDescription() == null)
+        if (v == null || v.getContentDescription() == null) {
             return false;
+        }
 
         String ctxDesc = v.getContentDescription().toString();
         PTZ_Direction ptzDirection = getPTZDirectionByContentDescription(ctxDesc);
@@ -221,19 +260,23 @@ public class PTZ_ControllerPopupWindowFactory implements OnTouchListener {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             //Toast.makeText(this.context, "Action Down " + ctxDesc, Toast.LENGTH_LONG).show();
             Log.d(TAG, "Action Down:" + ctxDesc);
-            if (ptzDirection != null)
+            if (ptzDirection != null) {
                 this.ptzCommandReceiver.onPTZstartMove(ptzDirection);
-            else if (ptzZoom != null)
+            }
+            else if (ptzZoom != null) {
                 this.ptzCommandReceiver.onPTZstartZoom(ptzZoom);
+            }
         }
 
         else if (event.getAction() == MotionEvent.ACTION_UP) {
             //Toast.makeText(getActivity(), "Action Up" + ctxDesc, Toast.LENGTH_LONG).show();
             Log.d(TAG, "Action Up:" + ctxDesc);
-            if (ptzDirection != null)
+            if (ptzDirection != null) {
                 this.ptzCommandReceiver.onPTZstopMove(ptzDirection);
-            else if (ptzZoom != null)
+            }
+            else if (ptzZoom != null) {
                 this.ptzCommandReceiver.onPTZstopZoom(ptzZoom);
+            }
         }
 
 
