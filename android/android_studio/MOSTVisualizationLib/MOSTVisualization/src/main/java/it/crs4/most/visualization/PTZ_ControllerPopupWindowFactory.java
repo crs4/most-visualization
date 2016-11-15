@@ -12,6 +12,7 @@ package it.crs4.most.visualization;
 
 import android.app.ActionBar.LayoutParams;
 import android.content.Context;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.util.Log;
 import android.view.Gravity;
@@ -92,7 +93,7 @@ public class PTZ_ControllerPopupWindowFactory implements OnTouchListener {
         this.popupWindow = new PopupWindow(rootView,
             LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, true);
 
-//        this.popupWindow.setBackgroundDrawable(new ColorDrawable(android.R.color.transparent));
+        this.popupWindow.setBackgroundDrawable(new BitmapDrawable());
         this.popupWindow.setTouchable(true);
         this.popupWindow.setFocusable(false);
         this.popupWindow.setTouchInterceptor(new OnTouchListener() {
