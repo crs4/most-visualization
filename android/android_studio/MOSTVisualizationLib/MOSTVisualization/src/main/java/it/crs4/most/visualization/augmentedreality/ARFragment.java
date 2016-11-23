@@ -214,7 +214,6 @@ public class ARFragment extends StreamViewerFragment implements
      */
     public void setStreamVisible() {
         streamCover.setVisibility(View.INVISIBLE);
-        getGlView().setEnabled(true);
     }
 
     /**
