@@ -53,6 +53,7 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     private boolean newViewport = true;
     private HashMap<Mesh, Integer> lastVisibleMarkers = new HashMap<>();
     private static float [] identityM = new float[16];
+    private float [] prevModelViewMatrix = new float [16];
 
     static {
         Matrix.setIdentityM(identityM, 0);
@@ -175,9 +176,14 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
                         Marker marker = markers.get(visibleMarkerIndex);
 
                         gl.glLoadMatrixf(modelMatrix, 0);
-                        gl.glMultMatrixf(ARToolKit.getInstance().
-                                queryMarkerTransformation(marker.getArtoolkitID()), 0);
+                        float alpha = 0.9f;
+                        float[] markerMatrix = ARToolKit.getInstance().
+                                queryMarkerTransformation(marker.getArtoolkitID());
+                        for (int i = 0; i < prevModelViewMatrix.length; i++) {
+                            prevModelViewMatrix[i] = alpha * prevModelViewMatrix[i] + (1 - alpha) * markerMatrix[i];
 
+                        }
+                        gl.glMultMatrixf(prevModelViewMatrix, 0);
                         modelMatrix = marker.getModelMatrix();
                         gl.glMultMatrixf(modelMatrix, 0);
 
