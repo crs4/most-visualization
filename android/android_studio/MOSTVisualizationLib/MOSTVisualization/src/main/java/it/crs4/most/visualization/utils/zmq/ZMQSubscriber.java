@@ -1,5 +1,6 @@
 package it.crs4.most.visualization.utils.zmq;
 
+import android.text.style.TextAppearanceSpan;
 import android.util.Log;
 
 import org.zeromq.ZMQ;
@@ -19,7 +20,9 @@ public class ZMQSubscriber extends BaseSubscriber implements Runnable {
         context = ZMQ.context(1);
         socket = context.socket(ZMQ.SUB);
         socket.connect("tcp://" + address);
+        Log.d(TAG, "connection to " + address);
         socket.subscribe(ZMQ.SUBSCRIPTION_ALL);
+        Log.d(TAG, "subscribed");
 
         while (true) {
             String msg = socket.recvStr(0);
