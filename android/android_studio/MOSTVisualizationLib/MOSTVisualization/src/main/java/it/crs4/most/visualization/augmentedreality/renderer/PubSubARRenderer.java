@@ -151,7 +151,7 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
                     gl.glMatrixMode(GL10.GL_MODELVIEW);
 
                     int visibleMarkerIndex;
-                    if (lastVisibleMarkers.containsKey(mesh)){
+                    if (lastVisibleMarkers.containsKey(mesh) && lastVisibleMarkers.get(mesh) > -1){
                         visibleMarkerIndex = lastVisibleMarkers.get(mesh);
                     }
                     else{
@@ -172,16 +172,25 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
                             }
                         }
                     }
+
+                    lastVisibleMarkers.put(mesh, visibleMarkerIndex);
+
                     if(visibleMarkerIndex >= 0){
                         Marker marker = markers.get(visibleMarkerIndex);
 
                         gl.glLoadMatrixf(modelMatrix, 0);
+
                         float alpha = 0.9f;
                         float[] markerMatrix = ARToolKit.getInstance().
                                 queryMarkerTransformation(marker.getArtoolkitID());
-                        for (int i = 0; i < prevModelViewMatrix.length; i++) {
-                            prevModelViewMatrix[i] = alpha * prevModelViewMatrix[i] + (1 - alpha) * markerMatrix[i];
 
+                        if(visibleMarkerIndex == lastVisibleMarkers.get(mesh)){
+                            for (int i = 0; i < prevModelViewMatrix.length; i++) {
+                                prevModelViewMatrix[i] = alpha * prevModelViewMatrix[i] + (1 - alpha) * markerMatrix[i];
+                            }
+                        }
+                        else{
+                            prevModelViewMatrix = markerMatrix;
                         }
                         gl.glMultMatrixf(prevModelViewMatrix, 0);
                         modelMatrix = marker.getModelMatrix();
