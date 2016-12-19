@@ -287,22 +287,29 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
         Log.d(TAG, String.format("updateViewport width %d  height %d videoWidth %d videoHeight %d",
                 width, height, videoWidth, videoHeight));
         if (newViewport && width != 0 && height != 0 && videoHeight != 0 && width != 0) {
-//            int x1 =0, y1 = 0;
-//            int finalWidth = width;
-//            int finalHeight = height;
-//            if (videoWidth > 0 && videoHeight > 0) {
-//
-//                x1 = (width - videoWidth*height/videoHeight) / 2;
-//                finalWidth = videoWidth*height/videoHeight;
-//                y1 = (height - videoHeight) / 2;
-//                finalHeight = videoHeight;
-//            }
-            if (width >= height) {
-                gl.glViewport(width/2 - videoWidth*height/(2*videoHeight), 0, videoWidth*height/(videoHeight), height);
+
+            if(videoWidth >=videoHeight) {
+
+                if (width >= height) {
+                    gl.glViewport(width/2 - videoWidth*height/(2*videoHeight), 0, videoWidth*height/(videoHeight), height);
+                }
+                else {
+                    gl.glViewport(0, height/2 - videoHeight*width/(2*videoWidth), width, videoHeight*width/videoWidth);
+                }
             }
-            else {
-                gl.glViewport(0, height/2 - videoHeight*width/(2*videoWidth), width, videoHeight*width/videoWidth);
+
+            else { //videoWidth < videoHeight
+
+                if (width <= height) {
+                    gl.glViewport(width/2 - videoWidth*height/(2*videoHeight), 0, videoWidth*height/(videoHeight), height);
+                }
+                else {
+                    gl.glViewport(0, height/2 - videoHeight*width/(2*videoWidth), width, videoHeight*width/videoWidth);
+                }
+
+
             }
+
 
             newViewport = false;
         }
