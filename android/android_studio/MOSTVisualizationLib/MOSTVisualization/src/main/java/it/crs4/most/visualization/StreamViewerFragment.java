@@ -15,6 +15,7 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
+import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -24,12 +25,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import it.crs4.most.streaming.IStream;
+import it.crs4.most.streaming.utils.Size;
 
 /**
  * This fragment represents a visual container for an {@link IStream}. It can be attached to any Activity, provided that it implements the {@link IStreamFragmentCommandListener} interface.
  * This fragment contains a surface where to render the stream along with two image buttons that you can optionally use for sending play or pause stream requests to the attached activity
  */
-public class StreamViewerFragment extends Fragment {
+public class StreamViewerFragment extends Fragment implements SurfaceHolder.Callback {
 
     public static final String FRAGMENT_STREAM_ID_KEY = "stream_fragment_stream_id_key";
     private static final String TAG = "StreamViewerFragment";
@@ -42,6 +44,9 @@ public class StreamViewerFragment extends Fragment {
     private ImageButton butPlay;
     private ImageButton butPause;
     private LinearLayout controlButtonLayout;
+    private Integer width;
+    private Integer height;
+    private Object lock = new Object();
 
     /**
      * Intances a new StreamViewerFragment
@@ -93,6 +98,8 @@ public class StreamViewerFragment extends Fragment {
         this.surfaceView = (SurfaceView) rootView.findViewById(R.id.stream_surface);
         this.streamCover = rootView.findViewById(R.id.hide_container);
         this.txtHiddenSurface = (TextView) rootView.findViewById(R.id.txt_hidden_surface);
+
+        surfaceView.getHolder().addCallback(this);
 
         this.butPlay = (ImageButton) rootView.findViewById(R.id.button_play);
         this.butPlay.setOnClickListener(new OnClickListener() {
@@ -160,6 +167,37 @@ public class StreamViewerFragment extends Fragment {
                 this.controlButtonLayout.setVisibility(View.INVISIBLE);
                 layoutParams.height = 0;
             }
+        }
+    }
+
+
+
+    @Override
+    public void surfaceCreated(SurfaceHolder surfaceHolder) {
+
+    }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder surfaceHolder, int format, int width, int height) {
+        synchronized (lock){
+            this.height = height;
+            this.width = width;
+        }
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+    }
+
+    public Integer getHeight() {
+        synchronized (lock){
+            return height;
+        }
+    }
+
+    public Integer getWidth() {
+        synchronized (lock){
+            return width;
         }
     }
 }
