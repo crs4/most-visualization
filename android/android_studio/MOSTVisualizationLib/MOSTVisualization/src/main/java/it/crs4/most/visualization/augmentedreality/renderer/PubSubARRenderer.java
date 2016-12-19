@@ -48,6 +48,8 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     protected int width;
     protected MeshManager meshManager;
     private boolean enabled = true;
+    private int videoHeight;
+    private int videoWidth;
 
     private float viewportAspectRatio = 16f/9f;
     private boolean newViewport = true;
@@ -282,14 +284,26 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     }
 
     private void updateViewport(GL10 gl){
-        if (newViewport && width != 0 && height != 0) {
-            int heightVideo = (int) (width/viewportAspectRatio);
-            if(viewportAspectRatio > 0) {
-                gl.glViewport(0, (height - heightVideo)/2, width, heightVideo);
+        Log.d(TAG, String.format("updateViewport width %d  height %d videoWidth %d videoHeight %d",
+                width, height, videoWidth, videoHeight));
+        if (newViewport && width != 0 && height != 0 && videoHeight != 0 && width != 0) {
+//            int x1 =0, y1 = 0;
+//            int finalWidth = width;
+//            int finalHeight = height;
+//            if (videoWidth > 0 && videoHeight > 0) {
+//
+//                x1 = (width - videoWidth*height/videoHeight) / 2;
+//                finalWidth = videoWidth*height/videoHeight;
+//                y1 = (height - videoHeight) / 2;
+//                finalHeight = videoHeight;
+//            }
+            if (width >= height) {
+                gl.glViewport(width/2 - videoWidth*height/(2*videoHeight), 0, videoWidth*height/(videoHeight), height);
             }
             else {
-                gl.glViewport(0, 0, width, height);
+                gl.glViewport(0, height/2 - videoHeight*width/(2*videoWidth), width, videoHeight*width/videoWidth);
             }
+
             newViewport = false;
         }
     }
@@ -309,15 +323,27 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
         this.enabled = enabled;
     }
 
-    public float getViewportAspectRatio() {
-        return viewportAspectRatio;
-    }
 
-    public void setViewportAspectRatio(float viewportAspectRatio) {
-        Log.d(TAG, "setViewportAspectRatio with " + viewportAspectRatio);
-        this.viewportAspectRatio = viewportAspectRatio;
+
+    public void setViewportSize(int width, int height){
+        videoWidth = width;
+        videoHeight = height;
         newViewport = true;
-
     }
 
+    public int getVideoHeight() {
+        return videoHeight;
+    }
+
+    public void setVideoHeight(int videoHeight) {
+        this.videoHeight = videoHeight;
+    }
+
+    public int getVideoWidth() {
+        return videoWidth;
+    }
+
+    public void setVideoWidth(int videoWidth) {
+        this.videoWidth = videoWidth;
+    }
 }
