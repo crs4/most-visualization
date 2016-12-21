@@ -1,5 +1,6 @@
 package it.crs4.most.visualization.utils.zmq;
 
+import android.opengl.Visibility;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -9,7 +10,7 @@ import java.io.Serializable;
 
 public class ZMQPublisher implements Runnable, IPublisher, Serializable {
 
-    private static String TAG = "public class ZMQPublisher";
+    private static String TAG = "ZMQPublisher";
     public int port = 5555;
     private ZMQ.Context context;
     private ZMQ.Socket publisher;
@@ -35,8 +36,16 @@ public class ZMQPublisher implements Runnable, IPublisher, Serializable {
     }
 
     public void close() {
-        publisher.close();
-        context.term();
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                publisher.close();
+                context.close();
+                Log.d(TAG, "closed zmq context");
+                return null;
+            }
+        }.execute();
+
     }
 
     protected class SendMessage extends AsyncTask<String, Void, Void> {
@@ -50,5 +59,4 @@ public class ZMQPublisher implements Runnable, IPublisher, Serializable {
             return null;
         }
     }
-
 }
