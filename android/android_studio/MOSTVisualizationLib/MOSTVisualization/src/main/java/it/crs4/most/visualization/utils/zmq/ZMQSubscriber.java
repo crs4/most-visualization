@@ -22,15 +22,15 @@ public class ZMQSubscriber extends BaseSubscriber implements Runnable{
     public static short KEEP_ALIVE_INTERVAL = 5000;
     //private ZContext CONTEXT = new ZContext();
     private boolean anyMessageReceived = false;
+    private boolean toClose = false;
     private HandlerThread looperThread;
     //used to reconnect in case of no message receveid. It seems some reconnection problems exist
     // only in first stage of conection when wifi is unstable
 
 
     public ZMQSubscriber(String address) {
-        this.address = address;
-        context = ZMQ.context(1);
-        socket = context.socket(ZMQ.SUB);
+        this.address = "tcp://" + address;
+
     }
 
     public boolean isPubIsAlive() {
@@ -51,7 +51,9 @@ public class ZMQSubscriber extends BaseSubscriber implements Runnable{
 
 
     private void connect(){
-        socket.connect("tcp://" + address);
+        context = ZMQ.context(1);
+        socket = context.socket(ZMQ.SUB);
+        socket.connect(address);
         Log.d(TAG, "connection to " + address);
         socket.subscribe(ZMQ.SUBSCRIPTION_ALL);
         socket.setReceiveTimeOut(1000);
@@ -64,7 +66,7 @@ public class ZMQSubscriber extends BaseSubscriber implements Runnable{
         long startTime = System.currentTimeMillis();
         long currentTime;
 
-        while (true) {
+        while (!toClose) {
             try {
                 String msg = socket.recvStr(0);
                 if (msg != null) {
@@ -77,7 +79,9 @@ public class ZMQSubscriber extends BaseSubscriber implements Runnable{
                     currentTime = System.currentTimeMillis();
                     if (currentTime - startTime > KEEP_ALIVE_INTERVAL){
                         Log.d(TAG, String.format("no message received after %d, reconnection...", KEEP_ALIVE_INTERVAL));
-                        socket.disconnect("tcp://" + address);
+                        socket.disconnect(address);
+                        socket.close();
+                        context.close();
                         connect();
                         startTime = currentTime;
                     }
@@ -89,5 +93,10 @@ public class ZMQSubscriber extends BaseSubscriber implements Runnable{
             }
 
         }
+        context.close();
+    }
+
+    public void close(){
+        toClose = true;
     }
 }
