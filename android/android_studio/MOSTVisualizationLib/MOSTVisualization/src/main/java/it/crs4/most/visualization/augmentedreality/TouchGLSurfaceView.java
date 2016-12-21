@@ -100,10 +100,10 @@ public class TouchGLSurfaceView extends GLSurfaceView {
     @Override
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
-        if (this.renderer != null){
+        if(renderer != null){
+            ((PubSubARRenderer) renderer).setEnabled(enabled);
             requestRender();
         }
-
         if (publisher != null) {
             JSONObject obj = new JSONObject();
 
@@ -270,11 +270,6 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                             case "visibility":
                                 boolean enabled = json.getBoolean("value");
                                 setEnabled(enabled);
-                                if(renderer != null){
-                                    ((PubSubARRenderer) renderer).setEnabled(enabled);
-                                    requestRender();
-                                }
-
                                 break;
 
 //                            case "newObj":
@@ -282,6 +277,11 @@ public class TouchGLSurfaceView extends GLSurfaceView {
 //                                addMesh(mesh);
 //                                break;
                             case "coord":
+                                if (!isEnabled()){
+                                    setEnabled(true);
+                                }
+
+
                                 String meshId = json.getString("id");
                                 mesh = meshManager.getMeshByID(meshId);
                                 break;
