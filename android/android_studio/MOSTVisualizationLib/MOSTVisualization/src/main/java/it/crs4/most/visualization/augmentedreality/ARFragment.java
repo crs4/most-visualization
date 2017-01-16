@@ -55,6 +55,7 @@ public class ARFragment extends StreamViewerFragment implements
     private int [] fixedSize;
     private boolean enabled = true;
     private LinearLayout controlButtonLayout;
+    private String deviceID = null;
 
     public static ARFragment newInstance(String streamId) {
         ARFragment sf = new ARFragment();
@@ -289,7 +290,7 @@ public class ARFragment extends StreamViewerFragment implements
         Log.d(TAG, "cameraPreviewStarted!");
         if (!ARToolKit.getInstance().isRunning()) {
             if (ARToolKit.getInstance()
-                .initialiseAR(width, height, "Data/camera_para.dat", cameraIndex, cameraIsFrontFacing)) {
+                .initialiseAR(width, height, "Data/camera_para.dat", cameraIndex, cameraIsFrontFacing, deviceID)) {
                 firstUpdate = true;
             }
             else {
@@ -378,5 +379,11 @@ public class ARFragment extends StreamViewerFragment implements
         }
     }
 
+    public String getDeviceID() {
+        return deviceID;
+    }
 
+    public void setDeviceID(String deviceID) {
+        this.deviceID = deviceID;
+    }
 }
