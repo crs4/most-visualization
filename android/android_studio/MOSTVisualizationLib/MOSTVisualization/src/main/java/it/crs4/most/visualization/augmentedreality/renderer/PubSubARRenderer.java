@@ -284,8 +284,6 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     }
 
     private void updateViewport(GL10 gl){
-        Log.d(TAG, String.format("updateViewport width %d  height %d videoWidth %d videoHeight %d",
-                width, height, videoWidth, videoHeight));
         if (newViewport && width != 0 && height != 0 && videoHeight != 0 && width != 0) {
 
             if(videoWidth >=videoHeight) {
