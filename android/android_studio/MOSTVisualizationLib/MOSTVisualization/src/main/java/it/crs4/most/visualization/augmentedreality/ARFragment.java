@@ -290,7 +290,7 @@ public class ARFragment extends StreamViewerFragment implements
         Log.d(TAG, "cameraPreviewStarted!");
         if (!ARToolKit.getInstance().isRunning()) {
             if (ARToolKit.getInstance()
-                .initialiseAR(width, height, "Data/camera_para.dat", cameraIndex, cameraIsFrontFacing, deviceID)) {
+                .initialiseAR(width, height, null, cameraIndex, cameraIsFrontFacing, deviceID)) {
                 firstUpdate = true;
             }
             else {
