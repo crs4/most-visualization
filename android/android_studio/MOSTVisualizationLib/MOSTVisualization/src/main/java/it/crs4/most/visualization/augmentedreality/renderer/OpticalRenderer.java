@@ -20,6 +20,10 @@ import it.crs4.most.visualization.utils.zmq.IPublisher;
 public class OpticalRenderer extends PubSubARRenderer {
     private OpticalARToolkit mOpticalARToolkit;
     private String TAG = "OpticalRenderer";
+    public enum EYE {
+        LEFT, RIGHT, BOTH
+    };
+    private EYE eye = EYE.BOTH;
 
 
     public OpticalRenderer(
@@ -32,8 +36,14 @@ public class OpticalRenderer extends PubSubARRenderer {
 
     public void draw(GL10 gl) {
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
-        drawLeft(gl);
-        drawRight(gl);
+        if (eye == EYE.BOTH || eye == EYE.LEFT ){
+            drawLeft(gl);
+        }
+
+        if (eye == EYE.BOTH || eye == EYE.RIGHT ){
+            drawRight(gl);
+        }
+
     }
 
     private void drawLeft(GL10 gl) {
@@ -44,5 +54,13 @@ public class OpticalRenderer extends PubSubARRenderer {
     private void drawRight(GL10 gl) {
         gl.glViewport(960 / 2, 0, 960 / 2, 436);
         basicDraw(gl, mOpticalARToolkit.getEyeRproject(), mOpticalARToolkit.getEyeRmodel());
+    }
+
+    public EYE getEye() {
+        return eye;
+    }
+
+    public void setEye(EYE eye) {
+        this.eye = eye;
     }
 }
