@@ -70,6 +70,10 @@ public class OpticalRenderer extends PubSubARRenderer {
     }
 
     public void adjustCalibration(float x, float y , float z) {
+        if (adjustedCalibration == null) {
+            adjustedCalibration = new float[3];
+        }
+
         adjustedCalibration[0] = x;
         adjustedCalibration[1] = y;
         adjustedCalibration[2] = z;
