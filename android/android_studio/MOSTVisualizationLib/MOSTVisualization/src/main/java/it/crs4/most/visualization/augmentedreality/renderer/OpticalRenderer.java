@@ -19,6 +19,7 @@ import it.crs4.most.visualization.utils.zmq.IPublisher;
 
 public class OpticalRenderer extends PubSubARRenderer {
     private OpticalARToolkit mOpticalARToolkit;
+    private float [] adjustedCalibration;
     private String TAG = "OpticalRenderer";
     public enum EYE {
         LEFT, RIGHT, BOTH
@@ -48,11 +49,15 @@ public class OpticalRenderer extends PubSubARRenderer {
 
     private void drawLeft(GL10 gl) {
         gl.glViewport(0, 0, 960 / 2, 436);
-        basicDraw(gl, mOpticalARToolkit.getEyeLproject(), mOpticalARToolkit.getEyeLmodel());
+        float [] model = mOpticalARToolkit.getEyeLmodel();
+        addAdjustedCalibration(model);
+        basicDraw(gl, mOpticalARToolkit.getEyeLproject(), model);
     }
 
     private void drawRight(GL10 gl) {
         gl.glViewport(960 / 2, 0, 960 / 2, 436);
+        float [] model = mOpticalARToolkit.getEyeRmodel();
+        addAdjustedCalibration(model);
         basicDraw(gl, mOpticalARToolkit.getEyeRproject(), mOpticalARToolkit.getEyeRmodel());
     }
 
@@ -62,5 +67,23 @@ public class OpticalRenderer extends PubSubARRenderer {
 
     public void setEye(EYE eye) {
         this.eye = eye;
+    }
+
+    public void adjustCalibration(float x, float y , float z) {
+        if (adjustedCalibration == null) {
+            adjustedCalibration = new float[3];
+        }
+
+        adjustedCalibration[0] = x;
+        adjustedCalibration[1] = y;
+        adjustedCalibration[2] = z;
+
+    }
+    private void addAdjustedCalibration(float [] model){
+        if (adjustedCalibration != null) {
+            model[12] = adjustedCalibration[0];
+            model[13] = adjustedCalibration[1];
+            model[14] = adjustedCalibration[2];
+        }
     }
 }

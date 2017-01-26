@@ -56,6 +56,7 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     private HashMap<Mesh, Integer> lastVisibleMarkers = new HashMap<>();
     private static float [] identityM = new float[16];
     private float [] prevModelViewMatrix = new float [16];
+    private float lowFilterLevel = 0.9f;
 
     static {
         Matrix.setIdentityM(identityM, 0);
@@ -182,13 +183,13 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
 
                         gl.glLoadMatrixf(modelMatrix, 0);
 
-                        float alpha = 0.9f;
+
                         float[] markerMatrix = ARToolKit.getInstance().
                                 queryMarkerTransformation(marker.getArtoolkitID());
 
                         if(visibleMarkerIndex == lastVisibleMarkers.get(mesh)){
                             for (int i = 0; i < prevModelViewMatrix.length; i++) {
-                                prevModelViewMatrix[i] = alpha * prevModelViewMatrix[i] + (1 - alpha) * markerMatrix[i];
+                                prevModelViewMatrix[i] = lowFilterLevel * prevModelViewMatrix[i] + (1 - lowFilterLevel) * markerMatrix[i];
                             }
                         }
                         else{
@@ -350,5 +351,13 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
 
     public void setVideoWidth(int videoWidth) {
         this.videoWidth = videoWidth;
+    }
+
+    public float getLowFilterLevel() {
+        return lowFilterLevel;
+    }
+
+    public void setLowFilterLevel(float lowFilterLevel) {
+        this.lowFilterLevel = lowFilterLevel;
     }
 }
