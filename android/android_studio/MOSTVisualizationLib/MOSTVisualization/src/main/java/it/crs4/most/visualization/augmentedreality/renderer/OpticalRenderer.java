@@ -1,10 +1,12 @@
 package it.crs4.most.visualization.augmentedreality.renderer;
 
 import android.content.Context;
+import android.opengl.Matrix;
 
 import org.artoolkit.ar.base.ARToolKit;
 
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -50,15 +52,14 @@ public class OpticalRenderer extends PubSubARRenderer {
     private void drawLeft(GL10 gl) {
         gl.glViewport(0, 0, 960 / 2, 436);
         float [] model = mOpticalARToolkit.getEyeLmodel();
-        addAdjustedCalibration(model);
-        basicDraw(gl, mOpticalARToolkit.getEyeLproject(), model);
+        basicDraw(gl, mOpticalARToolkit.getEyeLproject(), addAdjustedCalibration(model));
     }
 
     private void drawRight(GL10 gl) {
         gl.glViewport(960 / 2, 0, 960 / 2, 436);
         float [] model = mOpticalARToolkit.getEyeRmodel();
         addAdjustedCalibration(model);
-        basicDraw(gl, mOpticalARToolkit.getEyeRproject(), mOpticalARToolkit.getEyeRmodel());
+        basicDraw(gl, mOpticalARToolkit.getEyeRproject(), addAdjustedCalibration(model));
     }
 
     public EYE getEye() {
@@ -79,11 +80,20 @@ public class OpticalRenderer extends PubSubARRenderer {
         adjustedCalibration[2] = z;
 
     }
-    private void addAdjustedCalibration(float [] model){
+    private float [] addAdjustedCalibration(float [] model){
         if (adjustedCalibration != null) {
-            model[12] = adjustedCalibration[0];
-            model[13] = adjustedCalibration[1];
-            model[14] = adjustedCalibration[2];
+            float [] calib =  new float[16];
+            float [] finalModel = new float[16];
+            Matrix.setIdentityM(calib, 0);
+            calib[12] = adjustedCalibration[0];
+            calib[13] = adjustedCalibration[1];
+            calib[14] = adjustedCalibration[2];
+            Matrix.multiplyMM(finalModel, 0, calib, 0, model, 0);
+            return finalModel;
+
+        }
+        else {
+            return model;
         }
     }
 }
