@@ -42,11 +42,11 @@ public class OpticalARToolkit {
     public int initialiseAR(String eyeLfilename, String eyeRfilename) {
         int ret = getOpticalMatrices(eyeLfilename, eyeRfilename, eyeLmodel, eyeLproject, eyeRmodel, eyeRproject, 1);
 
-//        eyeLmodel[12] -= 70;
-//        eyeRmodel[12] -= 70;
-//
-//        eyeLmodel[14] -= 100;
-//        eyeRmodel[14] -= 100;
+        eyeLmodel[12] -= 70;
+        eyeRmodel[12] -= 70;
+
+        eyeLmodel[14] -= 100;
+        eyeRmodel[14] -= 100;
         return ret;
     }
 
