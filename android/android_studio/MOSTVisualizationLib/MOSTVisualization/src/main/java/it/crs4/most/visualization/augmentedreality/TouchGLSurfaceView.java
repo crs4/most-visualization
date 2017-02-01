@@ -31,20 +31,23 @@ public class TouchGLSurfaceView extends GLSurfaceView {
     protected float mPreviousY;
     protected Renderer renderer;
     private String TAG = "TouchGLSurfaceView";
-    private Group meshGroup;
+    protected Group meshGroup;
     private boolean mDrawing = false;
     private boolean mMoving = false;
-    private boolean enabled = true;
-    private Mode mode = Mode.Move;
-    private ScaleGestureDetector mScaleDetector;
-    private boolean mScaling = false;
-    private MeshManager meshManager;
-    private Mesh mesh;
-    private float moveNormFactor = 1;
-    private int touchSamplingCounter = 0;
-    private BaseSubscriber subscriber;
-    private IPublisher publisher;
-    private Handler handler;
+    protected boolean enabled = true;
+    protected Mode mode = Mode.Move;
+    protected ScaleGestureDetector mScaleDetector;
+    protected boolean mScaling = false;
+    protected MeshManager meshManager;
+    protected Mesh mesh;
+    protected float moveNormFactor = 1;
+    protected int touchSamplingCounter = 0;
+    protected BaseSubscriber subscriber;
+    protected IPublisher publisher;
+    protected Handler handler;
+//    public interface  postEventListener{
+//        public void postEvent()
+//    }
 
 
     public TouchGLSurfaceView(Context context) {
@@ -117,7 +120,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
         }
     }
 
-    private void initScaleDetector(Context context) {
+    protected void initScaleDetector(Context context) {
         mScaleDetector = new ScaleGestureDetector(context,
             new ScaleGestureDetector.SimpleOnScaleGestureListener() {
                 @Override
@@ -196,20 +199,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                             mesh.setRy(mesh.getRy() + (dx + dy) * TOUCH_SCALE_FACTOR);
                             break;
                         case Move:
-                            touchSamplingCounter += 1;
-                            Log.d(TAG, "Move");
-                            float finalDx = mesh.getX() + dx;
-                            float finalDy = mesh.getY() - dy;
-
-//                            mesh.setX(finalDx < 1? (finalDx > -1? finalDx: -1): 1);
-//                            mesh.setY(finalDy < 1? (finalDy > -1? finalDy: -1): 1);
-                            mesh.setX(finalDx, false);
-                            mesh.setY(finalDy, false);
-                            requestRender();
-                            if (touchSamplingCounter % 3 == 0) {
-                                mesh.publishCoordinate();
-                            }
-
+                            handleMove(dx, dy);
                             break;
 
 //                        case Edit:
@@ -219,23 +209,11 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                     break;
                 case MotionEvent.ACTION_UP:
                     Log.d(TAG, "ACTION_UP");
-                    if (mode == Mode.Edit) {
-                        mDrawing = false;
-                    }
-                    else
-                        mMoving = false;
-
-                    touchSamplingCounter = 0;
-                    mesh.publishCoordinate();
+                    handleUp();
                     break;
 
                 case MotionEvent.ACTION_DOWN:
-                    Log.d(TAG, "ACTION_DOWN");
-                    if (mode == Mode.Edit) {
-                        mDrawing = true;
-                    }
-                    else
-                        mMoving = true;
+                    handleDown();
                     break;
 
 
@@ -323,5 +301,42 @@ public class TouchGLSurfaceView extends GLSurfaceView {
 
     public void setPublisher(IPublisher publisher) {
         this.publisher = publisher;
+    }
+
+    protected void handleMove(float dx, float dy){
+        touchSamplingCounter += 1;
+        Log.d(TAG, "Move");
+        float finalDx = mesh.getX() + dx;
+        float finalDy = mesh.getY() - dy;
+
+//                            mesh.setX(finalDx < 1? (finalDx > -1? finalDx: -1): 1);
+//                            mesh.setY(finalDy < 1? (finalDy > -1? finalDy: -1): 1);
+        mesh.setX(finalDx, false);
+        mesh.setY(finalDy, false);
+        requestRender();
+        if (touchSamplingCounter % 3 == 0) {
+            mesh.publishCoordinate();
+        }
+
+    }
+
+    protected void handleUp() {
+        if (mode == Mode.Edit) {
+            mDrawing = false;
+        }
+        else
+            mMoving = false;
+
+        touchSamplingCounter = 0;
+        mesh.publishCoordinate();
+
+    }
+    protected void handleDown() {
+        Log.d(TAG, "ACTION_DOWN");
+        if (mode == Mode.Edit) {
+            mDrawing = true;
+        }
+        else
+            mMoving = true;
     }
 }

@@ -11,8 +11,7 @@ public class Arrow extends Group {
     public Arrow(float width, float height, float depth) {
         pyramid = new Pyramid(width * pyramidScale, height * pyramidScale, depth * pyramidScale);
         cube = new Cube(width * cubeScale, height * cubeScale, depth * cubeScale);
-        pyramid.setY(pyramid.getHeight());
-        cube.setY(pyramid.getHeight() + cube.getHeight()/2);
+        cube.setY(cube.getHeight()/2 + pyramid.getHeight());
         add(cube);
         add(pyramid);
 

@@ -32,11 +32,11 @@ public class Pyramid extends Mesh {
 //        height /= 2;
 
          vertices = new float []{
-            -width, 0, -depth, // 0
-            width, 0, -depth, // 1
-            width, 0, depth, // 2
-            -width, 0, depth, // 3
-            0, -height, 0, // 4
+            -width, height, -depth, // 0
+            width, height, -depth, // 1
+            width, height, depth, // 2
+            -width, height, depth, // 3
+            0, 0, 0, // 4
 
         };
 
@@ -57,9 +57,11 @@ public class Pyramid extends Mesh {
             0, 0, 0, 1f,
             1, 0, 0, 1f,
             1, 0, 0, 1f,
-            0, 1, 0, 1f,
-            0, 0, 1, 1f
+            1, 0, 0, 1f,
+            1, 0, 0, 1f
         };
+
+
         setColors(colors);
     }
 

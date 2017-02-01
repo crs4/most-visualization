@@ -52,14 +52,12 @@ public class OpticalRenderer extends PubSubARRenderer {
     private void drawLeft(GL10 gl) {
         gl.glViewport(0, 0, 960 / 2, 436);
         float [] model = mOpticalARToolkit.getEyeLmodel();
-        basicDraw(gl, mOpticalARToolkit.getEyeLproject(), addAdjustedCalibration(model));
+        basicDraw(gl, mOpticalARToolkit.getEyeLproject(), mOpticalARToolkit.getEyeLmodel());
     }
 
     private void drawRight(GL10 gl) {
         gl.glViewport(960 / 2, 0, 960 / 2, 436);
-        float [] model = mOpticalARToolkit.getEyeRmodel();
-        addAdjustedCalibration(model);
-        basicDraw(gl, mOpticalARToolkit.getEyeRproject(), addAdjustedCalibration(model));
+        basicDraw(gl, mOpticalARToolkit.getEyeRproject(), mOpticalARToolkit.getEyeRmodel());
     }
 
     public EYE getEye() {
