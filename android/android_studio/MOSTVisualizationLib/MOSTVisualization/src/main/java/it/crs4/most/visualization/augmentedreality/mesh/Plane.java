@@ -35,7 +35,7 @@ public class Plane extends Mesh {
 
         vertices = new float[(widthSegments + 1) * (heightSegments + 1)
             * 3];
-        short[] indices = new short[(widthSegments + 1) * (heightSegments + 1)
+        indices = new short[(widthSegments + 1) * (heightSegments + 1)
             * 6];
 
         float xOffset = width / -2;

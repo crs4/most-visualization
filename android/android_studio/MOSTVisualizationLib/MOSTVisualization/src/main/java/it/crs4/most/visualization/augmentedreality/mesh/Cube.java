@@ -35,7 +35,7 @@ public class Cube extends Mesh {
             -this.width, this.height, this.depth, // 7
         };
 
-        short indices[] = {0, 4, 5,
+        indices = new short[] {0, 4, 5,
             0, 5, 1,
             1, 5, 6,
             1, 6, 2,

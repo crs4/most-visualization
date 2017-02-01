@@ -4,21 +4,31 @@ package it.crs4.most.visualization.augmentedreality.mesh;
 public class Arrow extends Group {
     Pyramid pyramid;
     Cube cube;
+    private static float pyramidScale = 0.7f;
+    private static float cubeScale = 1 - pyramidScale;
 
-    public Arrow(String id) {
-        this(id, 1);
-    }
 
-    public Arrow(String id, float scale) {
-        super(id);
-        pyramid = new Pyramid(40f*scale, 20f*scale, 40f*scale);
-        cube = new Cube(30f*scale, 20f*scale, 30f*scale);
-//        pyramid.setRz(180);
-//        pyramid.setX(-40f);
+    public Arrow(float width, float height, float depth) {
+        pyramid = new Pyramid(width * pyramidScale, height * pyramidScale, depth * pyramidScale);
+        cube = new Cube(width * cubeScale, height * cubeScale, depth * cubeScale);
         pyramid.setY(pyramid.getHeight());
         cube.setY(pyramid.getHeight() + cube.getHeight()/2);
         add(cube);
         add(pyramid);
+
+    }
+    public Arrow(float width, float height, float depth, String id) {
+        this(width, height, depth);
+        setId(id);
+    }
+
+    public Arrow() {
+        this(1, 1, 1);
+    }
+
+    public Arrow(String id) {
+        this();
+        setId(id);
     }
 
     public float getHeight(){

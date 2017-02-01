@@ -45,11 +45,16 @@ public abstract class Mesh {
     private float [] yLimits;
     private float [] zLimits;
 
+    protected float [] vertices;
+    protected short [] indices;
+
+    public short[] getIndices() {
+        return indices;
+    }
+
     public float[] getVertices() {
         return vertices;
     }
-
-    protected float [] vertices;
 
     public Mesh() {
         setId(null);

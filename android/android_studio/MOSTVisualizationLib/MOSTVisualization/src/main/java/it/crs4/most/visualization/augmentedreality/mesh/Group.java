@@ -11,6 +11,9 @@ import javax.microedition.khronos.opengles.GL10;
 public class Group extends Mesh {
     private Vector<Mesh> children = new Vector<Mesh>();
 
+    public Group() {
+
+    }
     public Group(String id) {
         this.id = id;
     }
@@ -174,5 +177,13 @@ public class Group extends Mesh {
         for (Mesh child : children) {
             child.scale(xFactor,yFactor, zFactor);
         }
+    }
+
+    @Override
+    public void setColors(float[] colors) {
+        for (Mesh child : children) {
+            child.setColors(colors);
+        }
+
     }
 }
