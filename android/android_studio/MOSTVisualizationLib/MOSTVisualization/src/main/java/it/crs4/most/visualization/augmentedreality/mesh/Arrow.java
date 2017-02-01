@@ -22,6 +22,15 @@ public class Arrow extends Group {
         setId(id);
     }
 
+    public Arrow() {
+        this(1, 1, 1);
+    }
+
+    public Arrow(String id) {
+        this();
+        setId(id);
+    }
+
     public float getHeight(){
         return pyramid.getHeight() + cube.getHeight();
     }
