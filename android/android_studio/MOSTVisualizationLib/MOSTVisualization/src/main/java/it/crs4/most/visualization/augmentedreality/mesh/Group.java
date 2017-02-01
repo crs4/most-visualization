@@ -178,4 +178,12 @@ public class Group extends Mesh {
             child.scale(xFactor,yFactor, zFactor);
         }
     }
+
+    @Override
+    public void setColors(float[] colors) {
+        for (Mesh child : children) {
+            child.setColors(colors);
+        }
+
+    }
 }
