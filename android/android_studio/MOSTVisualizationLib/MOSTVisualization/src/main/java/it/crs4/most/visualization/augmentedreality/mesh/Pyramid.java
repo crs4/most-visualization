@@ -2,7 +2,7 @@ package it.crs4.most.visualization.augmentedreality.mesh;
 
 
 public class Pyramid extends Mesh {
-        private float height;
+    private float height;
     private float width;
     private float depth;
 
@@ -40,7 +40,7 @@ public class Pyramid extends Mesh {
 
         };
 
-        short indices[] = {
+        this.indices = new short[] {
             0, 3, 2,
             0, 2, 1,
             0, 1, 4,
