@@ -11,6 +11,9 @@ import javax.microedition.khronos.opengles.GL10;
 public class Group extends Mesh {
     private Vector<Mesh> children = new Vector<Mesh>();
 
+    public Group() {
+
+    }
     public Group(String id) {
         this.id = id;
     }
