@@ -32,7 +32,6 @@ import it.crs4.most.visualization.augmentedreality.mesh.Mesh;
 import it.crs4.most.visualization.augmentedreality.mesh.MeshFactory;
 import it.crs4.most.visualization.augmentedreality.mesh.MeshManager;
 import it.crs4.most.visualization.utils.zmq.BaseSubscriber;
-import io.appium.android.apis.graphics.spritetext.MatrixGrabber;
 
 //import org.artoolkit.ar.base.rendering.Cube;
 
