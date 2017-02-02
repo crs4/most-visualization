@@ -55,8 +55,8 @@ public class Cube extends Mesh {
             0, 0, 0, 1f,
             1, 0, 0, 1f,
             1, 0, 0, 1f,
-            0, 1, 0, 1f,
-            0, 0, 1, 1f
+            1, 0, 0, 1f,
+            1, 0, 0, 1f
         };
         setColors(colors);
     }

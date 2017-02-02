@@ -53,6 +53,7 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     private boolean enabled = true;
     private int videoHeight;
     private int videoWidth;
+    protected float [] extraCalibration = new float[3];
 
     private float viewportAspectRatio = 16f/9f;
     private boolean newViewport = true;
@@ -203,6 +204,11 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
                         gl.glMultMatrixf(modelMatrix, 0);
 
                         gl.glPushMatrix();
+//                        gl.glMultMatrixf(extraCalibration, 0);
+                        gl.glTranslatef(extraCalibration[0], extraCalibration[1], extraCalibration[2]);
+                        Log.d(TAG, String.format("extraCalibration: %f %f %f", extraCalibration[0], extraCalibration[1], extraCalibration[2]));
+//                        gl.glTranslatef(mesh.getX(), mesh.getY(), mesh.getZ());
+
                         mesh.draw(gl);
 
 //                        MatrixGrabber matrixGrabber = new MatrixGrabber();
@@ -442,4 +448,12 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
 
     }
 
+
+    public float[] getExtraCalibration() {
+        return extraCalibration;
+    }
+
+    public void setExtraCalibration(float[] extraCalibration) {
+        this.extraCalibration = extraCalibration;
+    }
 }
