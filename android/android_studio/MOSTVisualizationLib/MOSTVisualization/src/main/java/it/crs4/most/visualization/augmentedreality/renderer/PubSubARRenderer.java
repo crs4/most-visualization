@@ -14,6 +14,7 @@ import android.view.WindowManager;
 
 import org.artoolkit.ar.base.ARToolKit;
 import org.artoolkit.ar.base.rendering.ARRenderer;
+import org.artoolkit.ar.base.rendering.Line;
 import org.artoolkit.ar.base.rendering.gles20.ARRendererGLES20;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -200,24 +201,45 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
                             prevModelViewMatrix = markerMatrix;
                         }
                         gl.glMultMatrixf(prevModelViewMatrix, 0);
-                        modelMatrix = marker.getModelMatrix();
-                        gl.glMultMatrixf(modelMatrix, 0);
+                        float [] markerTransMatrix = marker.getModelMatrix();
+                        gl.glMultMatrixf(markerTransMatrix, 0);
 
-                        gl.glPushMatrix();
-//                        gl.glMultMatrixf(extraCalibration, 0);
                         gl.glTranslatef(extraCalibration[0], extraCalibration[1], extraCalibration[2]);
-                        Log.d(TAG, String.format("extraCalibration: %f %f %f", extraCalibration[0], extraCalibration[1], extraCalibration[2]));
-//                        gl.glTranslatef(mesh.getX(), mesh.getY(), mesh.getZ());
+                        gl.glPushMatrix();
 
                         mesh.draw(gl);
-
-//                        MatrixGrabber matrixGrabber = new MatrixGrabber();
-//                        matrixGrabber.getCurrentModelView(gl);
-//                        float [] currentModelMatrix = matrixGrabber.mModelView;
-
-//                        ((GL11) gl).glGetFloatv(GL11.GL_MODELVIEW, currentModelMatrix, 0);
-
                         gl.glPopMatrix();
+
+                        float [] finalMatrix = multiplyMatrix(
+                                projMatrix,
+                                multiplyMatrix(
+                                        mesh.getTransMatrix(),
+                                        multiplyMatrix(
+                                                getExtraCalibrationMatrix(),
+                                                multiplyMatrix(
+                                                        markerTransMatrix,
+                                                        multiplyMatrix(modelMatrix, prevModelViewMatrix)
+                                                )
+                                        )
+                                )
+                        );
+//                        float [] finalMatrix = multiplyMatrix(
+//                                projMatrix,
+//                                multiplyMatrix(mesh.getTransMatrix(),
+//                                        multiplyMatrix(markerMatrix, modelMatrix)
+//                                )
+//
+//                        );
+                        if (isMeshVisible(mesh,finalMatrix) < 1) {
+                            Line line = new Line(
+                                    new float[3],
+                                    new float[] {mesh.getX(), mesh.getY(), mesh.getZ()},
+                                    1f
+                            );
+                            line.setColor(new float[]{1.0F, 1F, 1F, 1.0F});
+                            line.draw(gl);
+                        }
+
                     }
 
                 }
@@ -398,37 +420,19 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
         return prevModelViewMatrix;
     }
 
-//    public float [] getScreenLimit(){
-//        float [] projMatrix = getLastProjMatrix();
-//        float [] modelMatrix = getLastModelMatrix();
-//        float [] finalMatrixToInvert = new float [16];
-//        float [] finalMatrix = new float [16];
-//        Matrix.multiplyMM(finalMatrixToInvert, 0, projMatrix, 0, modelMatrix, 0);
-//        Matrix.invertM(finalMatrix, 0, finalMatrixToInvert, 0);
-//
-//        float [] topRightCornerNDC = new float[] {1, 1, 1, 1};
-//        float [] topRightCorner =  new float[4];
-//        Matrix.multiplyMV(topRightCorner, 0, finalMatrix, 0, topRightCornerNDC, 0);
-//
-//        float [] bottomLeftCornerNDC = new float[] {-1, -1, 1, 1};
-//        float [] bottomLeftCorner=  new float[4];
-//        Matrix.multiplyMV(bottomLeftCorner, 0, finalMatrix, 0, bottomLeftCornerNDC , 0);
-//
-//        return new float[] {bottomLeftCorner[0], topRightCorner[0], bottomLeftCorner[1], topRightCorner[1]};
-//    }
-
-
-    public int isMeshVisible(Mesh mesh) {
-        float [] identityMatrix = new float [16];
-        Matrix.setIdentityM(identityMatrix, 0);
-        return isMeshVisible(mesh, identityMatrix);
+    public float [] getExtraCalibrationMatrix() {
+        float [] extraCalibrationMatrix = new float [16];
+        Matrix.setIdentityM(extraCalibrationMatrix, 0);
+        extraCalibrationMatrix[12] = extraCalibration[0];
+        extraCalibrationMatrix[13] = extraCalibration[1];
+        extraCalibrationMatrix[14] = extraCalibration[2];
+        return extraCalibrationMatrix;
     }
-
 
     /*
     return if mesh is visible after applying modelMatrix over current modelview matrix
      */
-    public int isMeshVisible(Mesh mesh, float [] modelMatrix) {
+    public int isMeshVisible(Mesh mesh, float [] matrix) {
         short[] indices = mesh.getIndices();
         char[] charIndices = new char[indices.length];
 
@@ -437,14 +441,7 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
             short shortIndex = indices[i];
             charIndices[i] = (char) shortIndex;
         }
-
-
-
-        Matrix.multiplyMM(modelMatrix, 0, modelMatrix, 0, getLastModelMatrix(), 0);
-
-        float [] resultMatrix = new float [16];
-        Matrix.multiplyMM(resultMatrix, 0, getLastProjMatrix(), 0, modelMatrix, 0);
-        return Visibility.visibilityTest(resultMatrix, 0, mesh.getVertices(), 0, charIndices, 0, indices.length);
+        return Visibility.visibilityTest(matrix, 0, mesh.getVertices(), 0, charIndices, 0, indices.length);
 
     }
 
@@ -455,5 +452,11 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
 
     public void setExtraCalibration(float[] extraCalibration) {
         this.extraCalibration = extraCalibration;
+    }
+
+    private float [] multiplyMatrix(float [] matrixL, float [] matrixR) {
+        float [] result = new float [16];
+        Matrix.multiplyMM(result, 0, matrixL, 0, matrixR, 0);
+        return result;
     }
 }
