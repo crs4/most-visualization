@@ -1,5 +1,7 @@
 package it.crs4.most.visualization.augmentedreality.mesh;
 
+import android.opengl.Matrix;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -367,4 +369,14 @@ public abstract class Mesh {
         setVertices(vertices);
     }
 
+    public float [] getTransMatrix(){
+        float [] transMatrix = new float[16];
+        Matrix.setIdentityM(transMatrix, 0);
+        transMatrix[12] = getX();
+        transMatrix[13] = getY();
+        transMatrix[14] = getZ();
+        return transMatrix;
+    }
 }
+
+
