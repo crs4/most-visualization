@@ -6,7 +6,6 @@ import android.opengl.GLU;
 import android.opengl.Matrix;
 import android.opengl.Visibility;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.view.Display;
@@ -15,27 +14,15 @@ import android.view.WindowManager;
 import org.artoolkit.ar.base.ARToolKit;
 import org.artoolkit.ar.base.rendering.ARRenderer;
 
-import org.artoolkit.ar.base.rendering.gles20.ARRendererGLES20;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.microedition.khronos.opengles.GL10;
-import javax.microedition.khronos.opengles.GL11;
-import javax.microedition.khronos.opengles.GL11;
 
 import it.crs4.most.visualization.augmentedreality.MarkerFactory.Marker;
 import it.crs4.most.visualization.augmentedreality.mesh.Line;
 import it.crs4.most.visualization.augmentedreality.mesh.Mesh;
-import it.crs4.most.visualization.augmentedreality.mesh.MeshFactory;
 import it.crs4.most.visualization.augmentedreality.mesh.MeshManager;
-import it.crs4.most.visualization.utils.zmq.BaseSubscriber;
-
-//import org.artoolkit.ar.base.rendering.Cube;
 
 public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     //  Code from:  https://groups.google.com/forum/#!topic/android-developers/nSv1Pjp5jLY
@@ -45,9 +32,6 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     private static final int _temp_in = 32;
     private static final int _temp_out = 36;
     protected volatile float angle = 0;
-    protected float previousAngle = 0;
-    protected Handler handler;
-    protected BaseSubscriber subscriber;
     protected String TAG = "PubSubARRenderer";
     protected int height;
     protected int width;
@@ -56,8 +40,6 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     private int videoHeight;
     private int videoWidth;
     protected float [] extraCalibration = new float[3];
-
-    private float viewportAspectRatio = 16f/9f;
     private boolean newViewport = true;
     private HashMap<Mesh, Integer> lastVisibleMarkers = new HashMap<>();
     private static float [] identityM = new float[16];
@@ -91,9 +73,6 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
                                    float proj[], int offsetP,
                                    int viewport[], int offsetV,
                                    float[] xyz, int offset) {
-   /* Transformation matrices */
-//   float[] m = new float[16], A = new float[16];
-//   float[] in = new float[4], out = new float[4];
 
    /* Normalize between -1 and 1 */
         _tempGluUnProjectData[_temp_in] = (winx - viewport[offsetV]) *
@@ -252,17 +231,8 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     public void addMesh(Mesh mesh, float winX, float winY) {
         float[] modelView = new float[16];
         Matrix.setIdentityM(modelView, 0);
-//        getMatrix(gl, GL11.GL_MODELVIEW, modelView);
-
-//        float [] modelView = ARToolKit.getInstance().queryMarkerTransformation(markerID);
-
         float[] projection = ARToolKit.getInstance().getProjectionMatrix();
-//        float [] projection = new float [16];
-//        getMatrix(gl, GL11.GL_PROJECTION, projection);;
-
-
         int[] view = {0, 0, width, height};
-//        gl.glGetIntegerv(GL11. ,viewVectorParams,0);
 
         Log.d(TAG, "width " + width + " height " + height);
         float[] newcoords = new float[4];
@@ -271,10 +241,6 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
         float winZ = 0;
 
         GLU.gluUnProject(winX, winY, winZ, modelView, 0, projection, 0, view, 0, newcoords, 0);
-//        gluUnProject(winX, winY, winZ, modelView, 0, projection, 0, view, 0, newcoords, 0);
-
-//        Log.d(TAG, "winX " +  winX);
-//        Log.d(TAG, "winY " +  winY);
 
         Log.d(TAG, "newcoords[0]" + newcoords[0]);
         Log.d(TAG, "newcoords[1]" + newcoords[1]);
@@ -284,25 +250,12 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
         float x = newcoords[0];
         float y = newcoords[1];
         float z = newcoords[2];
-//        float x = newcoords[0] / newcoords[3];
-//        float y = newcoords[1] / newcoords[3];
-//        float z = newcoords[2] / newcoords[3];
-//        float z = 1;
-
         mesh.setX(x * 500);
         mesh.setY(y * 500);
         mesh.setZ(z);
-//        mesh.setX(0);
-//        mesh.setY(0);
-//        mesh.setZ(0);
-
         Log.d(TAG, "adding mesh in x " + x + " y " + y + " z " + z);
         addMesh(mesh);
     }
-
-//    public Mesh removeMesh(Mesh mesh) {
-//        return meshes.remove(mesh.getId());
-//    }
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
