@@ -14,7 +14,7 @@ import android.view.WindowManager;
 
 import org.artoolkit.ar.base.ARToolKit;
 import org.artoolkit.ar.base.rendering.ARRenderer;
-import org.artoolkit.ar.base.rendering.Line;
+
 import org.artoolkit.ar.base.rendering.gles20.ARRendererGLES20;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,6 +29,7 @@ import javax.microedition.khronos.opengles.GL11;
 import javax.microedition.khronos.opengles.GL11;
 
 import it.crs4.most.visualization.augmentedreality.MarkerFactory.Marker;
+import it.crs4.most.visualization.augmentedreality.mesh.Line;
 import it.crs4.most.visualization.augmentedreality.mesh.Mesh;
 import it.crs4.most.visualization.augmentedreality.mesh.MeshFactory;
 import it.crs4.most.visualization.augmentedreality.mesh.MeshManager;
