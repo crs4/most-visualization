@@ -186,9 +186,6 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
                     if(visibleMarkerIndex >= 0){
                         Marker marker = markers.get(visibleMarkerIndex);
 
-                        gl.glLoadMatrixf(modelMatrix, 0);
-
-
                         float[] markerMatrix = ARToolKit.getInstance().
                                 queryMarkerTransformation(marker.getArtoolkitID());
 
@@ -200,13 +197,15 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
                         else{
                             prevModelViewMatrix = markerMatrix;
                         }
-                        gl.glMultMatrixf(prevModelViewMatrix, 0);
-                        float [] markerTransMatrix = marker.getModelMatrix();
-                        gl.glMultMatrixf(markerTransMatrix, 0);
-
-                        gl.glTranslatef(extraCalibration[0], extraCalibration[1], extraCalibration[2]);
+                        float [] finalModelMatrix = multiplyMatrix(
+                                getExtraCalibrationMatrix(),
+                                multiplyMatrix(
+                                        marker.getModelMatrix(),
+                                        multiplyMatrix(modelMatrix, prevModelViewMatrix)
+                                )
+                        );
+                        gl.glLoadMatrixf(finalModelMatrix, 0);
                         gl.glPushMatrix();
-
                         mesh.draw(gl);
                         gl.glPopMatrix();
 
@@ -214,22 +213,10 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
                                 projMatrix,
                                 multiplyMatrix(
                                         mesh.getTransMatrix(),
-                                        multiplyMatrix(
-                                                getExtraCalibrationMatrix(),
-                                                multiplyMatrix(
-                                                        markerTransMatrix,
-                                                        multiplyMatrix(modelMatrix, prevModelViewMatrix)
-                                                )
+                                        finalModelMatrix
                                         )
-                                )
                         );
-//                        float [] finalMatrix = multiplyMatrix(
-//                                projMatrix,
-//                                multiplyMatrix(mesh.getTransMatrix(),
-//                                        multiplyMatrix(markerMatrix, modelMatrix)
-//                                )
-//
-//                        );
+
                         if (isMeshVisible(mesh,finalMatrix) < 1) {
                             Line line = new Line(
                                     new float[3],
