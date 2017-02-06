@@ -62,6 +62,8 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     private static float [] identityM = new float[16];
     private float [] prevModelViewMatrix = new float [16];
     private float lowFilterLevel = 0.9f;
+    private boolean drawInvisibilityLine = true;
+
 
     static {
         Matrix.setIdentityM(identityM, 0);
@@ -217,7 +219,7 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
                                         )
                         );
 
-                        if (isMeshVisible(mesh,finalMatrix) < 1) {
+                        if (isDrawInvisibilityLine() && isMeshVisible(mesh,finalMatrix) < 1) {
                             Line line = new Line(
                                     new float[3],
                                     new float[] {mesh.getX(), mesh.getY(), mesh.getZ()},
@@ -445,5 +447,13 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
         float [] result = new float [16];
         Matrix.multiplyMM(result, 0, matrixL, 0, matrixR, 0);
         return result;
+    }
+
+    public boolean isDrawInvisibilityLine() {
+        return drawInvisibilityLine;
+    }
+
+    public void setDrawInvisibilityLine(boolean drawInvisibilityLine) {
+        this.drawInvisibilityLine = drawInvisibilityLine;
     }
 }
