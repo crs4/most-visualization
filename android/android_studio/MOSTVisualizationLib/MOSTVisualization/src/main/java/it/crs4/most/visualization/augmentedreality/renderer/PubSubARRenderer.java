@@ -6,7 +6,6 @@ import android.opengl.GLU;
 import android.opengl.Matrix;
 import android.opengl.Visibility;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.view.Display;
@@ -14,26 +13,16 @@ import android.view.WindowManager;
 
 import org.artoolkit.ar.base.ARToolKit;
 import org.artoolkit.ar.base.rendering.ARRenderer;
-import org.artoolkit.ar.base.rendering.gles20.ARRendererGLES20;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.microedition.khronos.opengles.GL10;
-import javax.microedition.khronos.opengles.GL11;
-import javax.microedition.khronos.opengles.GL11;
 
 import it.crs4.most.visualization.augmentedreality.MarkerFactory.Marker;
+import it.crs4.most.visualization.augmentedreality.mesh.Line;
 import it.crs4.most.visualization.augmentedreality.mesh.Mesh;
-import it.crs4.most.visualization.augmentedreality.mesh.MeshFactory;
 import it.crs4.most.visualization.augmentedreality.mesh.MeshManager;
-import it.crs4.most.visualization.utils.zmq.BaseSubscriber;
-
-//import org.artoolkit.ar.base.rendering.Cube;
 
 public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     //  Code from:  https://groups.google.com/forum/#!topic/android-developers/nSv1Pjp5jLY
@@ -43,9 +32,6 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     private static final int _temp_in = 32;
     private static final int _temp_out = 36;
     protected volatile float angle = 0;
-    protected float previousAngle = 0;
-    protected Handler handler;
-    protected BaseSubscriber subscriber;
     protected String TAG = "PubSubARRenderer";
     protected int height;
     protected int width;
@@ -54,13 +40,13 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     private int videoHeight;
     private int videoWidth;
     protected float [] extraCalibration = new float[3];
-
-    private float viewportAspectRatio = 16f/9f;
     private boolean newViewport = true;
     private HashMap<Mesh, Integer> lastVisibleMarkers = new HashMap<>();
     private static float [] identityM = new float[16];
     private float [] prevModelViewMatrix = new float [16];
     private float lowFilterLevel = 0.9f;
+    private boolean drawInvisibilityLine = true;
+
 
     static {
         Matrix.setIdentityM(identityM, 0);
@@ -87,9 +73,6 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
                                    float proj[], int offsetP,
                                    int viewport[], int offsetV,
                                    float[] xyz, int offset) {
-   /* Transformation matrices */
-//   float[] m = new float[16], A = new float[16];
-//   float[] in = new float[4], out = new float[4];
 
    /* Normalize between -1 and 1 */
         _tempGluUnProjectData[_temp_in] = (winx - viewport[offsetV]) *
@@ -185,9 +168,6 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
                     if(visibleMarkerIndex >= 0){
                         Marker marker = markers.get(visibleMarkerIndex);
 
-                        gl.glLoadMatrixf(modelMatrix, 0);
-
-
                         float[] markerMatrix = ARToolKit.getInstance().
                                 queryMarkerTransformation(marker.getArtoolkitID());
 
@@ -199,25 +179,36 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
                         else{
                             prevModelViewMatrix = markerMatrix;
                         }
-                        gl.glMultMatrixf(prevModelViewMatrix, 0);
-                        modelMatrix = marker.getModelMatrix();
-                        gl.glMultMatrixf(modelMatrix, 0);
-
+                        float [] finalModelMatrix = multiplyMatrix(
+                                getExtraCalibrationMatrix(),
+                                multiplyMatrix(
+                                        marker.getModelMatrix(),
+                                        multiplyMatrix(modelMatrix, prevModelViewMatrix)
+                                )
+                        );
+                        gl.glLoadMatrixf(finalModelMatrix, 0);
                         gl.glPushMatrix();
-//                        gl.glMultMatrixf(extraCalibration, 0);
-                        gl.glTranslatef(extraCalibration[0], extraCalibration[1], extraCalibration[2]);
-                        Log.d(TAG, String.format("extraCalibration: %f %f %f", extraCalibration[0], extraCalibration[1], extraCalibration[2]));
-//                        gl.glTranslatef(mesh.getX(), mesh.getY(), mesh.getZ());
-
                         mesh.draw(gl);
-
-//                        MatrixGrabber matrixGrabber = new MatrixGrabber();
-//                        matrixGrabber.getCurrentModelView(gl);
-//                        float [] currentModelMatrix = matrixGrabber.mModelView;
-
-//                        ((GL11) gl).glGetFloatv(GL11.GL_MODELVIEW, currentModelMatrix, 0);
-
                         gl.glPopMatrix();
+
+                        float [] finalMatrix = multiplyMatrix(
+                                projMatrix,
+                                multiplyMatrix(
+                                        mesh.getTransMatrix(),
+                                        finalModelMatrix
+                                        )
+                        );
+
+                        if (isDrawInvisibilityLine() && isMeshVisible(mesh,finalMatrix) < 1) {
+                            Line line = new Line(
+                                    new float[3],
+                                    new float[] {mesh.getX(), mesh.getY(), mesh.getZ()},
+                                    1f
+                            );
+                            line.setColor(new float[]{1.0F, 1F, 1F, 1.0F});
+                            line.draw(gl);
+                        }
+
                     }
 
                 }
@@ -240,17 +231,8 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     public void addMesh(Mesh mesh, float winX, float winY) {
         float[] modelView = new float[16];
         Matrix.setIdentityM(modelView, 0);
-//        getMatrix(gl, GL11.GL_MODELVIEW, modelView);
-
-//        float [] modelView = ARToolKit.getInstance().queryMarkerTransformation(markerID);
-
         float[] projection = ARToolKit.getInstance().getProjectionMatrix();
-//        float [] projection = new float [16];
-//        getMatrix(gl, GL11.GL_PROJECTION, projection);;
-
-
         int[] view = {0, 0, width, height};
-//        gl.glGetIntegerv(GL11. ,viewVectorParams,0);
 
         Log.d(TAG, "width " + width + " height " + height);
         float[] newcoords = new float[4];
@@ -259,10 +241,6 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
         float winZ = 0;
 
         GLU.gluUnProject(winX, winY, winZ, modelView, 0, projection, 0, view, 0, newcoords, 0);
-//        gluUnProject(winX, winY, winZ, modelView, 0, projection, 0, view, 0, newcoords, 0);
-
-//        Log.d(TAG, "winX " +  winX);
-//        Log.d(TAG, "winY " +  winY);
 
         Log.d(TAG, "newcoords[0]" + newcoords[0]);
         Log.d(TAG, "newcoords[1]" + newcoords[1]);
@@ -272,25 +250,12 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
         float x = newcoords[0];
         float y = newcoords[1];
         float z = newcoords[2];
-//        float x = newcoords[0] / newcoords[3];
-//        float y = newcoords[1] / newcoords[3];
-//        float z = newcoords[2] / newcoords[3];
-//        float z = 1;
-
         mesh.setX(x * 500);
         mesh.setY(y * 500);
         mesh.setZ(z);
-//        mesh.setX(0);
-//        mesh.setY(0);
-//        mesh.setZ(0);
-
         Log.d(TAG, "adding mesh in x " + x + " y " + y + " z " + z);
         addMesh(mesh);
     }
-
-//    public Mesh removeMesh(Mesh mesh) {
-//        return meshes.remove(mesh.getId());
-//    }
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
@@ -398,37 +363,19 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
         return prevModelViewMatrix;
     }
 
-//    public float [] getScreenLimit(){
-//        float [] projMatrix = getLastProjMatrix();
-//        float [] modelMatrix = getLastModelMatrix();
-//        float [] finalMatrixToInvert = new float [16];
-//        float [] finalMatrix = new float [16];
-//        Matrix.multiplyMM(finalMatrixToInvert, 0, projMatrix, 0, modelMatrix, 0);
-//        Matrix.invertM(finalMatrix, 0, finalMatrixToInvert, 0);
-//
-//        float [] topRightCornerNDC = new float[] {1, 1, 1, 1};
-//        float [] topRightCorner =  new float[4];
-//        Matrix.multiplyMV(topRightCorner, 0, finalMatrix, 0, topRightCornerNDC, 0);
-//
-//        float [] bottomLeftCornerNDC = new float[] {-1, -1, 1, 1};
-//        float [] bottomLeftCorner=  new float[4];
-//        Matrix.multiplyMV(bottomLeftCorner, 0, finalMatrix, 0, bottomLeftCornerNDC , 0);
-//
-//        return new float[] {bottomLeftCorner[0], topRightCorner[0], bottomLeftCorner[1], topRightCorner[1]};
-//    }
-
-
-    public int isMeshVisible(Mesh mesh) {
-        float [] identityMatrix = new float [16];
-        Matrix.setIdentityM(identityMatrix, 0);
-        return isMeshVisible(mesh, identityMatrix);
+    public float [] getExtraCalibrationMatrix() {
+        float [] extraCalibrationMatrix = new float [16];
+        Matrix.setIdentityM(extraCalibrationMatrix, 0);
+        extraCalibrationMatrix[12] = extraCalibration[0];
+        extraCalibrationMatrix[13] = extraCalibration[1];
+        extraCalibrationMatrix[14] = extraCalibration[2];
+        return extraCalibrationMatrix;
     }
-
 
     /*
     return if mesh is visible after applying modelMatrix over current modelview matrix
      */
-    public int isMeshVisible(Mesh mesh, float [] modelMatrix) {
+    public int isMeshVisible(Mesh mesh, float [] matrix) {
         short[] indices = mesh.getIndices();
         char[] charIndices = new char[indices.length];
 
@@ -437,14 +384,7 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
             short shortIndex = indices[i];
             charIndices[i] = (char) shortIndex;
         }
-
-
-
-        Matrix.multiplyMM(modelMatrix, 0, modelMatrix, 0, getLastModelMatrix(), 0);
-
-        float [] resultMatrix = new float [16];
-        Matrix.multiplyMM(resultMatrix, 0, getLastProjMatrix(), 0, modelMatrix, 0);
-        return Visibility.visibilityTest(resultMatrix, 0, mesh.getVertices(), 0, charIndices, 0, indices.length);
+        return Visibility.visibilityTest(matrix, 0, mesh.getVertices(), 0, charIndices, 0, indices.length);
 
     }
 
@@ -455,5 +395,19 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
 
     public void setExtraCalibration(float[] extraCalibration) {
         this.extraCalibration = extraCalibration;
+    }
+
+    private float [] multiplyMatrix(float [] matrixL, float [] matrixR) {
+        float [] result = new float [16];
+        Matrix.multiplyMM(result, 0, matrixL, 0, matrixR, 0);
+        return result;
+    }
+
+    public boolean isDrawInvisibilityLine() {
+        return drawInvisibilityLine;
+    }
+
+    public void setDrawInvisibilityLine(boolean drawInvisibilityLine) {
+        this.drawInvisibilityLine = drawInvisibilityLine;
     }
 }
