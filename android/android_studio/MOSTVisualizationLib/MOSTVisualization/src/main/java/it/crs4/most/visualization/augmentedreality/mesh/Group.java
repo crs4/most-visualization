@@ -4,6 +4,8 @@ import android.util.Log;
 
 import org.json.JSONException;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import javax.microedition.khronos.opengles.GL10;
@@ -185,5 +187,39 @@ public class Group extends Mesh {
             child.setColors(colors);
         }
 
+    }
+
+    @Override
+    public short[] getIndices() {
+        if (indices == null){
+            List<Short> totalIndices = new ArrayList<>();
+            for (Mesh child : children) {
+                for (short index: child.getIndices()){
+                    totalIndices.add(index);
+                }
+            }
+            indices = new short[totalIndices.size()];
+            for (int i =0; i<totalIndices.size(); i++){
+                indices[i] = totalIndices.get(i);
+            }
+        }
+        return indices;
+    }
+
+    @Override
+    public float[] getVertices() {
+        if (vertices == null){
+            List<Float> totalVertices = new ArrayList<>();
+            for (Mesh child : children) {
+                for (float vertix: child.getIndices()){
+                    totalVertices.add(vertix);
+                }
+            }
+            vertices = new float[totalVertices.size()];
+            for (int i =0; i<totalVertices.size(); i++){
+                vertices[i] = totalVertices.get(i);
+            }
+        }
+        return vertices;
     }
 }
