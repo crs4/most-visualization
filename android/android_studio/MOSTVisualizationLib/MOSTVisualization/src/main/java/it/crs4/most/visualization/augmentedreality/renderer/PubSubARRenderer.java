@@ -205,7 +205,7 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
                                     new float[] {mesh.getX(), mesh.getY(), mesh.getZ()},
                                     1f
                             );
-                            line.setColor(new float[]{1.0F, 1F, 1F, 1.0F});
+                            line.setColors(new float[]{1.0F, 1F, 1F, 1.0F});
                             line.draw(gl);
                         }
 

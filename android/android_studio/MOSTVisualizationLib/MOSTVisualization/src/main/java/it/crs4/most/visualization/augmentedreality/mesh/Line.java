@@ -14,7 +14,7 @@ import javax.microedition.khronos.opengles.GL10;
  *
  */
 
-public class Line {
+public class Line extends Mesh {
 
     int vertexLength = 3; //We only work with position vectors with three elements
     private float[] start = new float[3];
@@ -108,11 +108,11 @@ public class Line {
     }
 
 
-    public float[] getColor() {
+    public float[] getColors() {
         return color;
     }
 
-    public void setColor(float[] color) {
+    public void setColors(float[] color) {
         this.color = color;
     }
 
