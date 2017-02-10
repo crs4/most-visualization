@@ -46,6 +46,7 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     private float [] prevModelViewMatrix = new float [16];
     private float lowFilterLevel = 0.9f;
     private boolean drawInvisibilityLine = true;
+    private boolean adaptViewportToVideo = true;
 
 
     static {
@@ -267,42 +268,71 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     }
 
     private void updateViewport(GL10 gl){
-        if (newViewport && width != 0 && height != 0 && videoHeight != 0 && videoWidth!= 0) {
 
+        if (newViewport &&  width != 0 && height != 0 && videoHeight != 0 && videoWidth!= 0) {
             int finalX, finalY, finalWidth, finalHeight;
             finalX = finalY = finalWidth = finalHeight = 0;
-            if(videoWidth >=videoHeight) {
 
-                if (width >= height) {
-                    finalX = width/2 - videoWidth*height/(2*videoHeight);
-                    finalWidth = videoWidth*height/(videoHeight);
-                    finalHeight = height;
-
-                }
-                else {
-                    finalY = height/2 - videoHeight*width/(2*videoWidth);
-                    finalWidth = width;
-                    finalHeight = videoHeight*width/videoWidth;
-                }
+            if (!adaptViewportToVideo) {
+                finalWidth = width;
+                finalHeight = height;
             }
 
-            else { //videoWidth < videoHeight
-
-                if (width <= height) {
-                    finalX = width/2 - videoWidth*height/(2*videoHeight);
-                    finalWidth = videoWidth*height/(videoHeight);
+            else {
+//              Lets try if height fits
+                int tmpWidth = height*videoWidth/videoHeight;
+                if (tmpWidth < width) {
+                    finalWidth = tmpWidth;
+                    finalX = width/2 - finalWidth/2;
+                    finalY = 0;
                     finalHeight = height;
                 }
                 else {
-                    finalY = height/2 - videoHeight*width/(2*videoWidth);
                     finalWidth = width;
-                    finalHeight = videoHeight*width/videoWidth;
+                    finalX = 0;
+                    finalHeight = finalWidth*videoHeight/videoWidth;
+                    finalY = height/2 - finalHeight/2;
                 }
-            }
-            Log.d(TAG, String.format(" updateViewport width %s, height %s, videoHeight %s, videoWidth %s",
-                    width, height, videoHeight, videoWidth));
-            Log.d(TAG, String.format("updateViewport finalX %s, finalY %s, finalWidth %s, finalHeight %s",
-                    finalX, finalY, finalWidth, finalHeight));
+
+//                if (videoWidth >= videoHeight) {
+//
+//                    if (width >= height) {
+//                        if (width >= videoWidth) {
+//                            finalHeight = height;
+//                            finalWidth = finalHeight*videoWidth/videoHeight;
+//                            if (finalWidth > width) {
+//                                finalWidth = width;
+//                                finalHeight = finalWidth*height/width;
+//                            }
+//                            finalX = width / 2 - finalWidth/2;
+//                        }
+//                        else {
+//                            finalX = 0;
+//                            finalWidth = width;
+//                            finalHeight = videoHeight/videoWidth*finalWidth;
+//                        }
+//
+//                    } else {
+//                        finalY = height / 2 - videoHeight * width / (2 * videoWidth);
+//                        finalWidth = width;
+//                        finalHeight = videoHeight * width / videoWidth;
+//                    }
+//                } else { //videoWidth < videoHeight
+//
+//                    if (width <= height) {
+//                        finalX = width / 2 - videoWidth * height / (2 * videoHeight);
+//                        finalWidth = videoWidth * height / (videoHeight);
+//                        finalHeight = height;
+//                    } else {
+//                        finalY = height / 2 - videoHeight * width / (2 * videoWidth);
+//                        finalWidth = width;
+//                        finalHeight = videoHeight * width / videoWidth;
+//                    }
+                }
+                Log.d(TAG, String.format(" updateViewport width %s, height %s, videoHeight %s, videoWidth %s",
+                        width, height, videoHeight, videoWidth));
+                Log.d(TAG, String.format("updateViewport finalX %s, finalY %s, finalWidth %s, finalHeight %s",
+                        finalX, finalY, finalWidth, finalHeight));
 
             gl.glViewport(finalX, finalY, finalWidth, finalHeight);
             newViewport = false;
@@ -409,5 +439,13 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
 
     public void setDrawInvisibilityLine(boolean drawInvisibilityLine) {
         this.drawInvisibilityLine = drawInvisibilityLine;
+    }
+
+    public boolean isAdaptViewportToVideo() {
+        return adaptViewportToVideo;
+    }
+
+    public void setAdaptViewportToVideo(boolean adaptViewportToVideo) {
+        this.adaptViewportToVideo = adaptViewportToVideo;
     }
 }
