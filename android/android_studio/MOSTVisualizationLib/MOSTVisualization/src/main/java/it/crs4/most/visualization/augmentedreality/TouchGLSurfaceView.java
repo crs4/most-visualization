@@ -45,10 +45,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
     protected BaseSubscriber subscriber;
     protected IPublisher publisher;
     protected Handler handler;
-//    public interface  postEventListener{
-//        public void postEvent()
-//    }
-
+    protected boolean enableZmoving = false;
 
     public TouchGLSurfaceView(Context context) {
         super(context);
@@ -125,7 +122,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
             new ScaleGestureDetector.SimpleOnScaleGestureListener() {
                 @Override
                 public boolean onScale(ScaleGestureDetector detector) {
-                    if (!isEnabled()) {
+                    if (!isEnabled() || !isEnableZmoving()) {
                         return false;
                     }
                     TouchGLSurfaceView.this.mScaling = true;
@@ -338,5 +335,13 @@ public class TouchGLSurfaceView extends GLSurfaceView {
         }
         else
             mMoving = true;
+    }
+
+    public boolean isEnableZmoving() {
+        return enableZmoving;
+    }
+
+    public void setEnableZmoving(boolean enableZmoving) {
+        this.enableZmoving = enableZmoving;
     }
 }
