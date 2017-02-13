@@ -56,6 +56,11 @@ public class ARFragment extends StreamViewerFragment implements
     private boolean enabled = true;
     private LinearLayout controlButtonLayout;
     private String deviceID = null;
+    public interface ARListener {
+        public void ARInitialized();
+        public void ARStopped();
+    }
+    private ARListener arListener;
 
     public static ARFragment newInstance(String streamId) {
         ARFragment sf = new ARFragment();
@@ -292,6 +297,9 @@ public class ARFragment extends StreamViewerFragment implements
             if (ARToolKit.getInstance()
                 .initialiseAR(width, height, null, cameraIndex, cameraIsFrontFacing, deviceID)) {
                 firstUpdate = true;
+                if (arListener != null) {
+                    arListener.ARInitialized();
+                }
             }
             else {
                 Log.e(TAG, "getGLView(): Error initialising camera. Cannot continue.");
@@ -317,6 +325,9 @@ public class ARFragment extends StreamViewerFragment implements
     public void cameraPreviewStopped() {
         if (isARRunning()) {
             ARToolKit.getInstance().cleanup();
+            if (arListener != null) {
+                arListener.ARStopped();
+            }
         }
     }
 
@@ -385,5 +396,13 @@ public class ARFragment extends StreamViewerFragment implements
 
     public void setDeviceID(String deviceID) {
         this.deviceID = deviceID;
+    }
+
+    public ARListener getArListener() {
+        return arListener;
+    }
+
+    public void setArListener(ARListener arListener) {
+        this.arListener = arListener;
     }
 }
