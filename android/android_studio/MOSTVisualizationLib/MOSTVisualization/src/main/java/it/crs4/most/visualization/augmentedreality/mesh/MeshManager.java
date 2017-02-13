@@ -1,6 +1,7 @@
 package it.crs4.most.visualization.augmentedreality.mesh;
 
 import android.opengl.Matrix;
+import android.util.Log;
 
 import org.artoolkit.ar.base.ARToolKit;
 
@@ -20,6 +21,7 @@ public class MeshManager {
     private HashMap<Integer, List<Mesh>> markerToMeshes = new HashMap<>();
     private static int MARKERLESS_ID = -1000;
     private HashSet<Marker> markersAdded = new HashSet<>();
+    private final static String TAG = "MESHMANAGER";
 
     public void addMesh(Mesh mesh){
         meshes.put(mesh.getId(), mesh);
@@ -132,5 +134,19 @@ public class MeshManager {
 
     public List<Mesh> getMeshes(){
         return new ArrayList<>(meshes.values());
+    }
+
+    public List <Mesh> getMeshesByGroup(String group) {
+        List <Mesh> result = new ArrayList<>();
+        for (HashMap.Entry<Integer, Marker> entry: markersID.entrySet()) {
+            String markerGroup = entry.getValue().getGroup();
+            if (markerGroup != null && markerGroup.equals(group)) {
+                result.addAll(markerToMeshes.get(entry.getKey()));
+            }
+        }
+        if (result.size() == 0) {
+            Log.w(TAG, String.format("no mesh found for group %s, be sure it matches db side", group));
+        }
+        return result;
     }
 }

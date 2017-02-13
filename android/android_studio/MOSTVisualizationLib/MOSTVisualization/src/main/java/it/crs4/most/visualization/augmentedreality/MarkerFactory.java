@@ -9,6 +9,7 @@ public class MarkerFactory {
 
     public static class Marker{
         private String cfg;
+        private String group;
         private int artoolkitID = -1;
         private float [] modelMatrix = new float[] {
             1, 0, 0, 0,
@@ -40,6 +41,14 @@ public class MarkerFactory {
         public void setArtoolkitID(int artoolkitID) {
             this.artoolkitID = artoolkitID;
         }
+
+        public String getGroup() {
+            return group;
+        }
+
+        public void setGroup(String group) {
+            this.group = group;
+        }
     }
 
     public static Marker getMarker(String cfg){
@@ -53,6 +62,5 @@ public class MarkerFactory {
         }
         return marker;
     }
-
 
 }
