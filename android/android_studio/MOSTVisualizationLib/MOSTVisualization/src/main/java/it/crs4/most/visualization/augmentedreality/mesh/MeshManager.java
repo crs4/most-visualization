@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import it.crs4.most.visualization.augmentedreality.MarkerFactory.Marker;
 
@@ -147,6 +148,24 @@ public class MeshManager {
         if (result.size() == 0) {
             Log.w(TAG, String.format("no mesh found for group %s, be sure it matches db side", group));
         }
+        return result;
+    }
+
+
+    public Set<Integer> getMarkersID(){
+        return markersID.keySet();
+    }
+
+    public List<Marker> getVisibleMarkers() {
+        List<Marker> result = new ArrayList<>();
+
+        for (HashMap.Entry<Integer, Marker> entry: markersID.entrySet()) {
+            if (ARToolKit.getInstance().queryMarkerVisible(entry.getKey())) {
+                result.add(entry.getValue());
+            }
+        }
+
+
         return result;
     }
 }
