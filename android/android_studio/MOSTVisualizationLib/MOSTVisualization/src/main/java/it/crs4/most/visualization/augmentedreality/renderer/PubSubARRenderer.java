@@ -16,6 +16,7 @@ import org.artoolkit.ar.base.rendering.ARRenderer;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -43,7 +44,7 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     private boolean newViewport = true;
     private HashMap<Mesh, Integer> lastVisibleMarkers = new HashMap<>();
     private static float [] identityM = new float[16];
-    private float [] prevModelViewMatrix = new float [16];
+    private Map<Mesh, float []> prevModelViewMatrixMap = new HashMap<>();
     private float lowFilterLevel = 0.9f;
     private boolean drawInvisibilityLine = true;
     private boolean adaptViewportToVideo = true;
@@ -172,7 +173,13 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
                         float[] markerMatrix = ARToolKit.getInstance().
                                 queryMarkerTransformation(marker.getArtoolkitID());
 
+                        float [] prevModelViewMatrix;
                         if(visibleMarkerIndex == lastVisibleMarkers.get(mesh)){
+
+                            if (!prevModelViewMatrixMap.containsKey(mesh)) {
+                                prevModelViewMatrixMap.put(mesh, new float [16]);
+                            }
+                            prevModelViewMatrix = prevModelViewMatrixMap.get(mesh);
                             for (int i = 0; i < prevModelViewMatrix.length; i++) {
                                 prevModelViewMatrix[i] = lowFilterLevel * prevModelViewMatrix[i] + (1 - lowFilterLevel) * markerMatrix[i];
                             }
@@ -180,6 +187,8 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
                         else{
                             prevModelViewMatrix = markerMatrix;
                         }
+                        prevModelViewMatrixMap.put(mesh, prevModelViewMatrix);
+
                         float [] finalModelMatrix = multiplyMatrix(
                                 getExtraCalibrationMatrix(),
                                 multiplyMatrix(
@@ -385,14 +394,14 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
         this.lowFilterLevel = lowFilterLevel;
     }
 
-    public float [] getLastProjMatrix(){
-        return ARToolKit.getInstance().getProjectionMatrix();
-    }
-
-    public float [] getLastModelMatrix(){
-        return prevModelViewMatrix;
-    }
-
+//    public float [] getLastProjMatrix(){
+//        return ARToolKit.getInstance().getProjectionMatrix();
+//    }
+//
+//    public float [] getLastModelMatrix(){
+//        return prevModelViewMatrix;
+//    }
+//
     public float [] getExtraCalibrationMatrix() {
         float [] extraCalibrationMatrix = new float [16];
         Matrix.setIdentityM(extraCalibrationMatrix, 0);
