@@ -76,6 +76,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile project(':aRBaseLib')
     compile 'org.zeromq:jeromq:0.3.2@jar'
+    compile 'com.jjoe64:graphview:4.2.1'
 }
 
 

@@ -13,13 +13,11 @@ import android.view.ScaleGestureDetector;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import it.crs4.most.visualization.augmentedreality.mesh.Group;
 import it.crs4.most.visualization.augmentedreality.mesh.Mesh;
-import it.crs4.most.visualization.augmentedreality.mesh.MeshFactory;
 import it.crs4.most.visualization.augmentedreality.mesh.MeshManager;
 import it.crs4.most.visualization.augmentedreality.renderer.PubSubARRenderer;
 import it.crs4.most.visualization.utils.zmq.BaseSubscriber;
@@ -91,7 +89,6 @@ public class TouchGLSurfaceView extends GLSurfaceView {
         this.moveNormFactor = moveNormFactor;
     }
 
-
     @Override
     public boolean isEnabled() {
         return enabled;
@@ -100,7 +97,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
     @Override
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
-        if(renderer != null){
+        if (renderer != null) {
             ((PubSubARRenderer) renderer).setEnabled(enabled);
             requestRender();
         }
@@ -110,7 +107,8 @@ public class TouchGLSurfaceView extends GLSurfaceView {
             try {
                 obj.put("msgType", "visibility");
                 obj.put("value", enabled);
-            } catch (JSONException e) {
+            }
+            catch (JSONException e) {
                 e.printStackTrace();
             }
             publisher.send(obj.toString());
@@ -129,7 +127,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                     float currentScaleFactor = detector.getScaleFactor();
                     Log.d(TAG, "currentScaleFactor " + currentScaleFactor);
 
-                    if (mesh != null){
+                    if (mesh != null) {
                         if (currentScaleFactor < 1) {
                             mesh.setZ(mesh.getZ() - 5f);
                         }
@@ -158,7 +156,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
         float x = e.getX();
         float y = e.getY();
         mesh = meshManager.getSelectedMesh(x, y);
-        if (mesh == null){
+        if (mesh == null) {
             return false;
         }
 
@@ -175,8 +173,8 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                 return true;
 
             }
-            float dx = (x - mPreviousX)/moveNormFactor;
-            float dy = (y - mPreviousY)/moveNormFactor;
+            float dx = (x - mPreviousX) / moveNormFactor;
+            float dy = (y - mPreviousY) / moveNormFactor;
             switch (e.getAction()) {
                 case MotionEvent.ACTION_MOVE:
                     Log.d(TAG, "ACTION_MOVE");
@@ -224,7 +222,6 @@ public class TouchGLSurfaceView extends GLSurfaceView {
         return true;
     }
 
-
     public enum Mode {Rotate, Edit, Move}
 
     public BaseSubscriber getSubscriber() {
@@ -241,7 +238,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                     Mesh mesh = null;
                     try {
                         String msgType = (String) json.get("msgType");
-                        switch (msgType){
+                        switch (msgType) {
                             case "visibility":
                                 boolean enabled = json.getBoolean("value");
                                 setEnabled(enabled);
@@ -252,7 +249,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
 //                                addMesh(mesh);
 //                                break;
                             case "coord":
-                                if (!isEnabled()){
+                                if (!isEnabled()) {
                                     setEnabled(true);
                                 }
 
@@ -262,10 +259,10 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                                 break;
                             case "trans":
                                 Log.d(TAG, "received trans");
-                                float [] trans;
-                                for(Map.Entry<float [], List<Mesh>> entry: meshManager.getVisibleMeshes().entrySet()){
+                                float[] trans;
+                                for (Map.Entry<float[], List<Mesh>> entry : meshManager.getVisibleMeshes().entrySet()) {
                                     MarkerFactory.Marker marker = MarkerFactory.
-                                            getMarker(json.getString("marker"));
+                                        getMarker(json.getString("marker"));
                                     trans = marker.getModelMatrix();
                                     trans[12] = json.getLong("transX");
                                     trans[13] = json.getLong("transY");
@@ -274,21 +271,22 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                         }
                         if (mesh != null) {
                             mesh.setCoordinates(
-                                    Float.valueOf(json.get("x").toString()),
-                                    Float.valueOf(json.get("y").toString()),
-                                    Float.valueOf(json.get("z").toString()),
-                                    Float.valueOf(json.get("rx").toString()),
-                                    Float.valueOf(json.get("ry").toString()),
-                                    Float.valueOf(json.get("rz").toString())
+                                Float.valueOf(json.get("x").toString()),
+                                Float.valueOf(json.get("y").toString()),
+                                Float.valueOf(json.get("z").toString()),
+                                Float.valueOf(json.get("rx").toString()),
+                                Float.valueOf(json.get("ry").toString()),
+                                Float.valueOf(json.get("rz").toString())
                             );
                             requestRender();
                         }
-                    } catch (JSONException e) {
+                    }
+                    catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
             };
-            subscriber.handler = handler;
+            subscriber.setHandler(handler);
         }
     }
 
@@ -300,7 +298,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
         this.publisher = publisher;
     }
 
-    protected void handleMove(float dx, float dy){
+    protected void handleMove(float dx, float dy) {
         touchSamplingCounter += 1;
         Log.d(TAG, "Move");
         float finalDx = mesh.getX() + dx;
@@ -321,20 +319,23 @@ public class TouchGLSurfaceView extends GLSurfaceView {
         if (mode == Mode.Edit) {
             mDrawing = false;
         }
-        else
+        else {
             mMoving = false;
+        }
 
         touchSamplingCounter = 0;
         mesh.publishCoordinate();
 
     }
+
     protected void handleDown() {
         Log.d(TAG, "ACTION_DOWN");
         if (mode == Mode.Edit) {
             mDrawing = true;
         }
-        else
+        else {
             mMoving = true;
+        }
     }
 
     public boolean isEnableZmoving() {

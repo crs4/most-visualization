@@ -8,11 +8,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public abstract class BaseSubscriber {
-    public Handler handler;
+    protected Handler mHandler;
 
     public void notifyMessage(String msg) {
-        if (handler != null) {
-            Message message = handler.obtainMessage();
+        if (mHandler != null) {
+            Message message = mHandler.obtainMessage();
             try {
                 message.obj = new JSONObject(msg);
             }
@@ -21,5 +21,13 @@ public abstract class BaseSubscriber {
             }
             message.sendToTarget();
         }
+    }
+
+    public Handler getHandler() {
+        return mHandler;
+    }
+
+    public void setHandler(Handler handler) {
+        this.mHandler = handler;
     }
 }
