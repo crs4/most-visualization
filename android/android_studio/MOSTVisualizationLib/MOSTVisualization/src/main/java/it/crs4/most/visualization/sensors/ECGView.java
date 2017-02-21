@@ -17,9 +17,9 @@ public class ECGView extends GraphView {
     private static final String TAG = "ECGView";
     private BaseSubscriber mSubscriber;
     private Handler mHandler;
-    private ECGSeries<DataPoint> mSeries;
+    private ECGGraphSeries<DataPoint> mSeries;
     private double graph2LastXValue = 0d;
-    private int maxX = 200;
+    private int maxData = 200;
 
 
     public ECGView(Context context) {
@@ -46,10 +46,19 @@ public class ECGView extends GraphView {
 
         getViewport().setXAxisBoundsManual(true);
         getViewport().setMinX(0);
-        getViewport().setMaxX(maxX);
+        getViewport().setMaxX(maxData);
 
         mSeries = new ECGGraphSeries<>();
+        mSeries.setThickness(5);
         addSeries(mSeries);
+    }
+
+    public int getMaxData() {
+        return maxData;
+    }
+
+    public void setMaxData(int maxData) {
+        this.maxData = maxData;
     }
 
     public BaseSubscriber getSubscriber() {
@@ -63,14 +72,14 @@ public class ECGView extends GraphView {
                 @Override
                 public void handleMessage(Message inputMessage) {
                     double ecg = (double) inputMessage.obj;
-                    if (graph2LastXValue == maxX) {
+                    if (graph2LastXValue == maxData) {
                         graph2LastXValue = 0;
                     }
                     else {
                         graph2LastXValue += 1d;
                     }
                     DataPoint d = new DataPoint(graph2LastXValue, ecg);
-                    mSeries.appendData(d, false, maxX - 20);
+                    mSeries.appendData(d, false, maxData - 20);
                 }
             };
             subscriber.setHandler(mHandler);
