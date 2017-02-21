@@ -1,23 +1,11 @@
 package it.crs4.most.visualization.augmentedreality.renderer;
 
 import android.content.Context;
-import android.opengl.Matrix;
-
-import org.artoolkit.ar.base.ARToolKit;
-
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 import javax.microedition.khronos.opengles.GL10;
 
 import it.crs4.most.visualization.augmentedreality.OpticalARToolkit;
-import it.crs4.most.visualization.augmentedreality.mesh.Mesh;
 import it.crs4.most.visualization.augmentedreality.mesh.MeshManager;
-import it.crs4.most.visualization.utils.zmq.BaseSubscriber;
-import it.crs4.most.visualization.utils.zmq.IPublisher;
 
 public class OpticalRenderer extends PubSubARRenderer {
     private OpticalARToolkit mOpticalARToolkit;

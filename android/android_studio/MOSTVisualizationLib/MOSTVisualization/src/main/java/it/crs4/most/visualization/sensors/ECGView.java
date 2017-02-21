@@ -9,13 +9,13 @@ import android.util.AttributeSet;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 
-import it.crs4.most.visualization.utils.zmq.BaseSubscriber;
+import it.crs4.most.visualization.utils.zmq.ECGSubscriber;
 
 
 public class ECGView extends GraphView {
 
     private static final String TAG = "ECGView";
-    private BaseSubscriber mSubscriber;
+    private ECGSubscriber mSubscriber;
     private Handler mHandler;
     private ECGGraphSeries<DataPoint> mSeries;
     private double graph2LastXValue = 0d;
@@ -61,11 +61,11 @@ public class ECGView extends GraphView {
         this.maxData = maxData;
     }
 
-    public BaseSubscriber getSubscriber() {
+    public ECGSubscriber getSubscriber() {
         return mSubscriber;
     }
 
-    public void setSubscriber(BaseSubscriber subscriber) {
+    public void setSubscriber(ECGSubscriber subscriber) {
         mSubscriber = subscriber;
         if (subscriber != null) {
             mHandler = new Handler(Looper.getMainLooper()) {

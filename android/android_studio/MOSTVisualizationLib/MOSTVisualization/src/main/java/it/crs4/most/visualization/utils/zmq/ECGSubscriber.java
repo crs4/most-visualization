@@ -2,10 +2,14 @@ package it.crs4.most.visualization.utils.zmq;
 
 import android.os.Message;
 
-public class ECGSubscriber extends ZMQSubscriber {
+public class ECGSubscriber extends BaseSubscriber {
 
     public ECGSubscriber(String address, String topic) {
         super(address, topic);
+    }
+
+    public ECGSubscriber(String protocol, String address, String port, String topic) {
+        super(protocol, address, port, topic);
     }
 
     @Override

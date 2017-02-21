@@ -20,7 +20,7 @@ import it.crs4.most.visualization.augmentedreality.mesh.Group;
 import it.crs4.most.visualization.augmentedreality.mesh.Mesh;
 import it.crs4.most.visualization.augmentedreality.mesh.MeshManager;
 import it.crs4.most.visualization.augmentedreality.renderer.PubSubARRenderer;
-import it.crs4.most.visualization.utils.zmq.BaseSubscriber;
+import it.crs4.most.visualization.utils.zmq.ARSubscriber;
 import it.crs4.most.visualization.utils.zmq.IPublisher;
 
 public class TouchGLSurfaceView extends GLSurfaceView {
@@ -40,7 +40,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
     protected Mesh mesh;
     protected float moveNormFactor = 1;
     protected int touchSamplingCounter = 0;
-    protected BaseSubscriber subscriber;
+    protected ARSubscriber subscriber;
     protected IPublisher publisher;
     protected Handler handler;
     protected boolean enableZmoving = false;
@@ -224,11 +224,11 @@ public class TouchGLSurfaceView extends GLSurfaceView {
 
     public enum Mode {Rotate, Edit, Move}
 
-    public BaseSubscriber getSubscriber() {
+    public ARSubscriber getSubscriber() {
         return subscriber;
     }
 
-    public void setSubscriber(BaseSubscriber subscriber) {
+    public void setSubscriber(ARSubscriber subscriber) {
         this.subscriber = subscriber;
         if (subscriber != null) {
             handler = new Handler(Looper.getMainLooper()) {
