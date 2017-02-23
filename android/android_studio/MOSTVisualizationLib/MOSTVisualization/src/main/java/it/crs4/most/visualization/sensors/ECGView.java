@@ -53,6 +53,11 @@ public class ECGView extends GraphView {
         addSeries(mSeries);
     }
 
+    public void resetData() {
+        mSeries.resetData(new DataPoint[]{});
+        graph2LastXValue = 0;
+    }
+
     public int getMaxData() {
         return maxData;
     }
@@ -82,7 +87,7 @@ public class ECGView extends GraphView {
                     mSeries.appendData(d, false, maxData - 20);
                 }
             };
-            subscriber.setHandler(mHandler);
+            subscriber.setResponseHandler(mHandler);
         }
     }
 

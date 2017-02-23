@@ -14,6 +14,7 @@ public class ZMQPublisher implements Runnable, IPublisher, Serializable {
     public int port = 5555;
     private ZMQ.Context context;
     private ZMQ.Socket publisher;
+
     public ZMQPublisher() {
 
     }

@@ -1,34 +1,121 @@
 package it.crs4.most.visualization.utils.zmq;
 
 import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Message;
 import android.util.Log;
 
 import org.zeromq.ZMQ;
-import org.zeromq.ZMQ.Context;
-import org.zeromq.ZMQ.Socket;
 
-public abstract class BaseSubscriber implements Runnable {
-    protected Handler mHandler;
-    private static String TAG = "BaseSubscriber";
-    private static short KEEP_ALIVE_INTERVAL = 5000;
+public abstract class BaseSubscriber extends HandlerThread {
+    private final static String TAG = "BaseSubscriber";
+    private final static short KEEP_ALIVE_INTERVAL = 5000;
     private String mUrl;
     private String mTopic;
-    private Context mContext;
-    private Socket socket;
-    private boolean anyMessageReceived = false;
-    private boolean toClose = false;
+    private ZMQ.Context mContext;
+    private ZMQ.Socket mSocket;
+    private Handler mRequestHandler;
+    private Handler mResponseHandler;
+    private boolean messageReceived = false;
+    private boolean close = false;
     //used to reconnect in case of no message receveid. It seems some reconnection problems exist
     // only in first stage of conection when wifi is unstable
 
-
-    public BaseSubscriber(String url, String topic) {
+    BaseSubscriber(String url, String topic) {
+        super(TAG);
         mUrl = url;
         mTopic = topic;
     }
 
-    public BaseSubscriber(String protocol, String address, String port, String topic) {
+    BaseSubscriber(String protocol, String address, String port, String topic) {
         this(String.format("%1$s://%2$s:%3$s", protocol, address, port), topic);
     }
+
+    BaseSubscriber(String url, String topic, Handler responseHandler) {
+        super(TAG);
+        mUrl = url;
+        mTopic = topic;
+        mResponseHandler = responseHandler;
+    }
+
+    BaseSubscriber(String protocol, String address, String port, String topic, Handler responseHandler) {
+        this(String.format("%1$s://%2$s:%3$s", protocol, address, port), topic, responseHandler);
+    }
+
+    public void prepareResponseHandler() {
+        mRequestHandler = new Handler(getLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                getECGValues();
+            }
+        };
+    }
+    public void startReceiving() {
+        mRequestHandler.obtainMessage().sendToTarget();
+    }
+
+    public void stopReceiving() {
+        close();
+    }
+
+    private void connect() {
+        mContext = ZMQ.context(1);
+        mSocket = mContext.socket(ZMQ.SUB);
+        mSocket.connect(mUrl);
+        Log.d(TAG, "Connecting to " + mUrl);
+        if (mTopic != null) {
+            mSocket.subscribe(mTopic.getBytes());
+        }
+        else {
+            mSocket.subscribe(ZMQ.SUBSCRIPTION_ALL);
+        }
+        mSocket.setReceiveTimeOut(1000);
+        Log.d(TAG, "Subscribed");
+    }
+
+    private void disconnect() {
+        mSocket.disconnect(mUrl);
+        mSocket.close();
+        mContext.close();
+    }
+
+    private void getECGValues() {
+        connect();
+        close = false;
+        long startTime = System.currentTimeMillis();
+        long currentTime;
+
+        while (!close) {
+            try {
+                String msg = mSocket.recvStr();
+                if (msg != null) {
+                    messageReceived = true;
+                    notifyMessage(msg);
+                }
+                else if (!messageReceived) {
+                    currentTime = System.currentTimeMillis();
+                    if (currentTime - startTime > KEEP_ALIVE_INTERVAL) {
+                        Log.d(TAG, String.format("no message received after %d, reconnection...", KEEP_ALIVE_INTERVAL));
+                        disconnect();
+                        connect();
+                        startTime = currentTime;
+                    }
+                }
+            }
+            catch (org.zeromq.ZMQException ex) {
+                Log.d(TAG, "error in receiving message, probably keep alive failed");
+            }
+        }
+        disconnect();
+    }
+
+    @Override
+    public boolean quit() {
+        close();
+        return super.quit();
+    }
+
+    protected abstract void notifyMessage(String msg);
 
     public String getTopic() {
         return mTopic;
@@ -46,65 +133,15 @@ public abstract class BaseSubscriber implements Runnable {
         mUrl = url;
     }
 
-    public Handler getHandler() {
-        return mHandler;
+    public Handler getResponseHandler() {
+        return mResponseHandler;
     }
 
-    public void setHandler(Handler handler) {
-        this.mHandler = handler;
+    public void setResponseHandler(Handler responseHandler) {
+        this.mResponseHandler = responseHandler;
     }
-
-
-    protected void connect() {
-        mContext = ZMQ.context(1);
-        socket = mContext.socket(ZMQ.SUB);
-        socket.connect(mUrl);
-        Log.d(TAG, "Connection to " + mUrl);
-        if (mTopic != null) {
-            socket.subscribe(mTopic.getBytes());
-        }
-        else {
-            socket.subscribe(ZMQ.SUBSCRIPTION_ALL);
-        }
-        socket.setReceiveTimeOut(1000);
-        Log.d(TAG, "Subscribed");
-    }
-
-    @Override
-    public void run() {
-        connect();
-        long startTime = System.currentTimeMillis();
-        long currentTime;
-
-        while (!toClose) {
-            try {
-                String msg = socket.recvStr(0);
-                if (msg != null) {
-                    anyMessageReceived = true;
-                    notifyMessage(msg);
-                }
-                else if (!anyMessageReceived) {
-                    currentTime = System.currentTimeMillis();
-                    if (currentTime - startTime > KEEP_ALIVE_INTERVAL) {
-                        Log.d(TAG, String.format("no message received after %d, reconnection...", KEEP_ALIVE_INTERVAL));
-                        socket.disconnect(mUrl);
-                        socket.close();
-                        mContext.close();
-                        connect();
-                        startTime = currentTime;
-                    }
-                }
-            }
-            catch (org.zeromq.ZMQException ex) {
-                Log.d(TAG, "Error receiving message, probably keep alive failed");
-            }
-        }
-        mContext.close();
-    }
-
-    protected abstract void notifyMessage(String msg);
 
     public void close() {
-        toClose = true;
+        close = true;
     }
 }

@@ -286,7 +286,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                     }
                 }
             };
-            subscriber.setHandler(handler);
+            subscriber.setResponseHandler(handler);
         }
     }
 
