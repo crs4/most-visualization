@@ -22,7 +22,6 @@ public class CalibrateTouchGLSurfaceView extends TouchGLSurfaceView {
     protected void handleUp(){
         super.handleUp();
         float [] extraCalibration = new float[] {mesh.getX(), mesh.getY(), mesh.getZ()};
-        ((PubSubARRenderer)renderer).setExtraCalibration(extraCalibration);
         mesh.setX(0, false);
         mesh.setY(0, false);
         mesh.setZ(0, false);
@@ -35,7 +34,6 @@ public class CalibrateTouchGLSurfaceView extends TouchGLSurfaceView {
         mesh.setX(0, false);
         mesh.setY(0, false);
         mesh.setZ(0, false);
-        ((PubSubARRenderer)renderer).setExtraCalibration(new float[3]);
 
     }
 }

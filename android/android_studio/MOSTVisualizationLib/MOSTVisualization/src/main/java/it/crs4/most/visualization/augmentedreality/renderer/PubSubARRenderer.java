@@ -40,7 +40,7 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     private boolean enabled = true;
     private int videoHeight;
     private int videoWidth;
-    protected float [] extraCalibration = new float[3];
+    protected Map<String,float []> extraCalibration = new HashMap<>();
     private boolean newViewport = true;
     private HashMap<Mesh, Integer> lastVisibleMarkers = new HashMap<>();
     private static float [] identityM = new float[16];
@@ -190,7 +190,7 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
                         prevModelViewMatrixMap.put(mesh, prevModelViewMatrix);
 
                         float [] finalModelMatrix = multiplyMatrix(
-                                getExtraCalibrationMatrix(),
+                                getExtraCalibrationMatrix(marker),
                                 multiplyMatrix(
                                         marker.getModelMatrix(),
                                         multiplyMatrix(modelMatrix, prevModelViewMatrix)
@@ -402,12 +402,17 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
 //        return prevModelViewMatrix;
 //    }
 //
-    public float [] getExtraCalibrationMatrix() {
+    public float [] getExtraCalibrationMatrix(Marker marker) {
         float [] extraCalibrationMatrix = new float [16];
         Matrix.setIdentityM(extraCalibrationMatrix, 0);
-        extraCalibrationMatrix[12] = extraCalibration[0];
-        extraCalibrationMatrix[13] = extraCalibration[1];
-        extraCalibrationMatrix[14] = extraCalibration[2];
+
+        if (extraCalibration.containsKey(marker.getGroup())) {
+            float  [] calibration = extraCalibration.get(marker.getGroup());
+
+            extraCalibrationMatrix[12] = calibration[0];
+            extraCalibrationMatrix[13] = calibration[1];
+            extraCalibrationMatrix[14] = calibration[2];
+        }
         return extraCalibrationMatrix;
     }
 
@@ -428,12 +433,12 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     }
 
 
-    public float[] getExtraCalibration() {
-        return extraCalibration;
+    public float[] getExtraCalibration(String group) {
+        return extraCalibration.get(group);
     }
 
-    public void setExtraCalibration(float[] extraCalibration) {
-        this.extraCalibration = extraCalibration;
+    public void setExtraCalibration(String group, float[] extraCalibration) {
+        this.extraCalibration.put(group, extraCalibration);
     }
 
     private float [] multiplyMatrix(float [] matrixL, float [] matrixR) {
