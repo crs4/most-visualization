@@ -382,11 +382,11 @@ public class ARFragment extends StreamViewerFragment implements
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
-        if(renderer != null){
-            renderer.setEnabled(enabled);
-        }
+
         if (glView != null) {
             glView.setEnabled(enabled);
+            glView.setEnableRendering(enabled);
+
         }
     }
 

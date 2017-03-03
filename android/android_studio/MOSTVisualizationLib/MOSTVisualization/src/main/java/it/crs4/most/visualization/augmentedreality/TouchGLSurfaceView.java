@@ -44,6 +44,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
     protected IPublisher publisher;
     protected Handler handler;
     protected boolean enableZmoving = false;
+    protected boolean enableRendering = true;
 
     public TouchGLSurfaceView(Context context) {
         super(context);
@@ -97,22 +98,6 @@ public class TouchGLSurfaceView extends GLSurfaceView {
     @Override
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
-        if (renderer != null) {
-            ((PubSubARRenderer) renderer).setEnabled(enabled);
-            requestRender();
-        }
-        if (publisher != null) {
-            JSONObject obj = new JSONObject();
-
-            try {
-                obj.put("msgType", "visibility");
-                obj.put("value", enabled);
-            }
-            catch (JSONException e) {
-                e.printStackTrace();
-            }
-            publisher.send(obj.toString());
-        }
     }
 
     protected void initScaleDetector(Context context) {
@@ -241,7 +226,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                         switch (msgType) {
                             case "visibility":
                                 boolean enabled = json.getBoolean("value");
-                                setEnabled(enabled);
+                                setEnableRendering(enabled);
                                 break;
 
 //                            case "newObj":
@@ -249,8 +234,8 @@ public class TouchGLSurfaceView extends GLSurfaceView {
 //                                addMesh(mesh);
 //                                break;
                             case "coord":
-                                if (!isEnabled()) {
-                                    setEnabled(true);
+                                if (!isEnableRendering()) {
+                                    setEnableRendering(true);
                                 }
 
 
@@ -344,5 +329,29 @@ public class TouchGLSurfaceView extends GLSurfaceView {
 
     public void setEnableZmoving(boolean enableZmoving) {
         this.enableZmoving = enableZmoving;
+    }
+
+    public boolean isEnableRendering() {
+        return enableRendering;
+    }
+
+    public void setEnableRendering(boolean enableRendering) {
+        this.enableRendering = enableRendering;
+        if (renderer != null) {
+            ((PubSubARRenderer) renderer).setEnabled(enableRendering);
+            requestRender();
+        }
+        if (publisher != null) {
+            JSONObject obj = new JSONObject();
+
+            try {
+                obj.put("msgType", "visibility");
+                obj.put("value", enableRendering);
+            }
+            catch (JSONException e) {
+                e.printStackTrace();
+            }
+            publisher.send(obj.toString());
+        }
     }
 }
