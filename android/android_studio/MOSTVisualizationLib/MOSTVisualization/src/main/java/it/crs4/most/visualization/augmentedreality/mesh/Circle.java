@@ -1,0 +1,105 @@
+package it.crs4.most.visualization.augmentedreality.mesh;
+
+
+import android.opengl.GLES10;
+import android.opengl.Visibility;
+
+import org.artoolkit.ar.base.rendering.RenderUtils;
+
+import javax.microedition.khronos.opengles.GL10;
+
+public class Circle extends Mesh {
+    private int vertexLength = 3; //We only work with position vectors with three elements
+    private int width = 20;
+    private float [] vertices4Visibility;
+
+    static float PI = (float) Math.PI;
+    public static float[] MakeCircle2d(float rad,int points) {
+//        float[] vertices = new float[points*2+2];
+//        boolean first = true;
+//        float fx = 0;
+//        float fy = 0;
+//        int c = 0;
+//        for (int i = 0; i < points; i++) {
+//            float fi = 2* (PI)*i/points;
+//            float xa = rad * (float) Math.sin(fi + PI) ;
+//            float ya = rad * (float) Math.cos(fi + PI);
+//            if(first)
+//            {
+//                first=false;
+//                fx=xa;
+//                fy=ya;
+//            }
+//            vertices[c]=xa;
+//            vertices[c+1]=ya;
+//            c+=2;
+//        }
+//        vertices[c]=fx;
+//        vertices[c+1]=fy;
+
+        float [] vertices = new float[points*3];
+
+        for (int i = 0; i < vertices.length; i += 3) {
+            // x value
+            float fi = 2* (PI)*i/points;
+            vertices[i]   = rad * (float)Math.sin(fi);
+                    // y value
+            vertices[i+1] = rad * (float)Math.cos(fi);
+            vertices[i+2] = 0;
+        }
+
+        return vertices;
+    }
+
+    public Circle(float rad) {
+        vertices = MakeCircle2d(rad, 90);
+        verticesBuffer = RenderUtils.buildFloatBuffer(vertices);
+        indices = new short[(vertices.length - 1)*3 *3]; // n vertices -1 = n triangles inside circle
+
+        //add a vertex at the center, so we can call visibilityTest assuming the circle is a mesh triangle
+        vertices4Visibility = new float[vertices.length + 3];
+        for (int i = 0; i < vertices.length; i++) {
+            vertices4Visibility[i] = vertices[i];
+        }
+        vertices4Visibility[vertices4Visibility.length - 3] = 0;
+        vertices4Visibility[vertices4Visibility.length - 2] = 0;
+        vertices4Visibility[vertices4Visibility.length - 1] = 0;
+
+        for (int i = 0; i < vertices.length; i+=3) {
+            indices[i] = (short) (vertices4Visibility.length - 3);
+            indices[i + 2] = (short) i;
+            indices[i + 1] = (short) (i + 3);
+        }
+
+    }
+
+    public Circle(float width, float height, float depth, String id) {
+        this(width);
+        setId(id);
+    }
+
+    public void draw(GL10 gl) {
+        gl.glTranslatef(x, y, z);
+
+        gl.glVertexPointer(vertexLength, GLES10.GL_FLOAT, 0, verticesBuffer);
+        gl.glEnableClientState(GLES10.GL_VERTEX_ARRAY);
+        gl.glColor4f(1, 0, 0, 1); // Red
+//        gl.glColor4f(rgba[0],rgba[1],rgba[2],rgba[3]); // Red
+        gl.glLineWidth(this.width);
+        gl.glDrawArrays(GL10.GL_LINES, 0, vertices.length / 3);
+        gl.glDisableClientState(GLES10.GL_VERTEX_ARRAY);
+
+    }
+
+    public int isMeshVisible(float [] projModelViewMatrix) {
+        short[] indices = getIndices();
+        char[] charIndices = new char[indices.length];
+
+        // method needs char[]
+        for (int i = 0; i < indices.length; i++) {
+            short shortIndex = indices[i];
+            charIndices[i] = (char) shortIndex;
+        }
+        return Visibility.visibilityTest(projModelViewMatrix, 0, vertices4Visibility, 0, charIndices, 0, indices.length);
+    }
+}

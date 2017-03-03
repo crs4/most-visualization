@@ -1,6 +1,7 @@
 package it.crs4.most.visualization.augmentedreality.mesh;
 
 import android.opengl.Matrix;
+import android.opengl.Visibility;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,13 +32,13 @@ public abstract class Mesh {
     protected float ry = 0;
     protected float rz = 0;
     // Our vertex buffer.
-    private FloatBuffer verticesBuffer = null;
+    protected FloatBuffer verticesBuffer = null;
     // Our index buffer.
-    private ShortBuffer indicesBuffer = null;
+    protected ShortBuffer indicesBuffer = null;
     // The number of indices.
     private int numOfIndices = -1;
     // Flat Color
-    private float[] rgba = new float[]{1.0f, 1.0f, 1.0f, 1.0f};
+    protected float[] rgba = new float[]{1.0f, 1.0f, 1.0f, 1.0f};
     // Smooth Colors
     private FloatBuffer colorBuffer = null;
     private String TAG = "MESH";
@@ -376,6 +377,18 @@ public abstract class Mesh {
         transMatrix[13] = getY();
         transMatrix[14] = getZ();
         return transMatrix;
+    }
+
+    public int isMeshVisible(float [] projModelViewMatrix) {
+        short[] indices = getIndices();
+        char[] charIndices = new char[indices.length];
+
+        // method needs char[]
+        for (int i = 0; i < indices.length; i++) {
+            short shortIndex = indices[i];
+            charIndices[i] = (char) shortIndex;
+        }
+        return Visibility.visibilityTest(projModelViewMatrix, 0, getVertices(), 0, charIndices, 0, indices.length);
     }
 }
 
