@@ -10,7 +10,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 public class Circle extends Mesh {
     private int vertexLength = 3; //We only work with position vectors with three elements
-    private int width = 20;
+    private int width = 5;
     private float [] vertices4Visibility;
 
     static float PI = (float) Math.PI;
@@ -39,22 +39,25 @@ public class Circle extends Mesh {
 
         float [] vertices = new float[points*3];
 
+        int angleCounter = 0;
         for (int i = 0; i < vertices.length; i += 3) {
             // x value
-            float fi = 2* (PI)*i/points;
+            float fi = 2* (PI)*angleCounter/points;
             vertices[i]   = rad * (float)Math.sin(fi);
                     // y value
             vertices[i+1] = rad * (float)Math.cos(fi);
             vertices[i+2] = 0;
+            angleCounter++;
         }
 
         return vertices;
     }
 
     public Circle(float rad) {
-        vertices = MakeCircle2d(rad, 90);
+        int points = 16;
+        vertices = MakeCircle2d(rad, points);
         verticesBuffer = RenderUtils.buildFloatBuffer(vertices);
-        indices = new short[(vertices.length - 1)*3 *3]; // n vertices -1 = n triangles inside circle
+        indices = new short[points*3]; // n vertices -1 = n triangles inside circle
 
         //add a vertex at the center, so we can call visibilityTest assuming the circle is a mesh triangle
         vertices4Visibility = new float[vertices.length + 3];
@@ -65,11 +68,15 @@ public class Circle extends Mesh {
         vertices4Visibility[vertices4Visibility.length - 2] = 0;
         vertices4Visibility[vertices4Visibility.length - 1] = 0;
 
-        for (int i = 0; i < vertices.length; i+=3) {
-            indices[i] = (short) (vertices4Visibility.length - 3);
-            indices[i + 2] = (short) i;
-            indices[i + 1] = (short) (i + 3);
+        short vertexIndex = 0;
+        for (int i = 0; i < indices.length; i+=3) {
+            indices[i] = (short) (points);
+            indices[i + 1] = (short) ((vertexIndex  + 1) %  points);
+            indices[i + 2] = (short) (vertexIndex %  points);
+            vertexIndex += 1;
         }
+
+//        vertices = vertices4Visibility;
 
     }
 
@@ -77,7 +84,7 @@ public class Circle extends Mesh {
         this(width);
         setId(id);
     }
-
+//
     public void draw(GL10 gl) {
         gl.glTranslatef(x, y, z);
 
@@ -86,7 +93,7 @@ public class Circle extends Mesh {
         gl.glColor4f(1, 0, 0, 1); // Red
 //        gl.glColor4f(rgba[0],rgba[1],rgba[2],rgba[3]); // Red
         gl.glLineWidth(this.width);
-        gl.glDrawArrays(GL10.GL_LINES, 0, vertices.length / 3);
+        gl.glDrawArrays(GL10.GL_LINE_LOOP, 0, vertices.length / 3);
         gl.glDisableClientState(GLES10.GL_VERTEX_ARRAY);
 
     }
