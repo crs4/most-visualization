@@ -209,7 +209,7 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
                                         )
                         );
 
-                        if (isDrawInvisibilityLine() && isMeshVisible(mesh,finalMatrix) < 1) {
+                        if (isDrawInvisibilityLine() && mesh.isMeshVisible(finalMatrix) < 1) {
                             Line line = new Line(
                                     new float[3],
                                     new float[] {mesh.getX(), mesh.getY(), mesh.getZ()},
@@ -415,23 +415,6 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
         }
         return extraCalibrationMatrix;
     }
-
-    /*
-    return if mesh is visible after applying modelMatrix over current modelview matrix
-     */
-    public int isMeshVisible(Mesh mesh, float [] matrix) {
-        short[] indices = mesh.getIndices();
-        char[] charIndices = new char[indices.length];
-
-        // method needs char[]
-        for (int i = 0; i < indices.length; i++) {
-            short shortIndex = indices[i];
-            charIndices[i] = (char) shortIndex;
-        }
-        return Visibility.visibilityTest(matrix, 0, mesh.getVertices(), 0, charIndices, 0, indices.length);
-
-    }
-
 
     public float[] getExtraCalibration(String group) {
         return extraCalibration.get(group);
