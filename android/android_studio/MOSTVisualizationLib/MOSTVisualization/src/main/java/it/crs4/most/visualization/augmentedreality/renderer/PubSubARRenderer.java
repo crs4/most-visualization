@@ -135,7 +135,13 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
 
                 List<Marker> markers = mesh.getMarkers();
                 if(markers.size() == 0) { //MARKLESS
-                    gl.glLoadMatrixf(identityM, 0);
+                    float [] markerlessProjMatrix = new float[16];
+
+//                    float aspectRatio = width > height? (float) width/height: (float) height/width;
+//                    float aspectRatio = (float) width/height;
+                    float aspectRatio = videoHeight > 0? (float) videoWidth/videoHeight: 1f;
+                    Matrix.orthoM(markerlessProjMatrix, 0, -aspectRatio, aspectRatio, -1, 1, -1, 1);
+                    gl.glLoadMatrixf(markerlessProjMatrix, 0);
                     mesh.draw(gl);
                 }
                 else if(projMatrix != null){
