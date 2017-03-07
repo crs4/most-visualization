@@ -49,6 +49,11 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     private boolean drawInvisibilityLine = true;
     private boolean adaptViewportToVideo = true;
 
+    public interface ViewportListener {
+        public void onViewportChanged(int x, int y, int width, int height);
+    };
+
+    private ViewportListener viewportListener;
 
     static {
         Matrix.setIdentityM(identityM, 0);
@@ -351,6 +356,9 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
 
             gl.glViewport(finalX, finalY, finalWidth, finalHeight);
             newViewport = false;
+            if (viewportListener != null) {
+                viewportListener.onViewportChanged(finalX, finalY, finalWidth, finalHeight);
+            }
         }
     }
 
@@ -450,5 +458,13 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
 
     public void setAdaptViewportToVideo(boolean adaptViewportToVideo) {
         this.adaptViewportToVideo = adaptViewportToVideo;
+    }
+
+    public ViewportListener getViewportListener() {
+        return viewportListener;
+    }
+
+    public void setViewportListener(ViewportListener viewportListener) {
+        this.viewportListener = viewportListener;
     }
 }
