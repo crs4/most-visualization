@@ -89,6 +89,7 @@ public class Circle extends Mesh {
 //
     public void draw(GL10 gl) {
         gl.glTranslatef(x, y, z);
+        gl.glScalef(sx, sy, sz);
 
         gl.glVertexPointer(vertexLength, GLES10.GL_FLOAT, 0, verticesBuffer);
         gl.glEnableClientState(GLES10.GL_VERTEX_ARRAY);
