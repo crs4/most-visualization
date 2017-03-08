@@ -47,6 +47,9 @@ public class OpticalARToolkit {
 //
 //        eyeLmodel[14] -= 100;
 //        eyeRmodel[14] -= 100;
+        eyeRmodel[12] += -2.8583984;
+        eyeRmodel[13] += 22.968475;
+        eyeRproject[5] += eyeRproject[5]*0.3;
         return ret;
     }
 
