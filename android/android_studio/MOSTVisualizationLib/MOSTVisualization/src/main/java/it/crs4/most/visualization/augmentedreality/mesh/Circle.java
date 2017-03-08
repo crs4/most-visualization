@@ -10,8 +10,9 @@ import javax.microedition.khronos.opengles.GL10;
 
 public class Circle extends Mesh {
     private int vertexLength = 3; //We only work with position vectors with three elements
-    private int width = 5;
+    private float width = 5;
     private float [] vertices4Visibility;
+    private float rad;
 
     static float PI = (float) Math.PI;
     public static float[] MakeCircle2d(float rad,int points) {
@@ -54,6 +55,7 @@ public class Circle extends Mesh {
     }
 
     public Circle(float rad) {
+        this.rad = rad;
         int points = 16;
         vertices = MakeCircle2d(rad, points);
         verticesBuffer = RenderUtils.buildFloatBuffer(vertices);
@@ -87,6 +89,7 @@ public class Circle extends Mesh {
 //
     public void draw(GL10 gl) {
         gl.glTranslatef(x, y, z);
+        gl.glScalef(sx, sy, sz);
 
         gl.glVertexPointer(vertexLength, GLES10.GL_FLOAT, 0, verticesBuffer);
         gl.glEnableClientState(GLES10.GL_VERTEX_ARRAY);
@@ -108,5 +111,17 @@ public class Circle extends Mesh {
             charIndices[i] = (char) shortIndex;
         }
         return Visibility.visibilityTest(projModelViewMatrix, 0, vertices4Visibility, 0, charIndices, 0, indices.length);
+    }
+
+    public float getRad() {
+        return rad;
+    }
+
+    public float getWidth() {
+        return width;
+    }
+
+    public void setWidth(float width) {
+        this.width = width;
     }
 }

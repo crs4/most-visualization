@@ -31,6 +31,13 @@ public abstract class Mesh {
     protected float rx = 0;
     protected float ry = 0;
     protected float rz = 0;
+
+    //    scale params
+    protected float sx = 1;
+    protected float sy = 1;
+    protected float sz = 1;
+
+
     // Our vertex buffer.
     protected FloatBuffer verticesBuffer = null;
     // Our index buffer.
@@ -78,6 +85,14 @@ public abstract class Mesh {
 
     public void addMarker(Marker marker) {
         markers.add(marker);
+    }
+
+    public void removeMarker(Marker marker) {
+        markers.remove(marker);
+    }
+
+    public void removeAllMarkers() {
+        markers = new ArrayList<>();
     }
 
     protected void setId(String id) {
@@ -258,6 +273,8 @@ public abstract class Mesh {
         gl.glRotatef(ry, 0, 1, 0);
         gl.glRotatef(rz, 0, 0, 1);
 
+        gl.glScalef(sx, sy, sz);
+
         // Point out the where the color buffer is.
         gl.glDrawElements(GL10.GL_TRIANGLES, numOfIndices,
             GL10.GL_UNSIGNED_SHORT, indicesBuffer);
@@ -389,6 +406,30 @@ public abstract class Mesh {
             charIndices[i] = (char) shortIndex;
         }
         return Visibility.visibilityTest(projModelViewMatrix, 0, getVertices(), 0, charIndices, 0, indices.length);
+    }
+
+    public float getSx() {
+        return sx;
+    }
+
+    public void setSx(float sx) {
+        this.sx = sx;
+    }
+
+    public float getSy() {
+        return sy;
+    }
+
+    public void setSy(float sy) {
+        this.sy = sy;
+    }
+
+    public float getSz() {
+        return sz;
+    }
+
+    public void setSz(float sz) {
+        this.sz = sz;
     }
 }
 

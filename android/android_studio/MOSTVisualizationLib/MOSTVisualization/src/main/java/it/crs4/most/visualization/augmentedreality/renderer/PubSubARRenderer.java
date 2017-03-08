@@ -49,6 +49,11 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     private boolean drawInvisibilityLine = true;
     private boolean adaptViewportToVideo = true;
 
+    public interface ViewportListener {
+        public void onViewportChanged(int x, int y, int width, int height);
+    };
+
+    private ViewportListener viewportListener;
 
     static {
         Matrix.setIdentityM(identityM, 0);
@@ -135,7 +140,13 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
 
                 List<Marker> markers = mesh.getMarkers();
                 if(markers.size() == 0) { //MARKLESS
-                    gl.glLoadMatrixf(identityM, 0);
+                    float [] markerlessProjMatrix = new float[16];
+
+//                    float aspectRatio = width > height? (float) width/height: (float) height/width;
+//                    float aspectRatio = (float) width/height;
+                    float aspectRatio = videoHeight > 0? (float) videoWidth/videoHeight: 1f;
+                    Matrix.orthoM(markerlessProjMatrix, 0, -aspectRatio, aspectRatio, -1, 1, -1, 1);
+                    gl.glLoadMatrixf(markerlessProjMatrix, 0);
                     mesh.draw(gl);
                 }
                 else if(projMatrix != null){
@@ -345,6 +356,9 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
 
             gl.glViewport(finalX, finalY, finalWidth, finalHeight);
             newViewport = false;
+            if (viewportListener != null) {
+                viewportListener.onViewportChanged(finalX, finalY, finalWidth, finalHeight);
+            }
         }
     }
 
@@ -444,5 +458,13 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
 
     public void setAdaptViewportToVideo(boolean adaptViewportToVideo) {
         this.adaptViewportToVideo = adaptViewportToVideo;
+    }
+
+    public ViewportListener getViewportListener() {
+        return viewportListener;
+    }
+
+    public void setViewportListener(ViewportListener viewportListener) {
+        this.viewportListener = viewportListener;
     }
 }
