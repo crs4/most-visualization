@@ -14,6 +14,7 @@ import android.view.WindowManager;
 import org.artoolkit.ar.base.ARToolKit;
 import org.artoolkit.ar.base.rendering.ARRenderer;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,7 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     private float lowFilterLevel = 0.9f;
     private boolean drawInvisibilityLine = true;
     private boolean adaptViewportToVideo = true;
+    private boolean enableGrid = false;
 
     public interface ViewportListener {
         public void onViewportChanged(int x, int y, int width, int height);
@@ -128,25 +130,47 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
     }
 
 
+    private float getVideoAspectRatio(){
+        return videoHeight > 0? (float) videoWidth/videoHeight: 1f;
+    }
+
+    private float[] getOrthoProjMatrix() {
+        float [] orthoMatrix = new float[16];
+        float aspectRatio = getVideoAspectRatio();
+        Matrix.orthoM(orthoMatrix, 0, -aspectRatio, aspectRatio, -1, 1, -1, 1);
+//        Matrix.setIdentityM(orthoMatrix, 0);
+        return orthoMatrix;
+    }
+
     protected void basicDraw(GL10 gl, float [] projMatrix){
         basicDraw(gl, projMatrix, identityM);
     }
 
     protected void basicDraw(GL10 gl, float [] projMatrix, float [] modelMatrix){
+        float [] orthoMatrix = null;
 
-        gl.glMatrixMode(GL10.GL_PROJECTION);
+        if (isEnableGrid()) {
+            gl.glMatrixMode(GL10.GL_MODELVIEW);
+            gl.glLoadIdentity();
+            gl.glMatrixMode(GL10.GL_PROJECTION);
+            orthoMatrix = getOrthoProjMatrix();
+            gl.glLoadMatrixf(orthoMatrix, 0);
+//            gl.glLoadIdentity();
+            drawGrid(gl);
+        }
+
         synchronized (meshManager) {
             for (Mesh mesh : meshManager.getMeshes()) {
 
+                gl.glMatrixMode(GL10.GL_PROJECTION);
+
                 List<Marker> markers = mesh.getMarkers();
                 if(markers.size() == 0) { //MARKLESS
-                    float [] markerlessProjMatrix = new float[16];
+                    if (orthoMatrix == null) {
+                        orthoMatrix = getOrthoProjMatrix();
+                    }
 
-//                    float aspectRatio = width > height? (float) width/height: (float) height/width;
-//                    float aspectRatio = (float) width/height;
-                    float aspectRatio = videoHeight > 0? (float) videoWidth/videoHeight: 1f;
-                    Matrix.orthoM(markerlessProjMatrix, 0, -aspectRatio, aspectRatio, -1, 1, -1, 1);
-                    gl.glLoadMatrixf(markerlessProjMatrix, 0);
+                    gl.glLoadMatrixf(orthoMatrix, 0);
                     mesh.draw(gl);
                 }
                 else if(projMatrix != null){
@@ -313,7 +337,6 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
                     finalHeight = finalWidth*videoHeight/videoWidth;
                     finalY = height/2 - finalHeight/2;
                 }
-
 //                if (videoWidth >= videoHeight) {
 //
 //                    if (width >= height) {
@@ -466,5 +489,38 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
 
     public void setViewportListener(ViewportListener viewportListener) {
         this.viewportListener = viewportListener;
+    }
+
+    protected void drawGrid(GL10 gl) {
+        Line line;
+        float aspectRatio = getVideoAspectRatio();
+        Log.d(TAG, "aspectRatio " + aspectRatio);
+
+        float[] whiteColor = new float[] {1.0F, 1F, 1F, 1.0F};
+        float thick = 1f;
+
+        for (int i = -3; i <= 3; i++) {
+            line = new Line(
+                    new float[] {i *0.25f*aspectRatio, -1, 0},
+                    new float[] {i *0.25f*aspectRatio, 1, 0},
+                    thick);
+            line.setColors(whiteColor);
+            line.draw(gl);
+
+            line = new Line(
+                    new float[] {-aspectRatio, i * 0.25f, 0},
+                    new float[] {aspectRatio, i * 0.25f, 0},
+                    thick);
+            line.setColors(whiteColor);
+            line.draw(gl);
+        }
+    }
+
+    public boolean isEnableGrid() {
+        return enableGrid;
+    }
+
+    public void setEnableGrid(boolean enableGrid) {
+        this.enableGrid = enableGrid;
     }
 }
