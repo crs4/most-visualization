@@ -12,10 +12,11 @@ public class Circle extends Mesh {
     private int vertexLength = 3; //We only work with position vectors with three elements
     private float width = 5;
     private float [] vertices4Visibility;
-    private float rad;
+    private float radX;
+    private float radY;
 
     static float PI = (float) Math.PI;
-    public static float[] MakeCircle2d(float rad,int points) {
+    public static float[] MakeCircle2d(float radX, float radY,int points) {
 //        float[] vertices = new float[points*2+2];
 //        boolean first = true;
 //        float fx = 0;
@@ -23,8 +24,8 @@ public class Circle extends Mesh {
 //        int c = 0;
 //        for (int i = 0; i < points; i++) {
 //            float fi = 2* (PI)*i/points;
-//            float xa = rad * (float) Math.sin(fi + PI) ;
-//            float ya = rad * (float) Math.cos(fi + PI);
+//            float xa = radX * (float) Math.sin(fi + PI) ;
+//            float ya = radX * (float) Math.cos(fi + PI);
 //            if(first)
 //            {
 //                first=false;
@@ -44,9 +45,9 @@ public class Circle extends Mesh {
         for (int i = 0; i < vertices.length; i += 3) {
             // x value
             float fi = 2* (PI)*angleCounter/points;
-            vertices[i]   = rad * (float)Math.sin(fi);
+            vertices[i]   = radX * (float)Math.sin(fi);
                     // y value
-            vertices[i+1] = rad * (float)Math.cos(fi);
+            vertices[i+1] = radY * (float)Math.cos(fi);
             vertices[i+2] = 0;
             angleCounter++;
         }
@@ -54,10 +55,19 @@ public class Circle extends Mesh {
         return vertices;
     }
 
-    public Circle(float rad) {
-        this.rad = rad;
+
+    public Circle(float radX, float radY, float width, String id) {
+        this(radX, radY, width);
+        setId(id);
+    }
+
+    public Circle(float radX, float radY, float width) {
+        this.radX = radX;
+        this.radY = radY;
+        this.width = width;
+
         int points = 16;
-        vertices = MakeCircle2d(rad, points);
+        vertices = MakeCircle2d(radX, radY, points);
         verticesBuffer = RenderUtils.buildFloatBuffer(vertices);
         indices = new short[points*3]; // n vertices -1 = n triangles inside circle
 
@@ -78,13 +88,6 @@ public class Circle extends Mesh {
             vertexIndex += 1;
         }
 
-//        vertices = vertices4Visibility;
-
-    }
-
-    public Circle(float width, float height, float depth, String id) {
-        this(width);
-        setId(id);
     }
 //
     public void draw(GL10 gl) {
@@ -113,8 +116,8 @@ public class Circle extends Mesh {
         return Visibility.visibilityTest(projModelViewMatrix, 0, vertices4Visibility, 0, charIndices, 0, indices.length);
     }
 
-    public float getRad() {
-        return rad;
+    public float getRadX() {
+        return radX;
     }
 
     public float getWidth() {
