@@ -37,9 +37,13 @@ public class Line extends Mesh {
      * @param width Width of the vector
      */
     public Line(float[] start, float[] end, float width) {
+        setBorders(start, end);
+        this.width = width;
+    }
+
+    public void setBorders(float[]  start, float[] end) {
         setStart(start);
         setEnd(end);
-        this.width = width;
         setArrays();
     }
 
