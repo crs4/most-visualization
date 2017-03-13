@@ -161,15 +161,31 @@ public class Group extends Mesh {
             publishCoordinate();
     }
 
+    @Override
+    public void setSx(float sx, boolean publish) {
+        for (Mesh child : children) {
+            child.setSx(sx, false);
+        }
+        this.sx = sx;
+        if (publish)
+            publishCoordinate();
+    }
 
     @Override
-    public void setCoordinates(float x, float y, float z, float rx, float ry, float rz, boolean publish) {
-        setX(x, false);
-        setY(y, false);
-        setZ(z, false);
-        setRx(rx, false);
-        setRy(ry, false);
-        setRz(rz, false);
+    public void setSy(float sy, boolean publish) {
+        for (Mesh child : children) {
+            child.setSy(sy, false);
+        }
+        this.sy = sy;
+        if (publish)
+            publishCoordinate();
+    }
+    @Override
+    public void setSz(float sz, boolean publish) {
+        for (Mesh child : children) {
+            child.setSz(sz, false);
+        }
+        this.sz = sz;
         if (publish)
             publishCoordinate();
     }

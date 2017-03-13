@@ -123,9 +123,16 @@ public abstract class Mesh {
         obj.put("x", coords[0]);
         obj.put("y", coords[1]);
         obj.put("z", coords[2]);
+
         obj.put("rx", rx);
         obj.put("ry", ry);
         obj.put("rz", rz);
+
+        obj.put("sx", sx);
+        obj.put("sy", sy);
+        obj.put("sz", sz);
+
+
         return obj;
     }
 
@@ -229,20 +236,27 @@ public abstract class Mesh {
             publishCoordinate();
     }
 
-    public void setCoordinates(float x, float y, float z, float rx, float ry, float rz, boolean publish) {
+    public void setCoordinates(float x, float y, float z, float rx, float ry, float rz, float sx, float sy, float sz, boolean publish) {
         setX(x, false);
         setY(y, false);
         setZ(z, false);
-        this.rx = rx;
-        this.ry = ry;
-        this.rz = rz;
+
+
+        setRx(rx, false);
+        setRy(ry, false);
+        setRz(rz, false);
+
+        setSx(sx, false);
+        setSy(sy, false);
+        setSz(sz, false);
+
         if (publish)
             publishCoordinate();
 
     }
 
-    public void setCoordinates(float x, float y, float z, float rx, float ry, float rz) {
-        setCoordinates(x, y, z, rx, ry, rz, true);
+    public void setCoordinates(float x, float y, float z, float rx, float ry, float rz, float sx, float sy, float sz) {
+        setCoordinates(x, y, z, rx, ry, rz, sx, sy, sz, true);
 
     }
 
@@ -412,24 +426,41 @@ public abstract class Mesh {
         return sx;
     }
 
-    public void setSx(float sx) {
+    public void setSx(float sx, boolean publish) {
         this.sx = sx;
+        if (publish)
+            publishCoordinate();
+    }
+    public void setSx(float sx) {
+        this.setSx(sx, true);
     }
 
     public float getSy() {
         return sy;
     }
 
-    public void setSy(float sy) {
+    public void setSy(float sy, boolean publish) {
         this.sy = sy;
+        if (publish)
+            publishCoordinate();
+    }
+
+    public void setSy(float sy) {
+        this.setSy(sy, true);
     }
 
     public float getSz() {
         return sz;
     }
 
-    public void setSz(float sz) {
+    public void setSz(float sz, boolean publish) {
         this.sz = sz;
+        if (publish)
+            publishCoordinate();
+    }
+
+    public void setSz(float sz) {
+        setSz(sz, true);
     }
 }
 
