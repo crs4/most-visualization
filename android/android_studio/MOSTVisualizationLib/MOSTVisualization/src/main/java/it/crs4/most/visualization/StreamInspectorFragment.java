@@ -151,64 +151,63 @@ public class StreamInspectorFragment extends Fragment {
         streamsView.setAdapter(this.streamsArrayAdapter);
 
 
-        streamsView.setOnItemClickListener(new OnItemClickListener() {
+        streamsView.setOnItemClickListener(
+            new OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view,
+                                        int position, long id) {
+                    Log.d(TAG, "SELECTED ITEM:" + String.valueOf(position));
+
+                    // Create and show the dialog.
+                    final IStream selectedStream = streamsArray.get(position - 1);
+
+                    // custom dialog
+                    final Dialog dialog = new Dialog(getActivity());
+                    dialog.setContentView(R.layout.istream_popup_editor);
 
 
-                                               @Override
-                                               public void onItemClick(AdapterView<?> parent, View view,
-                                                                       int position, long id) {
-                                                   Log.d(TAG, "SELECTED ITEM:" + String.valueOf(position));
+                    dialog.setTitle(selectedStream.getName() + " [" + selectedStream.getState() + "]");
 
-                                                   // Create and show the dialog.
-                                                   final IStream selectedStream = streamsArray.get(position - 1);
+                    final TextView txtErrorMsg = (TextView) dialog.findViewById(R.id.txtErrorMsg);
+                    txtErrorMsg.setText(selectedStream.getErrorMsg());
+                    txtErrorMsg.setTextColor(Color.RED);
 
-                                                   // custom dialog
-                                                   final Dialog dialog = new Dialog(getActivity());
-                                                   dialog.setContentView(R.layout.istream_popup_editor);
+                    final EditText txtUri = (EditText) dialog.findViewById(R.id.editUri);
+                    final String currentUri = selectedStream.getProperty(StreamProperty.URI).toString();
+                    txtUri.setText(currentUri);
+                    final EditText txtLatency = (EditText) dialog.findViewById(R.id.editLatency);
+                    final String currentLatency = selectedStream.getProperty(StreamProperty.LATENCY).toString();
+                    txtLatency.setText(currentLatency);
 
+                    Button butOk = (Button) dialog.findViewById(R.id.button_ok);
+                    // if button is clicked, close the custom dialog
+                    butOk.setOnClickListener(new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            StreamProperties props = new StreamProperties();
+                            props.add(StreamProperty.URI, txtUri.getText().toString());
+                            props.add(StreamProperty.LATENCY, txtLatency.getText().toString());
+                            selectedStream.commitProperties(props);
 
-                                                   dialog.setTitle(selectedStream.getName() + " [" + selectedStream.getState() + "]");
+                            dialog.dismiss();
+                        }
+                    });
 
-                                                   final TextView txtErrorMsg = (TextView) dialog.findViewById(R.id.txtErrorMsg);
-                                                   txtErrorMsg.setText(selectedStream.getErrorMsg());
-                                                   txtErrorMsg.setTextColor(Color.RED);
-
-                                                   final EditText txtUri = (EditText) dialog.findViewById(R.id.editUri);
-                                                   final String currentUri = selectedStream.getProperty(StreamProperty.URI).toString();
-                                                   txtUri.setText(currentUri);
-                                                   final EditText txtLatency = (EditText) dialog.findViewById(R.id.editLatency);
-                                                   final String currentLatency = selectedStream.getProperty(StreamProperty.LATENCY).toString();
-                                                   txtLatency.setText(currentLatency);
-
-                                                   Button butOk = (Button) dialog.findViewById(R.id.button_ok);
-                                                   // if button is clicked, close the custom dialog
-                                                   butOk.setOnClickListener(new OnClickListener() {
-                                                       @Override
-                                                       public void onClick(View v) {
-                                                           StreamProperties props = new StreamProperties();
-                                                           props.add(StreamProperty.URI, txtUri.getText().toString());
-                                                           props.add(StreamProperty.LATENCY, txtLatency.getText().toString());
-                                                           selectedStream.commitProperties(props);
-
-                                                           dialog.dismiss();
-                                                       }
-                                                   });
-
-                                                   Button butCancel = (Button) dialog.findViewById(R.id.button_cancel);
-                                                   // if button is clicked, close the custom dialog
-                                                   butCancel.setOnClickListener(new OnClickListener() {
-                                                       @Override
-                                                       public void onClick(View v) {
-                                                           Log.d(TAG, "Dialog operation cancelled");
-                                                           dialog.dismiss();
-                                                       }
-                                                   });
+                    Button butCancel = (Button) dialog.findViewById(R.id.button_cancel);
+                    // if button is clicked, close the custom dialog
+                    butCancel.setOnClickListener(new OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Log.d(TAG, "Dialog operation cancelled");
+                            dialog.dismiss();
+                        }
+                    });
 
 
-                                                   dialog.show();
+                    dialog.show();
 
-                                               }// end of onItemClick
-                                           }
+                }// end of onItemClick
+            }
 
         );
 

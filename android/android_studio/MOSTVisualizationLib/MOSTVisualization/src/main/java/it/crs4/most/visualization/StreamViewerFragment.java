@@ -137,6 +137,7 @@ public class StreamViewerFragment extends Fragment implements SurfaceHolder.Call
      * Set the stream visible
      */
     public void setStreamVisible() {
+        this.surfaceView.setVisibility(View.VISIBLE);
         this.streamCover.setVisibility(View.INVISIBLE);
     }
 
@@ -147,6 +148,7 @@ public class StreamViewerFragment extends Fragment implements SurfaceHolder.Call
      */
     public void setStreamInvisible(String message) {
         this.streamCover.setVisibility(View.VISIBLE);
+        this.surfaceView.setVisibility(View.GONE);
         this.txtHiddenSurface.setText(message);
     }
 
@@ -170,16 +172,13 @@ public class StreamViewerFragment extends Fragment implements SurfaceHolder.Call
         }
     }
 
-
-
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-
     }
 
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int format, int width, int height) {
-        synchronized (lock){
+        synchronized (lock) {
             this.height = height;
             this.width = width;
         }
@@ -190,13 +189,13 @@ public class StreamViewerFragment extends Fragment implements SurfaceHolder.Call
     }
 
     public Integer getHeight() {
-        synchronized (lock){
+        synchronized (lock) {
             return height;
         }
     }
 
     public Integer getWidth() {
-        synchronized (lock){
+        synchronized (lock) {
             return width;
         }
     }

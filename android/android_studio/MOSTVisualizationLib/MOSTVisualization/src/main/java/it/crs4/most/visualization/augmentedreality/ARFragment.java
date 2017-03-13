@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.pm.ConfigurationInfo;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
@@ -32,34 +31,36 @@ import it.crs4.most.visualization.augmentedreality.renderer.PubSubARRenderer;
 //import org.artoolkit.ar.base.rendering.Cube;
 
 
-public class ARFragment extends StreamViewerFragment implements
-    CameraEventListener {
+public class ARFragment extends StreamViewerFragment implements CameraEventListener {
 
     public static final String FRAGMENT_STREAM_ID_KEY = "stream_fragment_stream_id_key";
     private static final String TAG = "ARFragment";
+
     protected RemoteCaptureCameraPreview preview;
     protected IStream streamAR;
     protected String streamURI;
     protected PubSubARRenderer renderer;
+    private LinearLayout controlButtonLayout;
     private IStreamFragmentCommandListener cmdListener = null;
-    private SurfaceView surfaceView;
+    private OnCompleteListener mOnCompleteListener;
+    private SurfaceView streamSurfaceView;
+    private TouchGLSurfaceView glView;
     private View streamCover;
     private TextView txtHiddenSurface;
-    private boolean firstUpdate = false;
-    private Handler handler;
     private SurfaceHolder.Callback surfaceViewCallback;
     private SurfaceHolder.Callback glSurfaceViewCallback;
-    private TouchGLSurfaceView glView;
+    private boolean firstUpdate = false;
     private boolean playerButtonsVisible = true;
-    private OnCompleteListener mListener;
-    private int [] fixedSize;
+    private int[] fixedSize;
     private boolean enabled = true;
-    private LinearLayout controlButtonLayout;
     private String deviceID = null;
+
     public interface ARListener {
-        public void ARInitialized();
-        public void ARStopped();
+        void ARInitialized();
+
+        void ARStopped();
     }
+
     private ARListener arListener;
 
     public static ARFragment newInstance(String streamId) {
@@ -121,16 +122,16 @@ public class ARFragment extends StreamViewerFragment implements
         return getArguments().getString(FRAGMENT_STREAM_ID_KEY);
     }
 
-    @Override
     /**
      * @param activity: the activity attached to this fragment: it must implement the  {@link IStreamFragmentCommandListener} interface
      */
+    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         Log.d(TAG, "ON ATTACH STREAM VIEWER");
         this.cmdListener = (IStreamFragmentCommandListener) activity;
         try {
-            this.mListener = (OnCompleteListener) activity;
+            this.mOnCompleteListener = (OnCompleteListener) activity;
         }
         catch (final ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement OnCompleteListener");
@@ -142,7 +143,6 @@ public class ARFragment extends StreamViewerFragment implements
         super.onDetach();
         Log.d(TAG, "ON DETACH STREAM VIEWER");
         this.cmdListener.onSurfaceViewDestroyed(getStreamId());
-
     }
 
     @Override
@@ -151,10 +151,10 @@ public class ARFragment extends StreamViewerFragment implements
         Log.d(TAG, "ON CREATE_VIEW STREAM VIEWER");
         View rootView = inflater.inflate(R.layout.fragment_ar, container, false);
 
-        surfaceView = (SurfaceView) rootView.findViewById(R.id.remoteCameraPreview);
+        streamSurfaceView = (SurfaceView) rootView.findViewById(R.id.remoteCameraPreview);
 
         if (surfaceViewCallback != null) {
-            surfaceView.getHolder().addCallback(surfaceViewCallback);
+            streamSurfaceView.getHolder().addCallback(surfaceViewCallback);
         }
 
         glView = (TouchGLSurfaceView) rootView.findViewById(R.id.ARSurface);
@@ -164,11 +164,9 @@ public class ARFragment extends StreamViewerFragment implements
         glView.setRenderer(renderer);
         glView.setEnabled(isEnabled());
 
-        if (fixedSize != null){
-            surfaceView.getHolder().setFixedSize(fixedSize[0], fixedSize[1]);
+        if (fixedSize != null) {
+            streamSurfaceView.getHolder().setFixedSize(fixedSize[0], fixedSize[1]);
             glView.getHolder().setFixedSize(fixedSize[0], fixedSize[1]);
-
-
         }
 
         if (glSurfaceViewCallback != null) {
@@ -194,7 +192,7 @@ public class ARFragment extends StreamViewerFragment implements
                 ARFragment.this.cmdListener.onPause(getStreamId());
             }
         });
-        mListener.onFragmentCreate();
+        mOnCompleteListener.onFragmentCreate();
 
         preview = (RemoteCaptureCameraPreview) rootView.findViewById(R.id.remoteCameraPreview);
         Log.i(TAG, "RemoteCaptureCameraPreview created");
@@ -220,6 +218,7 @@ public class ARFragment extends StreamViewerFragment implements
      */
     public void setStreamVisible() {
         streamCover.setVisibility(View.INVISIBLE);
+        streamSurfaceView.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -228,8 +227,9 @@ public class ARFragment extends StreamViewerFragment implements
      * @param message an optional message to show instead of the stream
      */
     public void setStreamInvisible(String message) {
-        this.streamCover.setVisibility(View.VISIBLE);
-        this.txtHiddenSurface.setText(message);
+        streamCover.setVisibility(View.VISIBLE);
+        txtHiddenSurface.setText(message);
+        streamSurfaceView.setVisibility(View.GONE);
         getGlView().setEnabled(false);
     }
 
@@ -271,10 +271,10 @@ public class ARFragment extends StreamViewerFragment implements
         super.onResume();
         //setCmdListenerCallback();
 
-        surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
+        streamSurfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder surfaceHolder) {
-                ARFragment.this.cmdListener.onSurfaceViewCreated(getStreamId(), surfaceView);
+                ARFragment.this.cmdListener.onSurfaceViewCreated(getStreamId(), streamSurfaceView);
             }
 
             @Override
@@ -287,7 +287,7 @@ public class ARFragment extends StreamViewerFragment implements
 
             }
         });
-        mListener.onFragmentResume();
+        mOnCompleteListener.onFragmentResume();
     }
 
     @Override
@@ -295,7 +295,7 @@ public class ARFragment extends StreamViewerFragment implements
         Log.d(TAG, "cameraPreviewStarted!");
         if (!ARToolKit.getInstance().isRunning()) {
             if (ARToolKit.getInstance()
-                .initialiseAR(width, height, null, cameraIndex, cameraIsFrontFacing, deviceID)) {
+                    .initialiseAR(width, height, null, cameraIndex, cameraIsFrontFacing, deviceID)) {
                 firstUpdate = true;
                 if (arListener != null) {
                     arListener.ARInitialized();
