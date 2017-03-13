@@ -122,28 +122,21 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                         float diff;
                         switch (pinchAction){
                             case Z_MOVING:
-                                diff = currentScaleFactor < 1 ?-5f: 5f;
+                                diff = currentScaleFactor < 1 ? 0.95f: 1.05f;
                                 Log.d(TAG, "diff " + diff);
                                 mesh.setZ(mesh.getZ() + diff);
                                 break;
 
                             case SCALING:
+//                                float scale = currentScaleFactor < 1 ? currentScaleFactor/1.5f: currentScaleFactor*1.5f;
+                                float scale = mesh.getSx()* currentScaleFactor;
 
-                                if (!meshScaling.containsKey(mesh)) {
-                                    meshScaling.put(mesh, mesh.getSx());
-                                }
+                                if (mesh.getSx()* scale < 1)
+                                    scale = 1;
 
-                                diff = 0.1f;
-                                if (currentScaleFactor < 1)
-                                    diff = -1f * diff;
-
-                                float finalScaling = mesh.getSx() + diff;
-                                if (finalScaling < meshScaling.get(mesh))
-                                    finalScaling = meshScaling.get(mesh);
-
-                                Log.d(TAG, "finalScaling " + finalScaling);
-                                mesh.setSx(finalScaling);
-                                mesh.setSy(finalScaling);
+                                Log.d(TAG, "scale " + scale);
+                                mesh.setSx(scale);
+                                mesh.setSy(scale);
                                 break;
                         }
 
