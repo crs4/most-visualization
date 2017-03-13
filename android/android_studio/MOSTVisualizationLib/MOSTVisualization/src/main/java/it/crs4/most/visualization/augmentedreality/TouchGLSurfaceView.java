@@ -13,6 +13,7 @@ import android.view.ScaleGestureDetector;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +23,8 @@ import it.crs4.most.visualization.augmentedreality.mesh.MeshManager;
 import it.crs4.most.visualization.augmentedreality.renderer.PubSubARRenderer;
 import it.crs4.most.visualization.utils.zmq.ARSubscriber;
 import it.crs4.most.visualization.utils.zmq.IPublisher;
+
+import static it.crs4.most.visualization.augmentedreality.TouchGLSurfaceView.PINCH_ACTION.*;
 
 public class TouchGLSurfaceView extends GLSurfaceView {
     protected final float TOUCH_SCALE_FACTOR = 180.0f / 320;
@@ -43,8 +46,11 @@ public class TouchGLSurfaceView extends GLSurfaceView {
     protected ARSubscriber subscriber;
     protected IPublisher publisher;
     protected Handler handler;
-    protected boolean enableZmoving = false;
     protected boolean enableRendering = true;
+    enum PINCH_ACTION {Z_MOVING, SCALING, DISABLED};
+    protected PINCH_ACTION pinchAction = SCALING;
+    private Map<Mesh, Float> meshScaling = new HashMap<>();
+
 
     public TouchGLSurfaceView(Context context) {
         super(context);
@@ -105,7 +111,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
             new ScaleGestureDetector.SimpleOnScaleGestureListener() {
                 @Override
                 public boolean onScale(ScaleGestureDetector detector) {
-                    if (!isEnabled() || !isEnableZmoving()) {
+                    if (!isEnabled() || pinchAction == DISABLED) {
                         return false;
                     }
                     TouchGLSurfaceView.this.mScaling = true;
@@ -113,13 +119,35 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                     Log.d(TAG, "currentScaleFactor " + currentScaleFactor);
 
                     if (mesh != null) {
-                        if (currentScaleFactor < 1) {
-                            mesh.setZ(mesh.getZ() - 5f);
-                        }
-                        else {
-                            mesh.setZ(mesh.getZ() + 5f);
+                        float diff;
+                        switch (pinchAction){
+                            case Z_MOVING:
+                                diff = currentScaleFactor < 1 ?-5f: 5f;
+                                Log.d(TAG, "diff " + diff);
+                                mesh.setZ(mesh.getZ() + diff);
+                                break;
+
+                            case SCALING:
+
+                                if (!meshScaling.containsKey(mesh)) {
+                                    meshScaling.put(mesh, mesh.getSx());
+                                }
+
+                                diff = 0.1f;
+                                if (currentScaleFactor < 1)
+                                    diff = -1f * diff;
+
+                                float finalScaling = mesh.getSx() + diff;
+                                if (finalScaling < meshScaling.get(mesh))
+                                    finalScaling = meshScaling.get(mesh);
+
+                                Log.d(TAG, "finalScaling " + finalScaling);
+                                mesh.setSx(finalScaling);
+                                mesh.setSy(finalScaling);
+                                break;
                         }
 
+                        mesh.publishCoordinate();
                         requestRender();
                         return true;
                     }
@@ -256,12 +284,17 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                         }
                         if (mesh != null) {
                             mesh.setCoordinates(
-                                Float.valueOf(json.get("x").toString()),
-                                Float.valueOf(json.get("y").toString()),
-                                Float.valueOf(json.get("z").toString()),
-                                Float.valueOf(json.get("rx").toString()),
-                                Float.valueOf(json.get("ry").toString()),
-                                Float.valueOf(json.get("rz").toString())
+                                    Float.valueOf(json.get("x").toString()),
+                                    Float.valueOf(json.get("y").toString()),
+                                    Float.valueOf(json.get("z").toString()),
+
+                                    Float.valueOf(json.get("rx").toString()),
+                                    Float.valueOf(json.get("ry").toString()),
+                                    Float.valueOf(json.get("rz").toString()),
+
+                                    Float.valueOf(json.get("sx").toString()),
+                                    Float.valueOf(json.get("sy").toString()),
+                                    Float.valueOf(json.get("sz").toString())
                             );
                             requestRender();
                         }
@@ -323,14 +356,6 @@ public class TouchGLSurfaceView extends GLSurfaceView {
         }
     }
 
-    public boolean isEnableZmoving() {
-        return enableZmoving;
-    }
-
-    public void setEnableZmoving(boolean enableZmoving) {
-        this.enableZmoving = enableZmoving;
-    }
-
     public boolean isEnableRendering() {
         return enableRendering;
     }
@@ -353,5 +378,13 @@ public class TouchGLSurfaceView extends GLSurfaceView {
             }
             publisher.send(obj.toString());
         }
+    }
+
+    public PINCH_ACTION getPinchAction() {
+        return pinchAction;
+    }
+
+    public void setPinchAction(PINCH_ACTION pinchAction) {
+        this.pinchAction = pinchAction;
     }
 }
