@@ -23,6 +23,7 @@ public class MeshManager {
     private static int MARKERLESS_ID = -1000;
     private HashSet<Marker> markersAdded = new HashSet<>();
     private final static String TAG = "MESHMANAGER";
+    private boolean sceneConfigured = false;
 
     public void addMesh(Mesh mesh){
         meshes.put(mesh.getId(), mesh);
@@ -60,6 +61,12 @@ public class MeshManager {
     }
 
     public boolean configureScene(){
+        return configureScene(false);
+
+    }
+    public boolean configureScene(boolean force){
+        if (sceneConfigured && !force)
+            return true;
 
         int markerID;
         for (Mesh mesh : meshes.values()) {
@@ -95,6 +102,7 @@ public class MeshManager {
             }
 
         }
+        sceneConfigured = true;
         return true;
     }
 
