@@ -64,9 +64,19 @@ public class MeshManager {
         return configureScene(false);
 
     }
+
+    private void reset() {
+        markersAdded = new HashSet<>();
+        markersID = new HashMap<>();
+        markerToMeshes = new HashMap<>();
+    }
+
     public boolean configureScene(boolean force){
         if (sceneConfigured && !force)
             return true;
+
+        if (force)
+            reset();
 
         int markerID;
         for (Mesh mesh : meshes.values()) {

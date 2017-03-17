@@ -219,6 +219,9 @@ public class ARFragment extends StreamViewerFragment implements CameraEventListe
     public void setStreamVisible() {
         streamCover.setVisibility(View.INVISIBLE);
         streamSurfaceView.setVisibility(View.VISIBLE);
+        glView.setVisibility(View.VISIBLE);
+//        glView.setEnabled(true);
+        setEnabled(true);
     }
 
     /**
@@ -230,7 +233,9 @@ public class ARFragment extends StreamViewerFragment implements CameraEventListe
         streamCover.setVisibility(View.VISIBLE);
         txtHiddenSurface.setText(message);
         streamSurfaceView.setVisibility(View.GONE);
-        getGlView().setEnabled(false);
+//        getGlView().setEnabled(false);
+        setEnabled(false);
+        glView.setVisibility(View.GONE);
     }
 
     /**
@@ -321,14 +326,18 @@ public class ARFragment extends StreamViewerFragment implements CameraEventListe
         glView.setZOrderMediaOverlay(true);
     }
 
-    @Override
-    public void cameraPreviewStopped() {
+    public void stopAR(){
         if (isARRunning()) {
             ARToolKit.getInstance().cleanup();
             if (arListener != null) {
                 arListener.ARStopped();
             }
         }
+    }
+
+    @Override
+    public void cameraPreviewStopped() {
+        stopAR();
     }
 
     @Override
@@ -404,5 +413,9 @@ public class ARFragment extends StreamViewerFragment implements CameraEventListe
 
     public void setArListener(ARListener arListener) {
         this.arListener = arListener;
+    }
+
+    public RemoteCaptureCameraPreview getPreview() {
+        return preview;
     }
 }
