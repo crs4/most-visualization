@@ -117,6 +117,10 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
         return meshManager.configureScene();
     }
 
+    public boolean configureARScene(boolean force) {
+        return meshManager.configureScene(force);
+    }
+
     /**
      * Should be overridden in subclasses and used to perform rendering.
      */
@@ -233,6 +237,7 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
                         );
                         gl.glLoadMatrixf(finalModelMatrix, 0);
                         gl.glPushMatrix();
+                        Log.d(TAG, "drawing");
                         mesh.draw(gl);
                         gl.glPopMatrix();
 
