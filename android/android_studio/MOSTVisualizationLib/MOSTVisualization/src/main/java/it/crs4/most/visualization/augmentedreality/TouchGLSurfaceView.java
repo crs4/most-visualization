@@ -2,6 +2,7 @@ package it.crs4.most.visualization.augmentedreality;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -42,7 +43,8 @@ public class TouchGLSurfaceView extends GLSurfaceView {
     protected MeshManager meshManager;
     protected Mesh mesh;
     protected float moveNormFactor = 1;
-    protected int touchSamplingCounter = 0;
+    protected int moveSamplingCounter = 0;
+    protected int scaleSamplingCounter = 0;
     protected ARSubscriber subscriber;
     protected IPublisher publisher;
     protected Handler handler;
@@ -123,14 +125,11 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                         switch (pinchAction){
                             case Z_MOVING:
                                 diff = currentScaleFactor < 1 ? 0.95f: 1.05f;
-                                Log.d(TAG, "diff " + diff);
                                 mesh.setZ(mesh.getZ() + diff);
                                 break;
 
                             case SCALING:
-//                                float scale = currentScaleFactor < 1 ? currentScaleFactor/1.5f: currentScaleFactor*1.5f;
                                 float scale = mesh.getSx()* currentScaleFactor;
-
                                 if (mesh.getSx()* scale < 1)
                                     scale = 1;
 
@@ -139,8 +138,18 @@ public class TouchGLSurfaceView extends GLSurfaceView {
                                 mesh.setSy(scale);
                                 break;
                         }
+                        scaleSamplingCounter++;
+                        if (moveSamplingCounter % 3 == 0) {
+                            new AsyncTask<Mesh, Void, Void>() {
+                                @Override
+                                protected Void doInBackground(Mesh... meshes) {
+                                    mesh.publishCoordinate();
+                                    return null;
+                                }
+                            }.execute(mesh);
+                            moveSamplingCounter = 0;
+                        }
 
-                        mesh.publishCoordinate();
                         requestRender();
                         return true;
                     }
@@ -310,19 +319,25 @@ public class TouchGLSurfaceView extends GLSurfaceView {
     }
 
     protected void handleMove(float dx, float dy) {
-        touchSamplingCounter += 1;
-        Log.d(TAG, "Move");
+        moveSamplingCounter += 1;
+//        Log.d(TAG, "Move");
         float finalDx = mesh.getX() + dx;
         float finalDy = mesh.getY() - dy;
 
-//                            mesh.setX(finalDx < 1? (finalDx > -1? finalDx: -1): 1);
-//                            mesh.setY(finalDy < 1? (finalDy > -1? finalDy: -1): 1);
         mesh.setX(finalDx, false);
         mesh.setY(finalDy, false);
         requestRender();
-        if (touchSamplingCounter % 3 == 0) {
-            mesh.publishCoordinate();
+        if (moveSamplingCounter % 3 == 0) {
+            new AsyncTask<Mesh, Void, Void>() {
+                @Override
+                protected Void doInBackground(Mesh... meshes) {
+                    mesh.publishCoordinate();
+                    return null;
+                }
+            }.execute(mesh);
+            moveSamplingCounter = 0;
         }
+
 
     }
 
@@ -334,7 +349,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
             mMoving = false;
         }
 
-        touchSamplingCounter = 0;
+        moveSamplingCounter = 0;
         mesh.publishCoordinate();
 
     }
