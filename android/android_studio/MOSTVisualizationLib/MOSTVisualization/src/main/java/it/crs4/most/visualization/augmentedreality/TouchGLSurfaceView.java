@@ -36,7 +36,7 @@ public class TouchGLSurfaceView extends GLSurfaceView {
     protected Group meshGroup;
     private boolean mDrawing = false;
     private boolean mMoving = false;
-    protected boolean enabled = true;
+    protected boolean enabled = false;
     protected Mode mode = Mode.Move;
     protected ScaleGestureDetector mScaleDetector;
     protected boolean mScaling = false;

@@ -294,6 +294,8 @@ public class ARFragment extends StreamViewerFragment implements CameraEventListe
 
     public void startAR() {
         Log.d(TAG, "startAR()");
+        setEnabled(true);
+        glView.setVisibility(View.VISIBLE);
         if (!cameraInizialized) {
             arSTartPending = true;
             return;
@@ -400,8 +402,12 @@ public class ARFragment extends StreamViewerFragment implements CameraEventListe
             if (arListener != null) {
                 arListener.ARStopped();
             }
-            glView.requestRender();
+            this.setEnabled(false);
+
         }
+        glView.requestRender();
+        glView.setVisibility(View.GONE);
+
     }
 
     @Override
