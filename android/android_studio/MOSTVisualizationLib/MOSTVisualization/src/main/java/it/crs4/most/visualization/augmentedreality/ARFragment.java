@@ -57,6 +57,7 @@ public class ARFragment extends StreamViewerFragment implements CameraEventListe
     private boolean cameraIsFrontFacing;
     private boolean cameraInizialized = false;
     private boolean arSTartPending = false;
+    private boolean frameCallback = true;
 
     public RemoteCaptureCameraPreview getPreview() {
         return preview;
@@ -398,6 +399,7 @@ public class ARFragment extends StreamViewerFragment implements CameraEventListe
 
     @Override
     public void cameraPreviewFrame(byte[] frame) {
+        Log.d(TAG, String.format("cameraPreviewFrame stream %s, len frame %s", stream.getName(), frame.length));
         if (!isEnabled()) {
             return;
         }
@@ -467,6 +469,14 @@ public class ARFragment extends StreamViewerFragment implements CameraEventListe
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
         super.surfaceCreated(surfaceHolder);
-        stream.prepare(surfaceView, true);
+        stream.prepare(surfaceView, frameCallback);
+    }
+
+    public boolean isFrameCallback() {
+        return frameCallback;
+    }
+
+    public void setFrameCallback(boolean frameCallback) {
+        this.frameCallback = frameCallback;
     }
 }
