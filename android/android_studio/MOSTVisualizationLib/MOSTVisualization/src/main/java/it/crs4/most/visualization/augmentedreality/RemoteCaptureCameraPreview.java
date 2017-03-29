@@ -25,6 +25,8 @@ public class RemoteCaptureCameraPreview extends SurfaceView implements SurfaceHo
     private int captureRate;
     private FPSCounter fpsCounter = new FPSCounter();
     private CameraEventListener listener;
+    private int videoWidth;
+    private int videoHeight;
 
     public RemoteCaptureCameraPreview(Context context) {
         super(context);
@@ -72,7 +74,11 @@ public class RemoteCaptureCameraPreview extends SurfaceView implements SurfaceHo
     @Override
     public void frameReady(byte[] bytes) {
         if (this.listener != null) {
-            this.listener.cameraPreviewFrame(bytes);
+            float expectedBufferLenght = videoHeight*videoWidth*1.5f;
+            if (bytes.length == expectedBufferLenght)
+                this.listener.cameraPreviewFrame(bytes);
+            else
+                Log.d(TAG, String.format("frame size %s != %s, dropping", bytes.length, expectedBufferLenght));
         }
 
     }
@@ -89,6 +95,8 @@ public class RemoteCaptureCameraPreview extends SurfaceView implements SurfaceHo
 
     @Override
     public void onVideoChanged(int width, int height) {
+        videoWidth = width;
+        videoHeight = height;
         this.listener.cameraPreviewStarted(width, height, 25, 0, false);
     }
 
