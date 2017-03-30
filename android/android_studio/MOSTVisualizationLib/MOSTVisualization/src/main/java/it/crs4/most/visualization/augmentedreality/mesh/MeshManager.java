@@ -157,15 +157,24 @@ public class MeshManager {
 
     public List <Mesh> getMeshesByGroup(String group) {
         List <Mesh> result = new ArrayList<>();
-        for (HashMap.Entry<Integer, Marker> entry: markersID.entrySet()) {
-            String markerGroup = entry.getValue().getGroup();
-            if (markerGroup != null && markerGroup.equals(group)) {
-                result.addAll(markerToMeshes.get(entry.getKey()));
+
+        for (Mesh mesh: getMeshes()){
+            for (Marker marker: mesh.getMarkers()) {
+                if (marker.getGroup().equals(group)) {
+                    result.add(mesh);
+                    break;
+                }
             }
         }
-        if (result.size() == 0) {
-            Log.w(TAG, String.format("no mesh found for group %s, be sure it matches db side", group));
-        }
+//        for (HashMap.Entry<Integer, Marker> entry: markersID.entrySet()) {
+//            String markerGroup = entry.getValue().getGroup();
+//            if (markerGroup != null && markerGroup.equals(group)) {
+//                result.addAll(markerToMeshes.get(entry.getKey()));
+//            }
+//        }
+//        if (result.size() == 0) {
+//            Log.w(TAG, String.format("no mesh found for group %s, be sure it matches db side", group));
+//        }
         return result;
     }
 
