@@ -375,7 +375,6 @@ public class ARFragment extends StreamViewerFragment implements CameraEventListe
 //    }
 
     public void stopAR(){
-        if (isARRunning()) {
             ARToolKit.getInstance().cleanup();
             arSTartPending = false;
             arStarted = false;
@@ -384,8 +383,6 @@ public class ARFragment extends StreamViewerFragment implements CameraEventListe
                 arListener.ARStopped();
             }
 
-
-        }
         this.setEnabled(false);
         glView.requestRender();
         glView.setVisibility(View.GONE);
