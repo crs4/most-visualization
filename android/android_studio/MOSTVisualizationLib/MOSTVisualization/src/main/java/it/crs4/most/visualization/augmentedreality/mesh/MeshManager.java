@@ -23,6 +23,7 @@ public class MeshManager {
     private static int MARKERLESS_ID = -1000;
     private HashSet<Marker> markersAdded = new HashSet<>();
     private final static String TAG = "MESHMANAGER";
+    private boolean sceneConfigured = false;
 
     public void addMesh(Mesh mesh){
         meshes.put(mesh.getId(), mesh);
@@ -60,6 +61,22 @@ public class MeshManager {
     }
 
     public boolean configureScene(){
+        return configureScene(false);
+
+    }
+
+    private void reset() {
+        markersAdded = new HashSet<>();
+        markersID = new HashMap<>();
+        markerToMeshes = new HashMap<>();
+    }
+
+    public boolean configureScene(boolean force){
+        if (sceneConfigured && !force)
+            return true;
+
+        if (force)
+            reset();
 
         int markerID;
         for (Mesh mesh : meshes.values()) {
@@ -95,6 +112,7 @@ public class MeshManager {
             }
 
         }
+        sceneConfigured = true;
         return true;
     }
 
@@ -139,15 +157,24 @@ public class MeshManager {
 
     public List <Mesh> getMeshesByGroup(String group) {
         List <Mesh> result = new ArrayList<>();
-        for (HashMap.Entry<Integer, Marker> entry: markersID.entrySet()) {
-            String markerGroup = entry.getValue().getGroup();
-            if (markerGroup != null && markerGroup.equals(group)) {
-                result.addAll(markerToMeshes.get(entry.getKey()));
+
+        for (Mesh mesh: getMeshes()){
+            for (Marker marker: mesh.getMarkers()) {
+                if (marker.getGroup().equals(group)) {
+                    result.add(mesh);
+                    break;
+                }
             }
         }
-        if (result.size() == 0) {
-            Log.w(TAG, String.format("no mesh found for group %s, be sure it matches db side", group));
-        }
+//        for (HashMap.Entry<Integer, Marker> entry: markersID.entrySet()) {
+//            String markerGroup = entry.getValue().getGroup();
+//            if (markerGroup != null && markerGroup.equals(group)) {
+//                result.addAll(markerToMeshes.get(entry.getKey()));
+//            }
+//        }
+//        if (result.size() == 0) {
+//            Log.w(TAG, String.format("no mesh found for group %s, be sure it matches db side", group));
+//        }
         return result;
     }
 

@@ -1,6 +1,5 @@
 package it.crs4.most.visualization.augmentedreality;
 
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ConfigurationInfo;
@@ -19,6 +18,7 @@ import android.widget.TextView;
 import org.artoolkit.ar.base.ARToolKit;
 import org.artoolkit.ar.base.camera.CameraEventListener;
 
+import it.crs4.most.streaming.IEventListener;
 import it.crs4.most.streaming.IStream;
 import it.crs4.most.streaming.StreamProperties;
 import it.crs4.most.streaming.enums.StreamProperty;
@@ -37,13 +37,11 @@ public class ARFragment extends StreamViewerFragment implements CameraEventListe
     private static final String TAG = "ARFragment";
 
     protected RemoteCaptureCameraPreview preview;
-    protected IStream streamAR;
+    protected IStream stream;
     protected String streamURI;
     protected PubSubARRenderer renderer;
     private LinearLayout controlButtonLayout;
     private IStreamFragmentCommandListener cmdListener = null;
-    private OnCompleteListener mOnCompleteListener;
-    private SurfaceView streamSurfaceView;
     private TouchGLSurfaceView glView;
     private View streamCover;
     private TextView txtHiddenSurface;
@@ -54,6 +52,16 @@ public class ARFragment extends StreamViewerFragment implements CameraEventListe
     private int[] fixedSize;
     private boolean enabled = true;
     private String deviceID = null;
+    private boolean arStarted = false;
+    private int videoHeight, videoWidth, cameraIndex;
+    private boolean cameraIsFrontFacing;
+    private boolean cameraInizialized = false;
+    private boolean arSTartPending = false;
+    private boolean frameCallback = true;
+
+    public RemoteCaptureCameraPreview getPreview() {
+        return preview;
+    }
 
     public interface ARListener {
         void ARInitialized();
@@ -97,12 +105,36 @@ public class ARFragment extends StreamViewerFragment implements CameraEventListe
         this.streamURI = streamURI;
     }
 
-    public IStream getStreamAR() {
-        return streamAR;
+    public IStream getStream() {
+        return stream;
     }
 
-    public void setStreamAR(IStream streamAR) {
-        this.streamAR = streamAR;
+    public void setStream(IStream stream) {
+        this.stream = stream;
+        if (preview != null) {
+            preview.setStream(stream);
+        }
+        this.stream.addEventListener(new IEventListener() {
+            @Override
+            public void frameReady(byte[] bytes) {
+
+            }
+
+            @Override
+            public void onPlay() {
+
+            }
+
+            @Override
+            public void onPause() {
+
+            }
+
+            @Override
+            public void onVideoChanged(int width, int height) {
+                renderer.setViewportSize(width, height);
+            }
+        });
     }
 
     public PubSubARRenderer getRenderer() {
@@ -122,22 +154,6 @@ public class ARFragment extends StreamViewerFragment implements CameraEventListe
         return getArguments().getString(FRAGMENT_STREAM_ID_KEY);
     }
 
-    /**
-     * @param activity: the activity attached to this fragment: it must implement the  {@link IStreamFragmentCommandListener} interface
-     */
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        Log.d(TAG, "ON ATTACH STREAM VIEWER");
-        this.cmdListener = (IStreamFragmentCommandListener) activity;
-        try {
-            this.mOnCompleteListener = (OnCompleteListener) activity;
-        }
-        catch (final ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement OnCompleteListener");
-        }
-    }
-
     @Override
     public void onDetach() {
         super.onDetach();
@@ -151,10 +167,10 @@ public class ARFragment extends StreamViewerFragment implements CameraEventListe
         Log.d(TAG, "ON CREATE_VIEW STREAM VIEWER");
         View rootView = inflater.inflate(R.layout.fragment_ar, container, false);
 
-        streamSurfaceView = (SurfaceView) rootView.findViewById(R.id.remoteCameraPreview);
+        surfaceView = (SurfaceView) rootView.findViewById(R.id.remoteCameraPreview);
 
         if (surfaceViewCallback != null) {
-            streamSurfaceView.getHolder().addCallback(surfaceViewCallback);
+            surfaceView.getHolder().addCallback(surfaceViewCallback);
         }
 
         glView = (TouchGLSurfaceView) rootView.findViewById(R.id.ARSurface);
@@ -164,8 +180,11 @@ public class ARFragment extends StreamViewerFragment implements CameraEventListe
         glView.setRenderer(renderer);
         glView.setEnabled(isEnabled());
 
+        glView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+        glView.setZOrderMediaOverlay(true);
+
         if (fixedSize != null) {
-            streamSurfaceView.getHolder().setFixedSize(fixedSize[0], fixedSize[1]);
+            surfaceView.getHolder().setFixedSize(fixedSize[0], fixedSize[1]);
             glView.getHolder().setFixedSize(fixedSize[0], fixedSize[1]);
         }
 
@@ -192,11 +211,12 @@ public class ARFragment extends StreamViewerFragment implements CameraEventListe
                 ARFragment.this.cmdListener.onPause(getStreamId());
             }
         });
-        mOnCompleteListener.onFragmentCreate();
 
         preview = (RemoteCaptureCameraPreview) rootView.findViewById(R.id.remoteCameraPreview);
         Log.i(TAG, "RemoteCaptureCameraPreview created");
         preview.setCameraListener(this);
+        if (stream != null)
+            preview.setStream(stream);
 
         this.controlButtonLayout = (LinearLayout) rootView.findViewById(R.id.control_button_layout);
         this.controlButtonLayout.setVisibility(playerButtonsVisible ? View.VISIBLE : View.INVISIBLE);
@@ -218,7 +238,7 @@ public class ARFragment extends StreamViewerFragment implements CameraEventListe
      */
     public void setStreamVisible() {
         streamCover.setVisibility(View.INVISIBLE);
-        streamSurfaceView.setVisibility(View.VISIBLE);
+        surfaceView.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -229,7 +249,7 @@ public class ARFragment extends StreamViewerFragment implements CameraEventListe
     public void setStreamInvisible(String message) {
         streamCover.setVisibility(View.VISIBLE);
         txtHiddenSurface.setText(message);
-        streamSurfaceView.setVisibility(View.GONE);
+        surfaceView.setVisibility(View.GONE);
         getGlView().setEnabled(false);
     }
 
@@ -253,100 +273,144 @@ public class ARFragment extends StreamViewerFragment implements CameraEventListe
         }
     }
 
-    public boolean isARRunning() {
-        return ARToolKit.getInstance().isRunning();
-    }
-
-    private void setProperties() {
-        StreamProperties sp = new StreamProperties();
-        sp.add(StreamProperty.URI, streamURI);
-        if (!streamAR.commitProperties(sp)) {
-            Log.e(TAG, "failed setting stream properties");
-            throw new RuntimeException("failed setting stream properties");
+    public void startAR() {
+        Log.d(TAG, "startAR()");
+        setEnabled(true);
+        glView.setVisibility(View.VISIBLE);
+        if (!cameraInizialized) {
+            arSTartPending = true;
+            return;
         }
-    }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        //setCmdListenerCallback();
+        if (!arStarted) {
+            initARToolkit();
 
-        streamSurfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
-            @Override
-            public void surfaceCreated(SurfaceHolder surfaceHolder) {
-                ARFragment.this.cmdListener.onSurfaceViewCreated(getStreamId(), streamSurfaceView);
-            }
-
-            @Override
-            public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-
-            }
-        });
-        mOnCompleteListener.onFragmentResume();
-    }
-
-    @Override
-    public void cameraPreviewStarted(int width, int height, int rate, int cameraIndex, boolean cameraIsFrontFacing) {
-        Log.d(TAG, "cameraPreviewStarted!");
-        if (!ARToolKit.getInstance().isRunning()) {
-            if (ARToolKit.getInstance()
-                    .initialiseAR(width, height, null, cameraIndex, cameraIsFrontFacing, deviceID)) {
+            arStarted = ARToolKit.getInstance()
+                    .initialiseAR(videoWidth, videoHeight, null, cameraIndex, cameraIsFrontFacing, deviceID);
+            if (arStarted) {
                 firstUpdate = true;
+                arSTartPending = false;
+                renderer.configureARScene(true);
+
                 if (arListener != null) {
                     arListener.ARInitialized();
                 }
             }
             else {
-                Log.e(TAG, "getGLView(): Error initialising camera. Cannot continue.");
+                Log.e(TAG, "Error initialiseAR.");
             }
+        }
+
+    }
+
+    private void initARToolkit() {
+        Log.d(TAG, "initARToolkit()");
+        if (!ARToolKit.getInstance().nativeInitialised()) {
+            ARToolKit.getInstance().initialiseNative(getActivity().getCacheDir().getAbsolutePath());
+        }
+
+    }
+
+    public boolean isARRunning() {
+        return ARToolKit.getInstance().isRunning() && arStarted;
+    }
+
+    private void setProperties() {
+        StreamProperties sp = new StreamProperties();
+        sp.add(StreamProperty.URI, streamURI);
+        if (!stream.commitProperties(sp)) {
+            Log.e(TAG, "failed setting stream properties");
+            throw new RuntimeException("failed setting stream properties");
         }
     }
 
-    private void prepareAR() {
-        ARToolKit.getInstance().initialiseNative(getActivity().getCacheDir().getAbsolutePath());
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        //setCmdListenerCallback();
+//
+//        surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
+//            @Override
+//            public void surfaceCreated(SurfaceHolder surfaceHolder) {
+//                ARFragment.this.cmdListener.onSurfaceViewCreated(getStreamId(), surfaceView);
+//            }
+//
+//            @Override
+//            public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
+//
+//            }
+//
+//            @Override
+//            public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+//
+//            }
+//        });
+//        mOnCompleteListener.onFragmentResume();
+//    }
+
+    @Override
+    public void cameraPreviewStarted(int width, int height, int rate, int cameraIndex, boolean cameraIsFrontFacing) {
+        Log.d(TAG, "cameraPreviewStarted");
+        videoHeight = height;
+        videoWidth = width;
+        this.cameraIndex = cameraIndex;
+        this.cameraIsFrontFacing = cameraIsFrontFacing;
+        cameraInizialized = true;
+        if (arSTartPending)
+            startAR();
     }
 
-    public void prepareRemoteAR() {
-        prepareAR();
+//    private void prepareAR() {
+//        Log.d(TAG, "prepareAR");
+//        if (!isARRunning())
+//            arStarted = ARToolKit.getInstance().initialiseNative(getActivity().getCacheDir().getAbsolutePath());
+//    }
+//
+//    public void prepareRemoteAR() {
+////        prepareAR();
+//
+////        stream.addFrameListener(preview);
+//        glView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+//        glView.setZOrderMediaOverlay(true);
+//    }
 
-        streamAR.addFrameListener(preview);
-//        glView.setRenderer(renderer);
-//        glView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
-        glView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
-        glView.setZOrderMediaOverlay(true);
+    public void stopAR(){
+            ARToolKit.getInstance().cleanup();
+            arSTartPending = false;
+            arStarted = false;
+            firstUpdate = true;
+            if (arListener != null) {
+                arListener.ARStopped();
+            }
+
+        this.setEnabled(false);
+        glView.requestRender();
+        glView.setVisibility(View.GONE);
+
     }
 
     @Override
     public void cameraPreviewStopped() {
-        if (isARRunning()) {
-            ARToolKit.getInstance().cleanup();
-            if (arListener != null) {
-                arListener.ARStopped();
-            }
-        }
+        stopAR();
     }
 
     @Override
     public void cameraPreviewFrame(byte[] frame) {
+        Log.d(TAG, String.format("cameraPreviewFrame stream %s, len frame %s", stream.getName(), frame.length));
         if (!isEnabled()) {
             return;
         }
 
-        if (this.firstUpdate) {
-            if (this.renderer.configureARScene()) {
-                Log.i(TAG, "cameraPreviewFrame(): Scene configured successfully");
-            }
-            else {
-                Log.e(TAG, "cameraPreviewFrame(): Error configuring scene. Cannot continue.");
-            }
-
-            this.firstUpdate = false;
-        }
+//        if (this.firstUpdate) {
+//            if (this.renderer.configureARScene()) {
+//                Log.i(TAG, "cameraPreviewFrame(): Scene configured successfully");
+//            }
+//            else {
+//                Log.e(TAG, "cameraPreviewFrame(): Error configuring scene. Cannot continue.");
+//            }
+//
+//            this.firstUpdate = false;
+//        }
 
         if (ARToolKit.getInstance().convertAndDetect(frame)) {
             if (this.glView != null) {
@@ -356,15 +420,8 @@ public class ARFragment extends StreamViewerFragment implements CameraEventListe
 //            this.onFrameProcessed();
         }
         else {
-            Log.d(TAG, "no marker found, sorry");
+            Log.d(TAG, String.format("no marker found in %s, sorry", stream.getName()));
         }
-
-    }
-
-    public static interface OnCompleteListener {
-        public abstract void onFragmentCreate();
-
-        public abstract void onFragmentResume();
 
     }
 
@@ -404,5 +461,19 @@ public class ARFragment extends StreamViewerFragment implements CameraEventListe
 
     public void setArListener(ARListener arListener) {
         this.arListener = arListener;
+    }
+
+    @Override
+    public void surfaceCreated(SurfaceHolder surfaceHolder) {
+        super.surfaceCreated(surfaceHolder);
+        stream.prepare(surfaceView, frameCallback);
+    }
+
+    public boolean isFrameCallback() {
+        return frameCallback;
+    }
+
+    public void setFrameCallback(boolean frameCallback) {
+        this.frameCallback = frameCallback;
     }
 }

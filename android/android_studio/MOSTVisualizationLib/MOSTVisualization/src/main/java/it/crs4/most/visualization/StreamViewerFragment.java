@@ -14,6 +14,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -26,6 +27,7 @@ import android.widget.TextView;
 
 import it.crs4.most.streaming.IStream;
 import it.crs4.most.streaming.utils.Size;
+import it.crs4.most.visualization.augmentedreality.ARFragment;
 
 /**
  * This fragment represents a visual container for an {@link IStream}. It can be attached to any Activity, provided that it implements the {@link IStreamFragmentCommandListener} interface.
@@ -37,7 +39,7 @@ public class StreamViewerFragment extends Fragment implements SurfaceHolder.Call
     private static final String TAG = "StreamViewerFragment";
 
     private IStreamFragmentCommandListener cmdListener = null;
-    private SurfaceView surfaceView = null;
+    protected SurfaceView surfaceView = null;
     private View streamCover = null;
     private TextView txtHiddenSurface = null;
     private boolean playerButtonsVisible = true;
@@ -47,6 +49,14 @@ public class StreamViewerFragment extends Fragment implements SurfaceHolder.Call
     private Integer width;
     private Integer height;
     private Object lock = new Object();
+
+    public static interface OnCompleteListener {
+        public abstract void onFragmentCreate();
+
+        public abstract void onFragmentResume();
+
+    }
+    protected OnCompleteListener mOnCompleteListener;
 
     /**
      * Intances a new StreamViewerFragment
@@ -73,7 +83,34 @@ public class StreamViewerFragment extends Fragment implements SurfaceHolder.Call
     public void onActivityCreated(Bundle bundle) {
         super.onActivityCreated(bundle);
         setPlayerButtonsVisible(this.playerButtonsVisible);
-        StreamViewerFragment.this.cmdListener.onSurfaceViewCreated(getStreamId(), this.surfaceView);
+//        StreamViewerFragment.this.cmdListener.onSurfaceViewCreated(getStreamId(), this.surfaceView);
+    }
+
+
+    @Override
+    public void onResume() {
+        Log.d(TAG, "onResume");
+        super.onResume();
+        //setCmdListenerCallback();
+        surfaceView.getHolder().addCallback(this);
+//        surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
+//            @Override
+//            public void surfaceCreated(SurfaceHolder surfaceHolder) {
+//
+//                cmdListener.onSurfaceViewCreated(getStreamId(), surfaceView);
+//            }
+//
+//            @Override
+//            public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
+//
+//            }
+//
+//            @Override
+//            public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+//
+//            }
+//        });
+        mOnCompleteListener.onFragmentResume();
     }
 
     @Override
@@ -83,6 +120,13 @@ public class StreamViewerFragment extends Fragment implements SurfaceHolder.Call
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         this.cmdListener = (IStreamFragmentCommandListener) activity;
+        try {
+            this.mOnCompleteListener = (OnCompleteListener) activity;
+        }
+        catch (final ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement OnCompleteListener");
+        }
+
     }
 
     @Override
@@ -99,7 +143,7 @@ public class StreamViewerFragment extends Fragment implements SurfaceHolder.Call
         this.streamCover = rootView.findViewById(R.id.hide_container);
         this.txtHiddenSurface = (TextView) rootView.findViewById(R.id.txt_hidden_surface);
 
-        surfaceView.getHolder().addCallback(this);
+//        surfaceView.getHolder().addCallback(this);
 
         this.butPlay = (ImageButton) rootView.findViewById(R.id.button_play);
         this.butPlay.setOnClickListener(new OnClickListener() {
@@ -126,6 +170,7 @@ public class StreamViewerFragment extends Fragment implements SurfaceHolder.Call
         }
         this.controlButtonLayout.setLayoutParams(layoutParams);
 
+        mOnCompleteListener.onFragmentCreate();
         return rootView;
     }
 
@@ -174,6 +219,7 @@ public class StreamViewerFragment extends Fragment implements SurfaceHolder.Call
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
+        cmdListener.onSurfaceViewCreated(getStreamId(), surfaceView);
     }
 
     @Override
