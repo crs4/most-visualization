@@ -396,7 +396,7 @@ public class ARFragment extends StreamViewerFragment implements CameraEventListe
 
     @Override
     public void cameraPreviewFrame(byte[] frame) {
-        Log.d(TAG, String.format("cameraPreviewFrame stream %s, len frame %s", stream.getName(), frame.length));
+//        Log.d(TAG, String.format("cameraPreviewFrame stream %s, len frame %s", stream.getName(), frame.length));
         if (!isEnabled()) {
             return;
         }

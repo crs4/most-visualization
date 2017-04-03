@@ -237,7 +237,6 @@ public class PubSubARRenderer extends ARRenderer implements Handler.Callback {
                         );
                         gl.glLoadMatrixf(finalModelMatrix, 0);
                         gl.glPushMatrix();
-                        Log.d(TAG, "drawing");
                         mesh.draw(gl);
                         gl.glPopMatrix();
 
