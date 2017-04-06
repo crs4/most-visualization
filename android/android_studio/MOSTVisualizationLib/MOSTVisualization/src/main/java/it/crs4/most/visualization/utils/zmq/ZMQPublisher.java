@@ -53,10 +53,16 @@ public class ZMQPublisher implements Runnable, IPublisher, Serializable {
 
         @Override
         protected Void doInBackground(String... messages) {
-            for (String msg : messages) {
-                Log.d(TAG, "sending msg " + msg);
-                publisher.send(msg);
+            try{
+                for (String msg : messages) {
+                    Log.d(TAG, "sending msg " + msg);
+                    publisher.send(msg);
+                }
             }
+            catch (org.zeromq.ZMQException ex) {
+                ex.printStackTrace();
+            }
+
             return null;
         }
     }
