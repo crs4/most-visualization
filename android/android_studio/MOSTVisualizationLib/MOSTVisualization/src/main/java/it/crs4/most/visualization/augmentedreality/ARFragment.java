@@ -158,6 +158,7 @@ public class ARFragment extends StreamViewerFragment implements CameraEventListe
     public void onDetach() {
         super.onDetach();
         Log.d(TAG, "ON DETACH STREAM VIEWER");
+        if (this.cmdListener != null)
         this.cmdListener.onSurfaceViewDestroyed(getStreamId());
     }
 
