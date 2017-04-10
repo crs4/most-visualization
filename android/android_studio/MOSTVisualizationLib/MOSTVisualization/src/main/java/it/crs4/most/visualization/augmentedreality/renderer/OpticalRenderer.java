@@ -1,6 +1,7 @@
 package it.crs4.most.visualization.augmentedreality.renderer;
 
 import android.content.Context;
+import android.opengl.Matrix;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -37,13 +38,13 @@ public class OpticalRenderer extends PubSubARRenderer {
     }
 
     private void drawLeft(GL10 gl) {
-        gl.glViewport(0, 0, 960 / 2, 436);
+        gl.glViewport(0, 0, width/ 2, height);
         float [] model = mOpticalARToolkit.getEyeLmodel();
         basicDraw(gl, mOpticalARToolkit.getEyeLproject(), mOpticalARToolkit.getEyeLmodel());
     }
 
     private void drawRight(GL10 gl) {
-        gl.glViewport(960 / 2, 0, 960 / 2, 436);
+        gl.glViewport(width/ 2, 0, width/ 2, height);
         basicDraw(gl, mOpticalARToolkit.getEyeRproject(), mOpticalARToolkit.getEyeRmodel());
     }
 
