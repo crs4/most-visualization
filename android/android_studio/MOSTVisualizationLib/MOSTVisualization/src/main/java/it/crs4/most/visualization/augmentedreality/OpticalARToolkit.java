@@ -51,8 +51,8 @@ public class OpticalARToolkit {
 //        eyeLmodel[13] += 5.4715576 + 8.252686;
 //        eyeRmodel[12] += -2.8583984;
 //        eyeRmodel[13] += 22.968475;
-//        eyeLmodel[12] = eyeRmodel[12] + 15.921417f;
-//        eyeLmodel[13] = eyeRmodel[13];
+        eyeLmodel[12] = eyeRmodel[12] + 8.8f;
+        eyeLmodel[13] = eyeRmodel[13] + 3;
 
 //        eyeRproject[5] += eyeRproject[5]*0.3;
 //        eyeLproject[5] = eyeRproject[5];
