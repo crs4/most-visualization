@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <string name="app_name">PTZ_GalleryActivityExample</string>
-    <string name="mnu_exit">Exit</string>
-	<string name="gallery_mode">Gallery View</string>
-	<string name="streaming_mode">Streaming View</string>
-</resources>
