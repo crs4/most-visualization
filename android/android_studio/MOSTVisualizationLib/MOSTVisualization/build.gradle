@@ -1,0 +1,96 @@
+apply plugin: 'com.android.model.library'
+apply plugin: 'maven-publish'
+
+model {
+    android {
+        compileSdkVersion = 21
+        buildToolsVersion = "21.1.2"
+
+        defaultConfig.with {
+            minSdkVersion.apiLevel = 15
+            targetSdkVersion.apiLevel = 21
+            versionCode = 1
+            versionName = "1.0"
+
+        }
+        repositories {
+            mavenLocal()
+        }
+        sources {
+            main {
+                jniLibs {
+                    source {
+                        srcDirs = []
+                    }
+                }
+            }
+        }
+        buildTypes {
+            release {
+                minifyEnabled = false
+                proguardFiles.add(file('proguard-rules.pro'))
+            }
+        }
+    }
+}
+
+def getProp(prop) {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    def property_val = properties.getProperty(prop, null)
+    if (property_val == null)
+        throw new GradleException("Property not found " + prop + ". You must set it in local.properties file")
+    return property_val
+}
+
+task ndkBuild(type: Exec, description: 'Compile JNI source via NDK') {
+    def ndkDir = getProp("ndk.dir")
+    def artoolkitRoot = getProp("artoolkit.dir")
+    environment "ARTOOLKIT_HOME", artoolkitRoot
+    commandLine "$ndkDir/ndk-build", 'V=1',
+            'NDK_PROJECT_PATH=build',
+            'NDK_APPLICATION_MK=src/main/jni/Application.mk',
+            'APP_BUILD_SCRIPT=src/main/jni/Android.mk',
+            'NDK_LIBS_OUT=src/main/jniLibs'
+}
+
+task removeSo(type: Exec) {
+    commandLine 'rm', 'src/main/jniLibs/armeabi/libARWrapper.so', 'src/main/jniLibs/armeabi/libc++_shared.so'
+}
+
+tasks.withType(JavaCompile) {
+    compileTask -> compileTask.dependsOn ndkBuild
+}
+
+tasks.withType(JavaCompile) {
+    compileTask -> compileTask.dependsOn removeSo
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'it.crs4.most.streaming:MOSTStreaming:1.0'
+    compile project(':aRBaseLib')
+    compile 'com.android.support:appcompat-v7:21.0.2'
+    compile 'com.android.support:support-v4:21.0.2'
+    testCompile 'junit:junit:4.12'
+    compile 'org.zeromq:jeromq:0.3.2@jar'
+    compile 'com.jjoe64:graphview:4.2.1'
+}
+
+
+publishing {
+    repositories {
+        maven {
+            url mavenLocal().url
+        }
+    }
+    publications {
+        aar(MavenPublication) {
+            groupId 'it.crs4.most.visualization'
+            version = '1.0'
+            artifactId 'MOSTVisualization'
+            artifact("build/outputs/aar/MOSTVisualization-debug.aar")
+
+        }
+    }
+}
